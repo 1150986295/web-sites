@@ -205,6 +205,34 @@ button{font-family:inherit; cursor:pointer; border:0}
 #errPanel .row .t{font-size:11.5px;color:var(--ink-3)}
 #errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;
   background:var(--accent);color:#fff;font-size:14px;cursor:pointer}
+/* ---------- 八、桌面端布局（≥768px）：底tab → 左侧边栏，DOM零改动 ---------- */
+@media (min-width: 768px){
+  /* 壳改 grid：左列侧边栏，右上顶栏，右下内容；移动端样式全部原样保留 */
+  .app{display:grid; grid-template-columns:216px 1fr; grid-template-rows:60px 1fr}
+  /* 侧边栏：原底部 tabbar 竖起来 */
+  .tabbar{grid-column:1; grid-row:1 / 3; flex-direction:column; justify-content:flex-start;
+    gap:4px; padding:var(--sp-2) var(--sp-1); box-shadow:1px 0 0 var(--line); z-index:900}
+  .tabbar .tab{flex:0 0 auto; flex-direction:row; justify-content:flex-start; gap:10px;
+    padding:11px 14px; border-radius:12px; font-size:var(--fs-sub); margin:0 2px}
+  .tabbar .tab .ico{font-size:19px}
+  .tabbar .tab.on{background:rgba(74,107,87,.12)}
+  /* 顶栏/内容都挪到右列 */
+  .topbar{grid-column:2; grid-row:1; padding-left:var(--sp-3); padding-right:var(--sp-3)}
+  .topbar .ttl{font-size:22px}
+  .content{grid-column:2; grid-row:2}
+  /* 内容限宽居中 + 加呼吸感，长文在宽屏不拉面条 */
+  .view{max-width:860px; width:100%; margin:0 auto; padding:var(--sp-3) var(--sp-3) var(--sp-4)}
+  /* 弹层从"贴底"升级为"居中对话框" */
+  .sheet{left:50%; right:auto; bottom:auto; top:50%; transform:translate(-50%,-50%);
+    width:460px; max-height:min(80vh, 640px); border-radius:var(--r-l)}
+  .mask{background:rgba(46,42,36,.5)}
+  /* 红点/错误面板：贴底位置跟着布局改到右下 */
+  #errDot{bottom:24px; right:24px}
+  #errPanel{left:auto; right:24px; bottom:80px; width:520px; max-width:calc(100vw - 280px)}
+  #toast{bottom:32px}
+  /* 硬编码浅色微调统一走令牌兜底：输入框聚焦底色在深色端用卡色 */
+  .field input:focus,.field textarea:focus{background:var(--card)}
+}
 </style>
 </head>
 <body>

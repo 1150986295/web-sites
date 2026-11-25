@@ -7,9 +7,9 @@
 <title>兰亭·竞墨 · 兰亭书画协会赛事平台</title>
 <style>
 /* 彩蛋·内嵌书法字体（已子集化，仅名言用字，共约105KB）：不依赖用户设备 */
-@font-face{font-family:"ZhiMangXing";src:url("/static/fonts/ZhiMangXing.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"MaShanZheng";src:url("/static/fonts/MaShanZheng.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"ChunJieKai";src:url("/static/fonts/ChunJieKai.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"ZhiMangXing";src:url("./fonts/ZhiMangXing.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"MaShanZheng";src:url("./fonts/MaShanZheng.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"ChunJieKai";src:url("./fonts/ChunJieKai.woff2") format("woff2");font-display:swap}
 :root{
   /* 品牌与主色 */
   --paper:#f7f2e8; --paper2:#fffdf8; --white:#fff;
@@ -326,7 +326,7 @@ body{
 #app.fest-on.fest-page.fest-spring .deco-spring{display:block}
 /* 春季·水墨垂柳：真实水墨插画素材（透明底），从顶部左上垂落，随风轻摆 */
 .willow-art{position:absolute;top:-10px;left:-30px;width:78%;max-width:420px;aspect-ratio:1;
-  background:url("/static/fest/spring-willow.png") no-repeat top left/contain;
+  background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/spring-willow.png?sharecode=HIDHQJKOUU" no-repeat top left/contain;
   transform-origin:top left;animation:willowSway ease-in-out infinite alternate;opacity:.9}
 @keyframes willowSway{from{transform:rotate(-1.5deg)}to{transform:rotate(1.5deg)}}
 /* 春季·飞燕掠过：SVG 剪影，横向飞过并略有起伏 */
@@ -338,7 +338,7 @@ body{
 /* 秋季·南飞雁阵：真实水墨插画素材（透明底），画面右上斜飞，缓慢飘移 */
 #app.fest-on.fest-page.fest-autumn .deco-autumn{display:block}
 .geese-art{position:absolute;top:16%;right:0;width:46%;max-width:280px;aspect-ratio:1024/450;
-  background:url("/static/fest/autumn-geese.png") no-repeat top right/contain;
+  background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/autumn-geese.png?sharecode=HIDHQJKOUU" no-repeat top right/contain;
   animation:geeseFly ease-in-out infinite alternate;opacity:.82}
 @keyframes geeseFly{from{transform:translate3d(-8px,4px,0)}to{transform:translate3d(10px,-8px,0)}}
 /* 秋季·淡月：CSS 圆月 + 柔和月晕，左上点缀，不抢雁阵 */
@@ -354,7 +354,7 @@ body{
   box-shadow:0 0 0 1px rgba(170,135,70,.12),0 0 22px rgba(226,198,140,.5),0 0 46px rgba(226,198,140,.28);
   opacity:.62;animation:moonBreathe ease-in-out infinite alternate}
 .rabbit-art{position:absolute;bottom:-2px;right:-2px;width:136px;aspect-ratio:820/610;
-  background:url("/static/fest/midautumn-rabbit.png") no-repeat bottom right/contain;
+  background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/midautumn-rabbit.png?sharecode=HIDHQJKOUU" no-repeat bottom right/contain;
   animation:rabbitFloat ease-in-out infinite alternate;opacity:.88}
 @keyframes rabbitFloat{from{transform:translate3d(0,3px,0)}to{transform:translate3d(0,-5px,0)}}
 /* 元旦·红梅远山：真实水墨插画（透明底），移到目录页「每日名言」区做底层点缀（报名页无此容器，不再压卡片/表单）；z-index 在书法下层不挡字。
@@ -362,7 +362,7 @@ body{
 #app.fest-on.fest-page.fest-newyearday .daily-quote .deco-newyearday{display:block}
 /* 四周渐隐：顶部淡出烟花、左右消除裁切硬边、底部溶入纸底，只留山水红梅淡淡伸向远方；书法仍在上层 */
 .newyear-art{position:absolute;top:-6px;right:24px;width:88%;max-width:340px;aspect-ratio:820/774;
-  background:image-set(url("/static/fest/newyear-firework-plum.webp") type("image/webp"),url("/static/fest/newyear-firework-plum.png") type("image/png")) no-repeat top right/contain;
+  background:image-set(url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/newyear-firework-plum.webp?sharecode=HIDHQJKOUU" type("image/webp"),url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/newyear-firework-plum.png?sharecode=HIDHQJKOUU" type("image/png")) no-repeat top right/contain;
   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0%,transparent 30%,#000 46%,#000 84%,transparent 100%);
   -webkit-mask-composite:source-in;
   mask-image:linear-gradient(90deg,transparent 0%,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0%,transparent 30%,#000 46%,#000 84%,transparent 100%);
@@ -382,19 +382,19 @@ body{
   mask-image:radial-gradient(ellipse 74% 68% at 50% 50%,#000 40%,transparent 92%)}
 /* 夏·荷塘：右下淡入 */
 #app.fest-on.fest-page.fest-summer .deco-summer{display:block}
-.deco-summer .summer-art{background:url("/static/fest/summer-deco.webp?v=2") no-repeat right bottom/contain;
+.deco-summer .summer-art{background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/summer-deco.webp?v=2&sharecode=HIDHQJKOUU" no-repeat right bottom/contain;
   opacity:.72;filter:saturate(.85);transform-origin:right bottom;animation:seasonFloatA ease-in-out infinite alternate}
 /* 春节·红梅爆竹：右上淡入 */
 #app.fest-on.fest-page.fest-newyear .deco-newyear{display:block}
-.deco-newyear .newyear-spring-art{background:url("/static/fest/newyear-deco.webp?v=2") no-repeat right top/contain;
+.deco-newyear .newyear-spring-art{background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/newyear-deco.webp?v=2&sharecode=HIDHQJKOUU" no-repeat right top/contain;
   opacity:.68;filter:saturate(.88);transform-origin:right top;animation:seasonFloatB ease-in-out infinite alternate}
 /* 端午·龙舟艾草：左下淡入 */
 #app.fest-on.fest-page.fest-dragon .deco-dragon{display:block}
-.deco-dragon .dragon-art{background:url("/static/fest/dragon-deco.webp?v=2") no-repeat left bottom/contain;
+.deco-dragon .dragon-art{background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/dragon-deco.webp?v=2&sharecode=HIDHQJKOUU" no-repeat left bottom/contain;
   opacity:.72;filter:saturate(.85);transform-origin:left bottom;animation:seasonFloatA ease-in-out infinite alternate;animation-duration:14s}
 /* 国庆·华表牡丹：左上淡入 */
 #app.fest-on.fest-page.fest-national .deco-national{display:block}
-.deco-national .national-art{background:url("/static/fest/national-deco.webp?v=2") no-repeat left top/contain;
+.deco-national .national-art{background:url("https://a1c41f510e5990816.app.workbuddy.host/static/fest/national-deco.webp?v=2&sharecode=HIDHQJKOUU" no-repeat left top/contain;
   opacity:.68;filter:saturate(.85);transform-origin:left top;animation:seasonFloatB ease-in-out infinite alternate;animation-duration:15s}
 @keyframes seasonFloatA{from{transform:translate3d(0,4px,0) scale(1)}to{transform:translate3d(5px,-5px,0) scale(1.02)}}
 @keyframes seasonFloatB{from{transform:translate3d(-4px,3px,0) scale(1.01)}to{transform:translate3d(2px,-4px,0) scale(1)}}
@@ -2266,22 +2266,34 @@ body.fest-midautumn .bn-pill::after{content:"";position:absolute;top:-9px;right:
 "use strict";
 var $ = function(s){ return document.querySelector(s); };
 var API = "";
+var SC = ""; /* GitHub Pages 演示模式：跨域带不了分享 cookie，改用显式 sharecode */
+if (location.hostname.indexOf("github.io") >= 0){
+  API = "https://a1c41f510e5990816.app.workbuddy.host";
+  SC = "HIDHQJKOUU";
+}
 /* 第 2 步：当前场次 slug 从 URL 的 ?e= 解析；所有 /api/* 请求自动带上它 */
 var E = (function(){ var m = location.search.match(/[?&]e=([^&]+)/); return m ? decodeURIComponent(m[1]) : ""; })();
 function apiPath(path){
   var u = API + path;
+  var sep = (u.indexOf("?") >= 0 ? "&" : "?");
+  if (SC){
+    var q = [];
+    if (E) q.push("e=" + encodeURIComponent(E));
+    q.push("sharecode=" + SC);
+    return u + sep + q.join("&");
+  }
   if (!E) return u;
-  return u + (u.indexOf("?") >= 0 ? "&" : "?") + "e=" + encodeURIComponent(E);
+  return u + sep + "e=" + encodeURIComponent(E);
 }
 function scParam(){
   var m = location.search.match(/[?&](sharecode=[^&]+)/);
   return m ? "&" + m[1] : "";
 }
-function enterEvent(slug){ location.href = "/?e=" + encodeURIComponent(slug) + scParam(); }
+function enterEvent(slug){ location.href = "./?e=" + encodeURIComponent(slug) + scParam(); }
 /* 后台专用：管理员从后台赛事列表点进某场次，必须带 admin=1 留在管理态，
    否则 boot 见 e 会强制切到前台作品提交页，导致看不到投稿/评审情况。 */
-function enterAdminEvent(slug){ location.href = "/?e=" + encodeURIComponent(slug) + "&admin=1" + scParam(); }
-function goDir(){ location.href = "/?dir=1" + scParam(); }
+function enterAdminEvent(slug){ location.href = "./?e=" + encodeURIComponent(slug) + "&admin=1" + scParam(); }
+function goDir(){ location.href = "./?dir=1" + scParam(); }
 var T = { token: localStorage.getItem("lt_token") || "", admin: localStorage.getItem("lt_admin") || "" };
 /* 两阶段场次（答题初赛 + 作品提交终赛）：COMBO=true 时报名页/成绩页显示进入终赛入口 */
 var COMBO = false;
@@ -3263,6 +3275,9 @@ function stemHtml(txt){
    直接打开图片等场景）会 403 裂图。把当前页参数附到图片 URL 上。*/
 function imgUrl(u){
   if (!u) return "";
+  if (SC && u.indexOf("http") !== 0){
+    return API + u + (u.indexOf("?") >= 0 ? "&" : "?") + "sharecode=" + SC;
+  }
   var s = location.search;
   if (!s || u.indexOf("sharecode=") >= 0) return u;
   return u + (u.indexOf("?") >= 0 ? "&" : "?") + s.replace(/^\?/, "");
@@ -3773,7 +3788,7 @@ document.querySelectorAll("#botnav .bn").forEach(function(b){
       // SPA 内切回目录：不整页重载，让水滴胶囊能连续滑动；同步 URL 与数据
       navSlideTab("#s-dir", function(){
         E = "";  // 清空赛事上下文，与整页重载回目录一致（否则 apiPath 会误带旧 e）
-        if (typeof history.replaceState === "function") history.replaceState(null,"","/?dir=1"+scParam());
+        if (typeof history.replaceState === "function") history.replaceState(null,"","./?dir=1"+scParam());
         renderDir(); show("#s-dir");
       });
     }
@@ -5028,7 +5043,7 @@ $("#btnEvCreate").onclick = function(){
     if (/[?&]dir=1/.test(location.search)){ renderDir(); return; }
     req("/api/events").then(function(r){
       var live = ((r && r.events) || []).filter(function(e){ return e.status === "draft" || e.status === "open"; });
-      if (live.length === 1){ location.replace("/?e=" + encodeURIComponent(live[0].slug) + scParam()); return; }
+      if (live.length === 1){ location.replace("./?e=" + encodeURIComponent(live[0].slug) + scParam()); return; }
       renderDir();
     });
     return;

@@ -138,6 +138,21 @@ button{font-family:inherit; cursor:pointer; border:0}
   transform:translateX(-50%) translateY(8px); z-index:9800; background:rgba(46,42,36,.92); color:#fff;
   padding:9px 18px; border-radius:999px; font-size:var(--fs-sub); opacity:0; transition:.25s; pointer-events:none; white-space:nowrap}
 #toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+/* ---------- 六·1.5、搜索+筛选组件（阶段6交互增强，可整段复制到任何列表站） ---------- */
+.searchbar{display:flex; flex-direction:column; gap:var(--sp-1); margin-bottom:var(--sp-2)}
+.searchrow{display:flex; gap:var(--sp-1); align-items:center}
+.searchbox{flex:1; position:relative}
+.searchbox input{width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--line);
+  border-radius:999px; background:var(--card); color:var(--ink); font-size:var(--fs-sub)}
+.searchbox input:focus{outline:none; border-color:var(--primary)}
+.searchbox .mag{position:absolute; left:13px; top:50%; transform:translateY(-50%);
+  font-size:15px; color:var(--ink-3); pointer-events:none}
+.filters{display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1.5px solid var(--line);
+  background:var(--card); color:var(--ink-2); font-size:var(--fs-mini); white-space:nowrap}
+.chip.on{background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600}
+.hitline{font-size:var(--fs-mini); color:var(--ink-3); min-height:1em; padding:0 2px}
 /* ---------- 六·2、数据层组件（列表项/分页/表单） ---------- */
 .item{background:var(--card); border-radius:var(--r-l); box-shadow:var(--sh-out);
   padding:var(--sp-2) var(--sp-3); margin-bottom:var(--sp-2)}
@@ -262,10 +277,23 @@ button{font-family:inherit; cursor:pointer; border:0}
     <section class="view" id="v-list">
       <!-- 列表三态容器：由 renderList() 按接口状态切换，不许手写死数据 -->
       <div id="listWrap">
+        <!-- 搜索+筛选：走 listItems 接口的 keyword/filter 参数，前端只认返回结果 -->
+        <div class="searchbar stg">
+          <div class="searchrow">
+            <div class="searchbox"><span class="mag">🔍</span>
+              <input id="listSearch" type="search" placeholder="搜标题或正文…" autocomplete="off" aria-label="搜索内容"></div>
+          </div>
+          <div class="filters" id="listFilters">
+            <button class="chip on" data-filter="all">全部</button>
+            <button class="chip" data-filter="image">带图</button>
+            <button class="chip" data-filter="recent">近7天</button>
+          </div>
+          <div class="hitline" id="listHit"></div>
+        </div>
         <div class="card" id="listLoading" style="display:none"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
         <div class="card empty" id="listEmpty" style="display:none">
-          <span>列表为空：还没有人发布过内容</span>
-          <button class="go" data-goto="post">去发布第一条</button></div>
+          <span id="listEmptyText">列表为空：还没有人发布过内容</span>
+          <button class="go" id="listEmptyGo" data-goto="post">去发布第一条</button></div>
         <div class="card err" id="listErr" style="display:none"><b>列表加载失败</b>
           <p>发生了什么：数据接口没有响应。<br>为什么：网络断开或接口故障。<br>怎么办：点重试；仍失败把红点截图发给制作方。</p>
           <button class="retry" id="listRetry">重试</button></div>
@@ -468,7 +496,17 @@ function mock(name,b){
   if(name==="listItems"){
     const d=loadJSON(DATA_KEY,{items:[],seq:1});
     const page=Math.max(1,parseInt(b.page)||1), ps=Math.min(20,Math.max(1,parseInt(b.pageSize)||5));
-    const items=d.items.slice().reverse(); /* 新的在前 */
+    let items=d.items.slice().reverse(); /* 新的在前 */
+    /* 搜索+筛选：接口层过滤，前端只认返回；换真后端照传 keyword/filter 即可 */
+    const kw=String(b.keyword||"").trim().toLowerCase();
+    if(kw) items=items.filter(x=>String(x.title||"").toLowerCase().includes(kw)
+                            || String(x.body||"").toLowerCase().includes(kw));
+    const f=b.filter||"all";
+    if(f==="image") items=items.filter(x=>!!x.image);
+    else if(f==="recent"){
+      const since=Date.now()-7*24*3600*1000;
+      items=items.filter(x=>new Date(x.createdAt).getTime()>=since);
+    }
     return env(0,"ok",{list:items.slice((page-1)*ps,page*ps), total:items.length, page, pageSize:ps});
   }
   if(name==="addItem"){
@@ -688,10 +726,10 @@ document.getElementById("btnRevoke").onclick=()=>{
    · 导出脱敏（无密码）、导入校验+去重，坏文件整包拒绝
    ================================================================ */
 const PAGE_SIZE=5;
-const LIST={page:0, total:0, dirty:true};  /* dirty：发布/导入后置真，下次进列表重拉 */
+const LIST={page:0, total:0, dirty:true, keyword:"", filter:"all"};  /* dirty：发布/导入后置真，下次进列表重拉 */
 
 async function loadListPage(page){
-  return api("listItems",{page, pageSize:PAGE_SIZE});
+  return api("listItems",{page, pageSize:PAGE_SIZE, keyword:LIST.keyword, filter:LIST.filter});
 }
 async function renderList(){
   const show=(id,on)=>document.getElementById(id).style.display=on?"":"none";
@@ -705,7 +743,13 @@ async function renderList(){
     LIST.dirty=false;
     show("listLoading",false); show("listErr",false);
     LIST.page=r.data.page; LIST.total=r.data.total;
+    const searching=!!LIST.keyword||LIST.filter!=="all";
+    document.getElementById("listHit").textContent = searching
+      ? ("命中 "+LIST.total+" 条"+(LIST.keyword?"（含「"+LIST.keyword+"」）":"")) : "";
     if(LIST.total===0){
+      document.getElementById("listEmptyText").textContent = searching
+        ? "没有找到符合条件的内容，换个词试试" : "列表为空：还没有人发布过内容";
+      document.getElementById("listEmptyGo").style.display = searching ? "none" : "";
       show("listEmpty",true); show("listMore",false); show("listDone",false); return;
     }
     r.data.list.forEach(it=>{
@@ -732,6 +776,18 @@ async function renderList(){
 }
 document.getElementById("listRetry").onclick=()=>{ LIST.page=0; LIST.dirty=true; renderList(); };
 document.getElementById("listMore").onclick=()=>renderList();
+/* 搜索：输入防抖250ms（每敲一个字就请求太浪费）；筛选芯片切换后重拉第一页 */
+let SEARCH_TIMER=null;
+document.getElementById("listSearch").addEventListener("input",(e)=>{
+  clearTimeout(SEARCH_TIMER);
+  const v=e.target.value;
+  SEARCH_TIMER=setTimeout(()=>{ LIST.keyword=v; LIST.page=0; LIST.dirty=true; renderList(); },250);
+});
+document.getElementById("listFilters").addEventListener("click",(e)=>{
+  const chip=e.target.closest(".chip"); if(!chip) return;
+  document.querySelectorAll("#listFilters .chip").forEach(c=>c.classList.toggle("on",c===chip));
+  LIST.filter=chip.dataset.filter; LIST.page=0; LIST.dirty=true; renderList();
+});
 
 /* 发布表单：必填校验 + 幂等提交（请求中禁用，双击/重复请求只落一条） */
 let POSTING=false;

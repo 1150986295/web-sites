@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>兰亭书画协会 · 临古人碑帖 · 展少年风华</title>
+<meta name="description" content="兰亭书画协会官方展示页——名家研读、碑帖真迹、名句赏析、协会动态与入会方式。">
+<style>
+/* ========== 一、设计令牌 ========== */
+:root{
+  --paper:#F2EBDD;        /* 宣纸底 */
+  --paper-2:#FAF5EA;
+  --card:rgba(255,255,255,.62);
+  --ink:#2E2A24;
+  --ink-2:rgba(46,42,36,.72);
+  --ink-3:rgba(46,42,36,.52);
+  --line:rgba(46,42,36,.14);
+  --zhu:#A8322A;          /* 朱红印章 */
+  --zhu-deep:#8C2820;
+  --gold:#A98B4F;
+  --shadow:#C9BFA8;
+
+  --fs-hero:clamp(30px,7vw,46px);
+  --fs-h1:19px;
+  --fs-body:16px;
+  --fs-sub:14px;
+  --fs-mini:12.5px;
+
+  --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
+  --r-s:12px; --r-l:20px;
+
+  --sh-1:0 4px 14px -4px rgba(90,70,40,.18);
+  --sh-2:0 10px 30px -10px rgba(90,70,40,.22);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%; overflow-x:hidden; scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; overflow-x:hidden;
+  background:var(--paper); color:var(--ink);
+  font-size:var(--fs-body); line-height:1.7;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Serif SC","Songti SC","Microsoft YaHei",serif;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+  background-image:radial-gradient(rgba(120,100,60,.08) 1px, transparent 1px);
+  background-size:6px 6px;
+}
+.wrap{position:relative; z-index:1; max-width:720px; margin:0 auto; padding:0 18px 60px}
+a{color:inherit; text-decoration:none}
+button{font-family:inherit; cursor:pointer; border:0; color:inherit; background:none}
+:focus-visible{outline:2px solid var(--zhu); outline-offset:3px}
+
+/* ========== 二、顶部 ========== */
+.top{display:flex; align-items:center; justify-content:space-between; padding:18px 0 8px}
+.seal{
+  width:38px; height:38px; border-radius:8px; flex:none;
+  background:var(--zhu); color:#FFF6E8; display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:800; line-height:1.05; text-align:center;
+  box-shadow:var(--sh-1); letter-spacing:1px;
+}
+.brand{font-size:13px; color:var(--ink-3); letter-spacing:2px}
+.top-nav{display:flex; gap:14px; font-size:13px; color:var(--ink-2)}
+.top-nav a:active{color:var(--zhu)}
+
+/* ========== 三、首屏 ========== */
+.hero{margin-top:16px; text-align:center; padding:30px 22px 34px;
+  background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-l);
+  box-shadow:var(--sh-2)}
+.hero-quote{font-size:var(--fs-sub); color:var(--ink-2); margin-bottom:24px; line-height:1.9}
+.hero-quote b{color:var(--zhu); font-weight:700}
+.hero-mark{font-size:26px; color:var(--zhu); letter-spacing:8px; margin-bottom:6px}
+.hero h1{font-size:var(--fs-hero); margin:0 0 8px; letter-spacing:4px; font-weight:800}
+.hero .slogan{font-size:var(--fs-sub); color:var(--ink-2); letter-spacing:2px; margin-bottom:22px}
+.hero-stats{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:24px}
+.stat{background:rgba(168,50,42,.06); border:1px solid rgba(168,50,42,.16);
+  border-radius:999px; padding:4px 14px; font-size:var(--fs-mini); color:var(--zhu-deep)}
+.hero-btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+.btn{padding:11px 26px; border-radius:999px; font-size:15px; font-weight:700; transition:transform .15s, opacity .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--zhu); color:#FFF6E8; box-shadow:var(--sh-1)}
+.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line)}
+
+/* ========== 四、通用区块 ========== */
+.section{margin-top:38px}
+.sec-hd{display:flex; align-items:baseline; gap:10px; margin-bottom:6px}
+.sec-hd h2{font-size:var(--fs-h1); margin:0; letter-spacing:1px}
+.sec-hd .num{font-size:var(--fs-mini); color:var(--zhu); font-weight:800; letter-spacing:1px}
+.sec-sub{font-size:var(--fs-mini); color:var(--ink-3); margin-bottom:16px}
+
+/* 搜索 + 芯片 */
+.toolbar{display:flex; flex-direction:column; gap:10px; margin-bottom:14px}
+.search{position:relative}
+.search input{
+  width:100%; padding:11px 40px 11px 16px; font-size:15px;
+  background:var(--paper-2); color:var(--ink); border:1px solid var(--line);
+  border-radius:var(--r-s); font-family:inherit; outline:none;
+}
+.search input:focus{border-color:var(--zhu)}
+.search .clear{position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; border-radius:50%; color:var(--ink-3); font-size:18px; line-height:1}
+.chips{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none; padding:6px 15px; border-radius:999px; font-size:var(--fs-mini);
+  background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2); white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--zhu); color:#FFF6E8; border-color:var(--zhu)}
+.hit{font-size:var(--fs-mini); color:var(--ink-3); margin:2px 0 12px}
+
+/* 状态区 */
+.state{padding:40px 20px; text-align:center; color:var(--ink-3); font-size:var(--fs-sub)}
+.spin{width:26px; height:26px; margin:0 auto 12px; border:2px solid var(--line);
+  border-top-color:var(--zhu); border-radius:50%; animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty-emoji{font-size:30px; margin-bottom:8px}
+.state .btn{margin-top:14px; padding:8px 20px; font-size:14px; border:1px solid var(--line); border-radius:999px}
+
+/* ========== 五、名家横滑 ========== */
+.masters{display:flex; gap:12px; overflow-x:auto; padding:2px 2px 12px; scroll-snap-type:x mandatory; scrollbar-width:none}
+.masters::-webkit-scrollbar{display:none}
+.master{flex:none; width:150px; scroll-snap-align:start; background:var(--paper-2);
+  border:1px solid var(--line); border-radius:var(--r-s); padding:14px; text-align:center;
+  box-shadow:var(--sh-1); cursor:pointer; transition:transform .15s}
+.master:active{transform:scale(.97)}
+.master .avatar{width:72px; height:72px; border-radius:50%; object-fit:cover; margin:0 auto 10px;
+  background:linear-gradient(135deg,#EDE3CE,#DCCFB4); border:2px solid rgba(168,50,42,.2)}
+.master .mname{font-size:16px; font-weight:800; letter-spacing:1px}
+.master .mdyn{font-size:var(--fs-mini); color:var(--ink-3); margin-top:2px}
+.master .mstyle{display:inline-block; margin-top:8px; font-size:var(--fs-mini);
+  color:var(--zhu-deep); background:rgba(168,50,42,.06); border-radius:999px; padding:2px 10px}
+
+/* ========== 六、碑帖网格 ========== */
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px}
+.card{display:block; background:var(--paper-2); border:1px solid var(--line);
+  border-radius:var(--r-s); padding:10px; box-shadow:var(--sh-1); cursor:pointer;
+  transition:transform .15s, box-shadow .15s; overflow:hidden}
+.card:active{transform:scale(.98)}
+.card .thumb{width:100%; aspect-ratio:264/376; object-fit:cover; border-radius:8px;
+  background:#EDE3CE; display:block}
+.card .ctitle{font-size:14px; font-weight:700; margin-top:8px; line-height:1.4;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.card .cmeta{font-size:var(--fs-mini); color:var(--ink-3); margin-top:2px}
+
+/* ========== 七、名句 ========== */
+.quotes{display:flex; flex-direction:column; gap:10px}
+.quote{background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-s);
+  padding:16px 18px; border-left:3px solid var(--zhu); position:relative}
+.quote .qt{font-size:15px; line-height:1.9; letter-spacing:1px}
+.quote .qf{font-size:var(--fs-mini); color:var(--ink-3); margin-top:6px; text-align:right}
+
+/* ========== 八、动态（占位，可增删）========== */
+.news{background:var(--paper-2); border:1px dashed var(--line); border-radius:var(--r-s);
+  padding:16px 18px; color:var(--ink-3); font-size:var(--fs-sub)}
+.news .nh{font-weight:700; color:var(--ink-2); margin-bottom:6px}
+.news .nhint{font-size:var(--fs-mini); line-height:1.8}
+
+/* ========== 九、加入 ========== */
+.join{text-align:center; background:var(--paper-2); border:1px solid var(--line);
+  border-radius:var(--r-l); padding:28px 22px; box-shadow:var(--sh-2)}
+.join .qr{width:150px; height:150px; object-fit:contain; margin:0 auto 16px;
+  background:#fff; border-radius:12px; padding:8px; border:1px solid var(--line)}
+.join .jtext{font-size:var(--fs-sub); color:var(--ink-2); line-height:1.9}
+.join .jcontact{margin-top:10px; font-size:var(--fs-mini); color:var(--ink-3)}
+
+footer{text-align:center; margin-top:36px; font-size:var(--fs-mini); color:var(--ink-3); letter-spacing:1px}
+
+/* ========== 十、灯箱 ========== */
+.lb{position:fixed; inset:0; z-index:99; background:rgba(20,16,12,.92); display:none;
+  flex-direction:column; align-items:center; justify-content:center; padding:20px}
+.lb.open{display:flex}
+.lb-img{max-width:100%; max-height:74vh; object-fit:contain; border-radius:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lb-bar{margin-top:16px; color:#F2EBDD; font-size:14px; text-align:center; line-height:1.7}
+.lb-bar .lbt{font-weight:700}
+.lb-close{position:absolute; top:18px; right:18px; width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,.14); color:#fff; font-size:22px; line-height:40px; text-align:center}
+.lb-nav{position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px;
+  border-radius:50%; background:rgba(255,255,255,.14); color:#fff; font-size:22px; line-height:44px; text-align:center}
+.lb-prev{left:12px} .lb-next{right:12px}
+
+/* ========== 十一、错误红点（骨架，勿删）========== */
+#errDot{position:fixed; right:12px; bottom:14px; z-index:120; display:none; align-items:center; gap:4px;
+  background:var(--zhu); color:#fff; border-radius:999px; padding:6px 10px; font-size:12px; cursor:pointer; box-shadow:var(--sh-2)}
+#errPanel{position:fixed; left:12px; right:12px; bottom:60px; z-index:121; display:none;
+  max-height:60vh; overflow:auto; background:var(--paper-2); border:1px solid var(--line);
+  border-radius:14px; padding:16px; box-shadow:var(--sh-2); font-size:13px}
+#errPanel h4{margin:0 0 8px; font-size:15px; color:var(--zhu)}
+#errPanel .hint{color:var(--ink-3); font-size:12px; margin-bottom:10px}
+#errPanel .row{padding:8px 0; border-top:1px solid var(--line)}
+#errPanel .row .t{color:var(--ink-3); font-size:11px}
+#errPanel .clr{margin-top:10px; padding:6px 14px; border:1px solid var(--line); border-radius:999px}
+
+@media (max-width:360px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .master{width:132px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important; scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 顶部 -->
+  <div class="top">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="seal">兰亭<br>书画</div>
+      <div class="brand">兰亭书画协会</div>
+    </div>
+    <nav class="top-nav">
+      <a href="#masters">名家</a>
+      <a href="#steles">碑帖</a>
+      <a href="#join">加入</a>
+    </nav>
+  </div>
+
+  <!-- 首屏 -->
+  <section class="hero">
+    <div class="hero-quote">「初学分布，但求平正；既知平正，务追险绝；既能险绝，复归平正。」<br><b>—— 唐 · 孙过庭《书谱》</b></div>
+    <div class="hero-mark">兰亭</div>
+    <h1>兰亭书画协会</h1>
+    <div class="slogan">临古人碑帖 · 展少年风华</div>
+    <div class="hero-stats">
+      <span class="stat" id="statMasters">11 位名家</span>
+      <span class="stat" id="statSteles">13 块碑帖</span>
+      <span class="stat" id="statQuotes">8 则名句</span>
+    </div>
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="#masters">浏览名家</a>
+      <a class="btn btn-ghost" href="#join">我要加入</a>
+    </div>
+  </section>
+
+  <!-- ② 名家研读 -->
+  <section class="section" id="masters">
+    <div class="sec-hd"><span class="num">壹</span><h2>名家研读</h2></div>
+    <div class="sec-sub">左右滑动 · 点开头像看生平与代表作</div>
+    <div class="masters" id="masterList"></div>
+  </section>
+
+  <!-- ③ 碑帖真迹 -->
+  <section class="section" id="steles">
+    <div class="sec-hd"><span class="num">贰</span><h2>碑帖真迹</h2></div>
+    <div class="sec-sub">全部为传世善本拓本 / 馆藏真迹扫描，可点开看大图</div>
+    <div class="toolbar">
+      <div class="search">
+        <input id="q" type="search" placeholder="搜碑帖名，如 兰亭 / 九成宫" autocomplete="off">
+        <button class="clear" id="clearBtn" hidden aria-label="清空">×</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="hit" id="hit">正在载入碑帖索引…</div>
+
+    <div class="state" id="listLoading"><div class="spin"></div>正在载入碑帖索引…</div>
+    <div class="state" id="listEmpty" hidden>
+      <div class="empty-emoji">🖌</div>
+      <div id="emptyTitle">没有找到相关碑帖</div>
+      <button class="btn" id="emptyReset">看全部</button>
+    </div>
+    <div class="state" id="listErr" hidden>
+      <div class="empty-emoji">!</div>
+      <div id="errMsg">载入失败</div>
+      <button class="btn" id="retryBtn">重试</button>
+    </div>
+    <div class="grid" id="grid" hidden></div>
+  </section>
+
+  <!-- ④ 名句 -->
+  <section class="section" id="quotes">
+    <div class="sec-hd"><span class="num">叁</span><h2>名句赏析</h2></div>
+    <div class="sec-sub">书家箴言，字字有来历</div>
+    <div class="quotes" id="quoteList"></div>
+  </section>
+
+  <!-- ⑤ 协会动态（占位，可增删） -->
+  <section class="section" id="news">
+    <div class="sec-hd"><span class="num">肆</span><h2>协会动态</h2></div>
+    <div class="sec-sub">活动与比赛 · 这里先占位，后续加照片即可</div>
+    <div class="news">
+      <div class="nh">📷 近期活动 · 待添加</div>
+      <div class="nhint">
+        这里放协会活动 / 比赛照片和一句话说明。<br>
+        现在先用占位，等你给真图后再替换——增删只需改这一块的 HTML，不影响其它板块。
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ 加入 -->
+  <section class="section" id="join">
+    <div class="sec-hd"><span class="num">伍</span><h2>加入我们</h2></div>
+    <div class="sec-sub">扫码联系 · 一起写字</div>
+    <div class="join">
+      <img class="qr" src="images/misc/qrcode.png" alt="入会联系二维码">
+      <div class="jtext">愿与同好者，共临一帖，同写一字。<br>扫码联系我们，了解入会方式。</div>
+      <div class="jcontact">联系方式 / 联系人：待补充</div>
+    </div>
+  </section>
+
+  <footer>兰亭书画协会 · 临古人碑帖 · 展少年风华</footer>
+</div>
+
+<!-- 灯箱 -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="碑帖大图">
+  <button class="lb-close" id="lbClose" aria-label="关闭">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="上一张">‹</button>
+  <img class="lb-img" id="lbImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="碑帖大图">
+  <button class="lb-nav lb-next" id="lbNext" aria-label="下一张">›</button>
+  <div class="lb-bar"><div class="lbt" id="lbTitle"></div><div id="lbSub"></div></div>
+</div>
+
+<script>window.DATA = {"masters":[{"name":"王羲之","zi":"逸少","dynasty":"东晋","style":"行 / 草","tagline":"书圣在此，且随我写一段风流","intro":"后世尊为“书圣”。行书《兰亭序》遒媚劲健，草书《十七帖》气象超然。本小程序所用皆为宋拓善本。","avatar":"images/masters/01_head.png","color":"#4a6d8c"},{"name":"欧阳询","zi":"信本","dynasty":"唐","style":"楷书","tagline":"一笔一画，皆有法度","intro":"楷法之冠，世称“欧体”。《九成宫醴泉铭》法度森严、险劲秀拔，是初学楷书公认的第一范本。","avatar":"images/masters/02_head.png","color":"#3d6b85"},{"name":"颜真卿","zi":"清臣","dynasty":"唐","style":"楷 / 行","tagline":"字如其人，先立正气","intro":"颜体开创者，雄浑刚正。《多宝塔碑》端整，《颜勤礼碑》宽博，《祭侄文稿》悲愤苍茫。","avatar":"images/masters/03_head.png","color":"#a83c32"},{"name":"柳公权","zi":"诚悬","dynasty":"唐","style":"楷书","tagline":"心正则笔正","intro":"柳体创始人，与颜并称“颜筋柳骨”。《玄秘塔碑》骨力遒健、清劲挺拔。","avatar":"images/masters/04_head.png","color":"#417057"},{"name":"赵孟頫","zi":"子昂","dynasty":"元","style":"行 / 楷","tagline":"圆熟流美，复古开新","intro":"元代书坛盟主，倡“复古”、追晋唐。《前后赤壁赋》写一赋二帖，圆润遒丽，是松雪体行书的代表。","avatar":"images/masters/05_head.png","color":"#527f9b"},{"name":"苏轼","zi":"子瞻","dynasty":"宋","style":"行书","tagline":"我书意造本无法","intro":"宋四家之首，尚“意”。《黄州寒食诗卷》沉郁顿挫，被誉为“天下第三行书”。","avatar":"images/masters/06_head.png","color":"#a2702f"},{"name":"米芾","zi":"元章","dynasty":"宋","style":"行书","tagline":"八面出锋，沉着痛快","intro":"“米颠”也。八面出锋、沉着痛快，自谓“刷字”。《英光堂帖》为宋刻汇帖，米书面目最全。","avatar":"images/masters/07_head.png","color":"#3a4f5e"},{"name":"怀素","zi":"藏真","dynasty":"唐","style":"草书","tagline":"笔走龙蛇，满纸云烟","intro":"“草圣”也。以狂继颠，奔蛇走虺。《自叙帖》纵横不羁、满纸云烟，狂草极则。","avatar":"images/masters/08_head.png","color":"#7a6a58"},{"name":"曹全碑","zi":"景完","dynasty":"汉","style":"隶书","tagline":"蚕头燕尾，秀润典丽","intro":"东汉隶书名碑，秀润典丽、蚕头燕尾。《曹全碑》是习隶最温润平和的入门范本。","avatar":"images/masters/09_head.png","color":"#8a7330"},{"name":"李斯","zi":"通古","dynasty":"秦","style":"篆书","tagline":"书同文，篆法森严","intro":"助秦始皇“书同文”，小篆之祖。《峄山碑》线条圆融、法度森严，是篆书入门正途。","avatar":"images/masters/10_head.png","color":"#4a4450"},{"name":"褚遂良","zi":"登善","dynasty":"唐","style":"楷书","tagline":"清远萧散，瘦劲丰神","intro":"唐初名臣、太宗侍书。《雁塔圣教序》瘦劲飘逸，把初唐楷书从方正推向疏朗丰秀。","avatar":"images/masters/11_head.png","color":"#5c6f70"}],"steles":[{"id":"caoquan","master":"caoquan","title":"曹全碑","cover":"images/steles/caoquan/caoquan/thumbs/01.jpg","hero":"images/steles/caoquan/caoquan/01.jpg","count":8},{"id":"yanta","master":"chusuiliang","title":"雁塔圣教序","cover":"images/steles/chusuiliang/yanta/thumbs/01.jpg","hero":"images/steles/chusuiliang/yanta/01.jpg","count":8},{"id":"zixu","master":"huaisu","title":"自叙帖卷","cover":"images/steles/huaisu/zixu/thumbs/01.jpg","hero":"images/steles/huaisu/zixu/01.jpg","count":10},{"id":"yishan","master":"lisi","title":"峄山碑","cover":"images/steles/lisi/yishan/thumbs/01.jpg","hero":"images/steles/lisi/yishan/01.jpg","count":8},{"id":"xuanmita","master":"liugongquan","title":"玄秘塔碑","cover":"images/steles/liugongquan/xuanmita/thumbs/01.jpg","hero":"images/steles/liugongquan/xuanmita/01.jpg","count":8},{"id":"yingguangtang","master":"mifei","title":"英光堂帖","cover":"images/steles/mifei/yingguangtang/thumbs/01.jpg","hero":"images/steles/mifei/yingguangtang/01.jpg","count":8},{"id":"jiuchenggong","master":"ouyangxun","title":"九成宫醴泉铭","cover":"images/steles/ouyangxun/jiuchenggong/thumbs/01.jpg","hero":"images/steles/ouyangxun/jiuchenggong/01.jpg","count":8},{"id":"hanshi","master":"sushi","title":"黄州寒食诗卷（寒食帖）","cover":"images/steles/sushi/hanshi/thumbs/01.jpg","hero":"images/steles/sushi/hanshi/01.jpg","count":8},{"id":"qishitie","master":"wangxizhi","title":"十七帖","cover":"images/steles/wangxizhi/qishitie/thumbs/01.jpg","hero":"images/steles/wangxizhi/qishitie/01.jpg","count":8},{"id":"shengjiaoxu","master":"wangxizhi","title":"集王羲之圣教序","cover":"images/steles/wangxizhi/shengjiaoxu/thumbs/01.jpg","hero":"images/steles/wangxizhi/shengjiaoxu/01.jpg","count":10},{"id":"duobaota","master":"yanzhenqing","title":"多宝塔碑","cover":"images/steles/yanzhenqing/duobaota/thumbs/01.jpg","hero":"images/steles/yanzhenqing/duobaota/01.jpg","count":8},{"id":"yanqinli","master":"yanzhenqing","title":"颜勤礼碑","cover":"images/steles/yanzhenqing/yanqinli/thumbs/01.jpg","hero":"images/steles/yanzhenqing/yanqinli/01.jpg","count":8},{"id":"chibifu","master":"zhaomengfu","title":"前后赤壁赋册","cover":"images/steles/zhaomengfu/chibifu/thumbs/01.jpg","hero":"images/steles/zhaomengfu/chibifu/01.jpg","count":6}],"quotes":[{"text":"用笔在心，心正则笔正。","from":"唐 · 柳公权（《旧唐书》笔谏）"},{"text":"初学分布，但求平正；既知平正，务追险绝；既能险绝，复归平正。","from":"唐 · 孙过庭《书谱》"},{"text":"临书易失古人位置，而多得古人笔意；摹书易得古人位置，而多失古人笔意。","from":"宋 · 姜夔《续书谱》"},{"text":"书之妙道，神彩为上，形质次之。","from":"南朝 · 王僧虔《笔意赞》"},{"text":"夫书肇于自然，自然既立，阴阳生焉。","from":"汉 · 蔡邕《九势》"},{"text":"取法乎上，仅得乎中。","from":"唐 · 李世民《帝范》"},{"text":"书，如也。如其学，如其才，如其志，总之曰如其人而已。","from":"清 · 刘熙载《艺概》"},{"text":"意在笔前，然后作字。","from":"传 王羲之《题卫夫人〈笔阵图〉后》"}]};</script>
+<script>
+/* 兰亭书画协会展示页 · 主逻辑
+   骨架沿用已验证模板：路由表 / 三态 / 搜索筛选 / 错误红点 / 切场 */
+(function(){
+  'use strict';
+
+  var DATA = window.DATA || {masters:[], steles:[], quotes:[]};
+  var MASTERS = DATA.masters || [];
+  var STeles = DATA.steles || [];
+  var QUOTES = DATA.quotes || [];
+
+  /* 分类路由表（按碑帖所属书家/书体归并，唯一来源） */
+  var ROUTES = [
+    {id:'all', name:'全部'},
+    {id:'wangxizhi', name:'王羲之'},
+    {id:'lisi', name:'李斯'},
+    {id:'huaisu', name:'怀素'},
+    {id:'ouyangxun', name:'欧阳询'},
+    {id:'caoquan', name:'曹全'},
+    {id:'liugongquan', name:'柳公权'},
+    {id:'yanqinli', name:'颜真卿'}
+  ];
+  var CATNAME = {};
+  ROUTES.forEach(function(c){ CATNAME[c.id]=c.name; });
+
+  var STATE = {cat:'all', q:'', ready:false, animate:true};
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var switchSeq = 0;
+
+  var els = {
+    masterList: document.getElementById('masterList'),
+    quoteList: document.getElementById('quoteList'),
+    grid: document.getElementById('grid'),
+    loading: document.getElementById('listLoading'),
+    empty: document.getElementById('listEmpty'),
+    err: document.getElementById('listErr'),
+    emptyTitle: document.getElementById('emptyTitle'),
+    errMsg: document.getElementById('errMsg'),
+    hit: document.getElementById('hit'),
+    q: document.getElementById('q'),
+    clearBtn: document.getElementById('clearBtn'),
+    chips: document.getElementById('chips')
+  };
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function shortQ(s){ return s.length > 16 ? s.slice(0,16)+'…' : s; }
+
+  /* ---- 名家横滑 ---- */
+  function renderMasters(){
+    if(!MASTERS.length){ return; }
+    els.masterList.innerHTML = MASTERS.map(function(m,i){
+      var av = m.avatar ? '<img class="avatar" src="'+esc(m.avatar)+'" alt="'+esc(m.name)+'">' : '';
+      return '<div class="master" data-i="'+i+'" role="button" tabindex="0" aria-label="查看'+esc(m.name)+'">'
+        + av + '<div class="mname">'+esc(m.name)+'</div>'
+        + '<div class="mdyn">'+esc(m.dynasty)+' · '+esc(m.zi)+'</div>'
+        + '<div class="mstyle">'+esc(m.style)+'</div></div>';
+    }).join('');
+    document.getElementById('statMasters').textContent = MASTERS.length+' 位名家';
+  }
+  function bindMasters(){
+    els.masterList.addEventListener('click', function(e){
+      var el = e.target.closest ? e.target.closest('.master') : null;
+      if(!el) return;
+      var m = MASTERS[+el.getAttribute('data-i')];
+      if(m){
+        openLB({title:m.name+' · '+m.zi, sub:(m.dynasty||'')+' '+(m.style||'')+'　'+(m.tagline||''),
+                img:m.avatar, list:[], idx:0, single:true});
+      }
+    });
+    els.masterList.addEventListener('keydown', function(e){
+      if(e.key!=='Enter' && e.key!==' ') return;
+      var el = e.target.closest ? e.target.closest('.master') : null;
+      if(el){ e.preventDefault(); el.click(); }
+    });
+  }
+
+  /* ---- 名句 ---- */
+  function renderQuotes(){
+    els.quoteList.innerHTML = QUOTES.map(function(q){
+      return '<div class="quote"><div class="qt">'+esc(q.text)+'</div>'
+        + '<div class="qf">—— '+esc(q.from)+'</div></div>';
+    }).join('');
+    document.getElementById('statQuotes').textContent = QUOTES.length+' 则名句';
+  }
+
+  /* ---- 碑帖筛选 ---- */
+  function matches(s){
+    if(STATE.cat!=='all' && s.master!==STATE.cat) return false;
+    var kw = STATE.q.trim().toLowerCase();
+    if(!kw) return true;
+    return (s.title+' '+s.id+' '+s.master).toLowerCase().indexOf(kw) > -1;
+  }
+  function cardHTML(s,i){
+    return '<div class="card cat-'+esc(s.master)+'" data-i="'+i+'" role="button" tabindex="0" aria-label="查看'+esc(s.title)+'">'
+      + '<img class="thumb" src="'+esc(s.cover)+'" alt="'+esc(s.title)+'" loading="lazy">'
+      + '<div class="ctitle">'+esc(s.title)+'</div>'
+      + '<div class="cmeta">'+esc(CATNAME[s.master]||s.master)+' · '+s.count+' 页</div></div>';
+  }
+  function renderChips(){
+    els.chips.innerHTML = ROUTES.map(function(c){
+      var n = c.id==='all' ? STeles.length : STeles.filter(function(s){return s.master===c.id;}).length;
+      if(c.id!=='all' && n===0) return '';
+      return '<button class="chip" data-cat="'+c.id+'" aria-pressed="'+(STATE.cat===c.id?'true':'false')+'">'
+        + esc(c.name)+' '+n+'</button>';
+    }).join('');
+  }
+  function syncChips(){
+    for(var i=0;i<els.chips.children.length;i++){
+      var b = els.chips.children[i];
+      b.setAttribute('aria-pressed', b.getAttribute('data-cat')===STATE.cat ? 'true':'false');
+    }
+  }
+  function render(animate){
+    STATE.animate = animate !== false;
+    var list = STeles.filter(matches);
+    els.grid.innerHTML = list.map(cardHTML).join('');
+    els.grid.hidden = list.length===0;
+    els.loading.hidden = true;
+    els.err.hidden = true;
+    els.empty.hidden = list.length>0;
+
+    var kw = STATE.q.trim();
+    if(kw){
+      els.hit.textContent = '命中 '+list.length+' 块碑帖 · 关键词「'+shortQ(kw)+'」';
+      els.emptyTitle.textContent = '没有找到「'+shortQ(kw)+'」';
+    }else{
+      els.hit.textContent = list.length+' 块碑帖 · 当前「'+(CATNAME[STATE.cat]||'全部')+'」';
+      els.emptyTitle.textContent = '这个分类暂时没有碑帖';
+    }
+    document.getElementById('statSteles').textContent = STeles.length+' 块碑帖';
+  }
+  function goto(cat, opts){
+    opts = opts || {};
+    if(!CATNAME[cat]) cat='all';
+    STATE.cat = cat;
+    syncChips();
+    try{ history.replaceState(null,'','#'+cat); }catch(e){}
+    if(!STATE.ready || opts.instant || reduce){ if(STATE.ready) render(!opts.instant); return; }
+    var my = ++switchSeq;
+    els.grid.classList.add('switching');
+    setTimeout(function(){
+      if(my!==switchSeq) return;
+      render(true);
+      requestAnimationFrame(function(){ els.grid.classList.remove('switching'); });
+    },150);
+  }
+  function readHash(){
+    var h=(location.hash||'').replace(/^#/,'');
+    return CATNAME[h] ? h:'all';
+  }
+  function boot(){
+    STATE.ready=false;
+    els.loading.hidden=false; els.empty.hidden=true; els.err.hidden=true; els.grid.hidden=true;
+    els.grid.innerHTML='';
+    els.hit.textContent='正在载入碑帖索引…';
+    setTimeout(function(){
+      try{
+        if(!STeles.length) throw new Error('碑帖索引为空');
+        STATE.ready=true;
+        renderChips(); syncChips(); render(true);
+      }catch(err){
+        STATE.ready=false;
+        els.loading.hidden=true; els.grid.hidden=true; els.empty.hidden=true; els.err.hidden=false;
+        els.errMsg.textContent='错误信息：'+(err && err.message ? err.message : String(err));
+        els.hit.textContent='索引载入失败';
+        if(window.__errLogAdd) window.__errLogAdd('碑帖索引载入失败：'+(err&&err.message?err.message:err));
+      }
+    },240);
+  }
+
+  /* ---- 灯箱 ---- */
+  var lbState = {list:[], idx:0, single:false};
+  var lb = document.getElementById('lb');
+  var lbImg = document.getElementById('lbImg');
+  var lbTitle = document.getElementById('lbTitle');
+  var lbSub = document.getElementById('lbSub');
+  function openLB(o){
+    lbState.list=o.list||[]; lbState.idx=o.idx||0; lbState.single=!!o.single;
+    lbImg.src=o.img||''; lbImg.alt=o.title||'大图';
+    lbTitle.textContent=o.title||''; lbSub.textContent=o.sub||'';
+    document.getElementById('lbPrev').style.display = (lbState.single||lbState.list.length<2)?'none':'block';
+    document.getElementById('lbNext').style.display = (lbState.single||lbState.list.length<2)?'none':'block';
+    lb.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeLB(){
+    lb.classList.remove('open'); lbImg.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; document.body.style.overflow='';
+  }
+  function stepLB(d){
+    if(lbState.single || lbState.list.length<2) return;
+    lbState.idx=(lbState.idx+d+lbState.list.length)%lbState.list.length;
+    var s=lbState.list[lbState.idx];
+    lbImg.src=s.img; lbTitle.textContent=s.title; lbSub.textContent=s.sub||'';
+  }
+  document.getElementById('lbClose').addEventListener('click',closeLB);
+  document.getElementById('lbPrev').addEventListener('click',function(){stepLB(-1);});
+  document.getElementById('lbNext').addEventListener('click',function(){stepLB(1);});
+  lb.addEventListener('click',function(e){ if(e.target===lb) closeLB(); });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape') closeLB();
+    if(e.key==='ArrowLeft') stepLB(-1);
+    if(e.key==='ArrowRight') stepLB(1);
+  });
+
+  /* ---- 事件绑定 ---- */
+  els.chips.addEventListener('click',function(e){
+    var b=e.target.closest ? e.target.closest('.chip') : null;
+    if(!b) return;
+    goto(b.getAttribute('data-cat'));
+  });
+  els.q.addEventListener('input',function(){
+    STATE.q=els.q.value;
+    els.clearBtn.hidden=!els.q.value;
+    if(!STATE.ready) return;
+    switchSeq++; render(false);
+  });
+  els.q.addEventListener('keydown',function(e){
+    if(e.key==='Escape' && els.q.value){
+      els.q.value=''; STATE.q=''; els.clearBtn.hidden=true;
+      switchSeq++; if(STATE.ready) render(false);
+    }
+  });
+  els.clearBtn.addEventListener('click',function(){
+    els.q.value=''; STATE.q=''; els.clearBtn.hidden=true;
+    switchSeq++; if(STATE.ready) render(false); els.q.focus();
+  });
+  document.getElementById('emptyReset').addEventListener('click',function(){
+    els.q.value=''; STATE.q=''; els.clearBtn.hidden=true; STATE.cat='all'; syncChips();
+    switchSeq++; if(STATE.ready) render(false); els.q.focus();
+  });
+  document.getElementById('retryBtn').addEventListener('click',boot);
+
+  els.grid.addEventListener('click',function(e){
+    var el=e.target.closest ? e.target.closest('.card') : null;
+    if(!el) return;
+    var vis=STeles.filter(matches);
+    var s=vis[+el.getAttribute('data-i')];
+    if(!s||!s.hero) return;
+    var imgs=vis.filter(function(x){return x.hero;}).map(function(x){
+      return {img:x.hero,title:x.title,sub:(CATNAME[x.master]||x.master)+' · 馆藏善本扫描'};
+    });
+    var idx=imgs.findIndex(function(x){return x.img===s.hero;});
+    openLB({img:s.hero,title:s.title,sub:(CATNAME[s.master]||s.master)+' · 馆藏善本扫描',list:imgs,idx:idx<0?0:idx});
+  });
+  els.grid.addEventListener('keydown',function(e){
+    if(e.key!=='Enter' && e.key!==' ') return;
+    var el=e.target.closest ? e.target.closest('.card') : null;
+    if(el){ e.preventDefault(); el.click(); }
+  });
+
+  /* ---- 启动 ---- */
+  STATE.cat=readHash();
+  renderMasters(); bindMasters(); renderQuotes(); boot();
+})();
+
+</script>
+
+<script>
+/* 前端错误红点：捕获脚本错误 → localStorage 持久 → 角落红点。勿删。 */
+(function(){
+  var KEY='lanting_assoc_errlog_v1', MAX=50;
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ return []; } }
+  function fmt(ts){ var d=new Date(ts); function p(x){return (x<10?'0':'')+x;}
+    return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function add(msg){ var a=load(); a.push({t:Date.now(),m:String(msg).slice(0,300)});
+    try{ localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX))); }catch(e){} render(); }
+  window.__errLogAdd=add;
+  window.addEventListener('error',function(e){ add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):'')); },true);
+  window.addEventListener('unhandledrejection',function(e){ var r=e.reason;
+    add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息')); });
+  function render(){
+    var a=load(), n=a.length, dot=document.getElementById('errDot');
+    if(!n){ if(dot) dot.style.display='none'; return; }
+    if(!dot){
+      dot=document.createElement('div'); dot.id='errDot';
+      dot.innerHTML='&#9888;<span class="n"></span>';
+      dot.onclick=function(){
+        var p=document.getElementById('errPanel');
+        if(p.style.display==='block'){ p.style.display='none'; return; }
+        var b=''; a.forEach(function(x){ b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'; });
+        p.innerHTML='<h4>&#9888; 页面出过错（'+n+' 条）</h4><div class="hint">打开以来捕获的脚本错误。把带时间的几行截图发给制作方定位；看完可清除。</div>'+b+'<button class="clr">清除全部</button>';
+        p.style.display='block';
+        p.querySelector('.clr').onclick=function(){ localStorage.removeItem(KEY); p.style.display='none'; render(); };
+      };
+      document.body.appendChild(dot);
+      var pnl=document.createElement('div'); pnl.id='errPanel'; pnl.style.display='none'; document.body.appendChild(pnl);
+    }
+    dot.style.display='flex'; dot.querySelector('.n').textContent=(n>9?'9+':n);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>开工包 · 从零做网页的唯一入口</title>
+<style>
+:root{--paper:#EAE6DC;--card:#fff;--ink:#2E2A24;--ink2:rgba(46,42,36,.72);--line:#C9C2B0;--primary:#4A6B57;--accent:#B03A2E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 -apple-system,"PingFang SC","Noto Sans SC",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:26px;margin:0 0 4px}
+.sub{color:var(--ink2);font-size:14px;margin-bottom:24px}
+.alert{background:#fff6e8;border:1px solid #e6c98a;border-radius:14px;padding:14px 18px;margin-bottom:22px;font-size:14px}
+.alert b{color:var(--accent)}
+.step{background:var(--card);border-radius:16px;padding:18px 20px;margin-bottom:14px;box-shadow:2px 2px 6px rgba(201,194,176,.45)}
+.step h2{font-size:18px;margin:0 0 8px;color:var(--primary)}
+.step h2 .n{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--primary);color:#fff;font-size:14px;margin-right:8px}
+.step p{margin:6px 0;font-size:15px;color:var(--ink2)}
+code{background:var(--paper);padding:2px 6px;border-radius:6px;font-size:13px;word-break:break-all}
+a{color:var(--primary)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+.footer{margin-top:28px;text-align:center;color:var(--ink2);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>开工包 · 从零做网页的唯一入口</h1>
+  <div class="sub">给新对话 AI 看：读这一页 + 仓库里的文档，就能照流程做网页</div>
+
+  <div class="alert">
+    <b>⚠ 甩链接别甩错</b>：要给 AI 的是 <b>GitHub 仓库地址</b> <code>https://github.com/1150986295/web-sites</code>，
+    不是 Pages 展示地址。Pages 只是作品集门面，看不到模板代码和文档。
+  </div>
+
+  <div class="step">
+    <h2><span class="n">1</span>判断站型</h2>
+    <p>纯展示不登录 → 模板A（<code>tpl-a/index.html</code>）；要登录/后台/多人数据 → 模板B（<code>tpl-b/index.html</code>）。拿不准就问主人，别猜。</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">2</span>读规矩</h2>
+    <p>开工包 <code>docs/00_做网页的规矩_总纲.md</code> + 对应模板使用说明。五阶段不跳、五行提需求格式——三个真实项目踩出来的，跳过必翻车。</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">3</span>基于模板复制，不要从零写</h2>
+    <p>模板A五步：改三色、换图、改文字。模板B八步：先改路由表 <code>ROUTES</code> 再加页面，身份逻辑已内置别删。</p>
+    <p><b>红线</b>：路由表、切场引擎、设计令牌、错误红点、三态、401/403分流、幂等键——一个字都别删。</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">4</span>跑门禁验收（机械判断）</h2>
+    <p><code>python3.11 开工包/tools/验收门禁.py 你的文件.html</code></p>
+    <p>有 FAIL 自己修到全绿；全绿后再用浏览器真点一遍：页面能切、按钮有反应、无错误红点、手机不溢出。</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">5</span>成品发回主人，别自己推仓库</h2>
+    <p>不要碰 token、不要自己改仓库。推仓库由主线 AI 按 <code>docs/03_验收与推仓库流程.md</code> 做。</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">📁</span>开工包文件清单</h2>
+    <table>
+      <tr><th>文件</th><th>作用</th></tr>
+      <tr><td>START_HERE.md</td><td>给 AI 读的完整入口（本页的文字版）</td></tr>
+      <tr><td>docs/00_做网页的规矩_总纲.md</td><td>开工前必读的规矩</td></tr>
+      <tr><td>docs/01_施工规格书.md</td><td>施工总章程</td></tr>
+      <tr><td>docs/02_经验库_三项目复盘.md</td><td>踩过的坑</td></tr>
+      <tr><td>docs/模板A/B_使用说明.md</td><td>复制模板的步骤</td></tr>
+      <tr><td>docs/模板A/B_交接决策.md</td><td>模板设计红线</td></tr>
+      <tr><td>docs/03_验收与推仓库流程.md</td><td>五步 SOP</td></tr>
+      <tr><td>docs/04_推仓库交接卡.md</td><td>推仓库命令</td></tr>
+      <tr><td>tools/验收门禁.py</td><td>15 项机械验收</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">这套流程不依赖任何特定 AI 的记忆，换谁来都能照做。</div>
+</div>
+</body>
+</html>

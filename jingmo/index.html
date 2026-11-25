@@ -326,7 +326,7 @@ body{
 #app.fest-on.fest-page.fest-spring .deco-spring{display:block}
 /* 春季·水墨垂柳：真实水墨插画素材（透明底），从顶部左上垂落，随风轻摆 */
 .willow-art{position:absolute;top:-10px;left:-30px;width:78%;max-width:420px;aspect-ratio:1;
-  background:url("./fest/spring-willow.png" no-repeat top left/contain;
+  background:url("./fest/spring-willow.png") no-repeat top left/contain;
   transform-origin:top left;animation:willowSway ease-in-out infinite alternate;opacity:.9}
 @keyframes willowSway{from{transform:rotate(-1.5deg)}to{transform:rotate(1.5deg)}}
 /* 春季·飞燕掠过：SVG 剪影，横向飞过并略有起伏 */
@@ -338,7 +338,7 @@ body{
 /* 秋季·南飞雁阵：真实水墨插画素材（透明底），画面右上斜飞，缓慢飘移 */
 #app.fest-on.fest-page.fest-autumn .deco-autumn{display:block}
 .geese-art{position:absolute;top:16%;right:0;width:46%;max-width:280px;aspect-ratio:1024/450;
-  background:url("./fest/autumn-geese.png" no-repeat top right/contain;
+  background:url("./fest/autumn-geese.png") no-repeat top right/contain;
   animation:geeseFly ease-in-out infinite alternate;opacity:.82}
 @keyframes geeseFly{from{transform:translate3d(-8px,4px,0)}to{transform:translate3d(10px,-8px,0)}}
 /* 秋季·淡月：CSS 圆月 + 柔和月晕，左上点缀，不抢雁阵 */
@@ -354,7 +354,7 @@ body{
   box-shadow:0 0 0 1px rgba(170,135,70,.12),0 0 22px rgba(226,198,140,.5),0 0 46px rgba(226,198,140,.28);
   opacity:.62;animation:moonBreathe ease-in-out infinite alternate}
 .rabbit-art{position:absolute;bottom:-2px;right:-2px;width:136px;aspect-ratio:820/610;
-  background:url("./fest/midautumn-rabbit.png" no-repeat bottom right/contain;
+  background:url("./fest/midautumn-rabbit.png") no-repeat bottom right/contain;
   animation:rabbitFloat ease-in-out infinite alternate;opacity:.88}
 @keyframes rabbitFloat{from{transform:translate3d(0,3px,0)}to{transform:translate3d(0,-5px,0)}}
 /* 元旦·红梅远山：真实水墨插画（透明底），移到目录页「每日名言」区做底层点缀（报名页无此容器，不再压卡片/表单）；z-index 在书法下层不挡字。
@@ -362,7 +362,7 @@ body{
 #app.fest-on.fest-page.fest-newyearday .daily-quote .deco-newyearday{display:block}
 /* 四周渐隐：顶部淡出烟花、左右消除裁切硬边、底部溶入纸底，只留山水红梅淡淡伸向远方；书法仍在上层 */
 .newyear-art{position:absolute;top:-6px;right:24px;width:88%;max-width:340px;aspect-ratio:820/774;
-  background:image-set(url("./fest/newyear-firework-plum.webp" type("image/webp"),url("./fest/newyear-firework-plum.png" type("image/png")) no-repeat top right/contain;
+  background:image-set(url("./fest/newyear-firework-plum.webp") type("image/webp"),url("./fest/newyear-firework-plum.png") type("image/png")) no-repeat top right/contain;
   -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0%,transparent 30%,#000 46%,#000 84%,transparent 100%);
   -webkit-mask-composite:source-in;
   mask-image:linear-gradient(90deg,transparent 0%,#000 20%,#000 80%,transparent 100%),linear-gradient(180deg,transparent 0%,transparent 30%,#000 46%,#000 84%,transparent 100%);
@@ -370,6 +370,34 @@ body{
   transform-origin:top right;animation:newyearFloat ease-in-out infinite alternate;opacity:.42;
   filter:saturate(.7)}
 @keyframes newyearFloat{from{transform:translate3d(0,3px,0) scale(1)}to{transform:translate3d(-6px,-4px,0) scale(1.02)}}
+/* ===== 补：夏 / 春节 / 端午 / 国庆 四套专属水墨插画（名言卡片内·渐隐放大版）=====
+   模式沿用 .fest-deco 家族：CSS 门控 + 轻微漂浮动画；素材 webp 主用 png 兜底，放 public/fest/。
+   复现早期"伸向远方"观感：卡片加高让画铺开、contain 等比不裁切、四角锚定、
+   四边椭圆柔化渐隐（中心清晰、边缘化开），透明度略提以见笔意，仍是氛围底层不挡字。 */
+/* 仅节日模式下把名言卡片加高，给放大插画留空间；非节日维持 200px 原高 */
+#app.fest-on.fest-page #s-dir .daily-quote .dq-body{min-height:300px}
+/* 四边椭圆渐隐：中心实、向外到 92% 透明，画面慢慢化开伸向远方，避免硬边碎片 */
+.fest-deco .season-art{position:absolute;inset:-14px;animation-duration:16s;
+  -webkit-mask-image:radial-gradient(ellipse 74% 68% at 50% 50%,#000 40%,transparent 92%);
+  mask-image:radial-gradient(ellipse 74% 68% at 50% 50%,#000 40%,transparent 92%)}
+/* 夏·荷塘：右下淡入 */
+#app.fest-on.fest-page.fest-summer .deco-summer{display:block}
+.deco-summer .summer-art{background:url("./fest/summer-deco.webp?v=2") no-repeat right bottom/contain;
+  opacity:.72;filter:saturate(.85);transform-origin:right bottom;animation:seasonFloatA ease-in-out infinite alternate}
+/* 春节·红梅爆竹：右上淡入 */
+#app.fest-on.fest-page.fest-newyear .deco-newyear{display:block}
+.deco-newyear .newyear-spring-art{background:url("./fest/newyear-deco.webp?v=2") no-repeat right top/contain;
+  opacity:.68;filter:saturate(.88);transform-origin:right top;animation:seasonFloatB ease-in-out infinite alternate}
+/* 端午·龙舟艾草：左下淡入 */
+#app.fest-on.fest-page.fest-dragon .deco-dragon{display:block}
+.deco-dragon .dragon-art{background:url("./fest/dragon-deco.webp?v=2") no-repeat left bottom/contain;
+  opacity:.72;filter:saturate(.85);transform-origin:left bottom;animation:seasonFloatA ease-in-out infinite alternate;animation-duration:14s}
+/* 国庆·华表牡丹：左上淡入 */
+#app.fest-on.fest-page.fest-national .deco-national{display:block}
+.deco-national .national-art{background:url("./fest/national-deco.webp?v=2") no-repeat left top/contain;
+  opacity:.68;filter:saturate(.85);transform-origin:left top;animation:seasonFloatB ease-in-out infinite alternate;animation-duration:15s}
+@keyframes seasonFloatA{from{transform:translate3d(0,4px,0) scale(1)}to{transform:translate3d(5px,-5px,0) scale(1.02)}}
+@keyframes seasonFloatB{from{transform:translate3d(-4px,3px,0) scale(1.01)}to{transform:translate3d(2px,-4px,0) scale(1)}}
 .fx{position:absolute;display:block;top:-9%;pointer-events:none;will-change:transform,opacity}
 /* 雪花 */
 @keyframes fallSnow{0%{transform:translate3d(0,-14px,0) rotate(0);opacity:0}12%{opacity:.95}88%{opacity:.95}100%{transform:translate3d(var(--dx,20px),var(--fall,158px),0) rotate(260deg);opacity:0}}
@@ -391,16 +419,34 @@ body{
 .fx-glow{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle,#fff7cf,#f1d67f);box-shadow:0 0 9px rgba(245,221,138,.9);animation:floatUp ease-in-out infinite alternate}
 /* 灯笼 */
 @keyframes fallLantern{0%{transform:translate3d(0,-26px,0) rotate(-6deg);opacity:0}12%{opacity:.95}88%{opacity:.95}100%{transform:translate3d(var(--dx,16px),var(--fall,158px),0) rotate(7deg);opacity:0}}
-.fx-lantern{width:13px;height:16px;border-radius:6px/4px;background:linear-gradient(#d8453c,#a8231e);box-shadow:0 0 6px rgba(200,50,40,.4);animation:fallLantern linear infinite}
-.fx-lantern::before,.fx-lantern::after{content:"";position:absolute;left:2px;right:2px;height:2px;background:#e8c46a}
-.fx-lantern::before{top:0}.fx-lantern::after{bottom:0}
+.fx-lantern{width:17px;height:22px;border-radius:8px/6px;background:
+    linear-gradient(90deg,transparent 47%,rgba(255,220,150,.7) 50%,transparent 53%),
+    linear-gradient(100deg,#f2684f 0%,#e23a26 38%,#c92218 100%);
+  box-shadow:inset 2px 0 3px rgba(255,214,150,.45),inset -2px 0 4px rgba(120,20,14,.3);
+  border:1px solid rgba(139,24,16,.35);animation:fallLantern linear infinite}
+.fx-lantern::before,.fx-lantern::after{content:"";position:absolute;left:-1px;right:-1px;height:4px;border-radius:2px;
+  background:linear-gradient(#ffe9a8,#e3b53f);border:1px solid rgba(150,110,30,.5)}
+.fx-lantern::before{top:-2px}.fx-lantern::after{bottom:-2px}
 /* 桂花（金色碎点） */
 @keyframes fallOsmanthus{0%{transform:translate3d(0,-18px,0) rotate(0);opacity:0}14%{opacity:.95}86%{opacity:.95}100%{transform:translate3d(var(--dx,26px),var(--fall,156px),0) rotate(200deg);opacity:0}}
 .fx-osmanthus{width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,#ffe9a0,#e9b64f);box-shadow:0 0 5px rgba(233,182,79,.7);animation:fallOsmanthus linear infinite}
 /* 礼花星（自下而上） */
 @keyframes floatStar{0%{transform:translate3d(0,var(--rise-start,20px),0) scale(.5) rotate(0);opacity:0}30%{opacity:1}70%{opacity:1}100%{transform:translate3d(var(--dx,8px),var(--rise,-110px),0) scale(1.2) rotate(120deg);opacity:0}}
 .fx-star{width:10px;height:10px;background:#f4d486;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:floatStar ease-in-out infinite alternate}
-@media (prefers-reduced-motion:reduce){.card.hero>.fest-scene .fx,.fest-full-scene .fx,.fest-clouds .cloud,.fest-deco .willow-art,.fest-deco .swallow,.fest-deco .geese-art,.fest-deco .autumn-moon,.fest-deco .moon-disc,.fest-deco .rabbit-art,.fest-deco .newyear-art{display:none}}
+/* 红梅瓣（春节）：五瓣小梅徐徐飘落，柔粉不糊 */
+@keyframes fallPlum{0%{transform:translate3d(0,-16px,0) rotate(0) scale(.85);opacity:0}14%{opacity:.92}86%{opacity:.92}100%{transform:translate3d(var(--dx,30px),var(--fall,152px),0) rotate(320deg) scale(1);opacity:0}}
+.fx-plum{width:11px;height:11px;background:radial-gradient(circle at 50% 50%,#fff2f5 0 12%,#f4a9c0 13% 60%,#e27599 100%);
+  clip-path:polygon(50% 0,61% 34%,98% 35%,70% 57%,80% 91%,50% 70%,20% 91%,30% 57%,2% 35%,39% 34%);animation:fallPlum linear infinite}
+/* 水花（端午·龙舟）：自下而上溅起再落的淡青水滴 */
+@keyframes splashUp{0%{transform:translate3d(0,14px,0) scale(.5);opacity:0}18%{opacity:.85}55%{opacity:.8}100%{transform:translate3d(var(--dx,8px),var(--rise,-118px),0) scale(1.15);opacity:0}}
+.fx-splash{width:7px;height:10px;top:auto;bottom:8%;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(122,196,208,.95));box-shadow:0 0 6px rgba(110,196,210,.9),inset 0 -1px 2px rgba(70,150,170,.4);animation:splashUp ease-out infinite}
+/* 银杏叶（国庆）：真实扇形银杏——上缘宽弧、正中 V 形缺口、底部细叶柄、放射叶脉；金黄渐变 */
+@keyframes fallGinkgo{0%{transform:translate3d(0,-18px,0) rotate(0);opacity:0}12%{opacity:.9}88%{opacity:.9}100%{transform:translate3d(var(--dx,34px),var(--fall,156px),0) rotate(300deg);opacity:0}}
+.fx-ginkgo{width:15px;height:15px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe9a8'/%3E%3Cstop offset='.5' stop-color='%23e9b64f'/%3E%3Cstop offset='1' stop-color='%23c89a30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 21 L12 13 C6 13 3 11 3 7 C3 3 8 2 11 3 L12 8 L13 3 C16 2 21 3 21 7 C21 11 18 13 12 13 Z' fill='url(%23g)'/%3E%3Cg stroke='%23a9721f' stroke-width='.6' opacity='.5' fill='none'%3E%3Cpath d='M12 13 L5 6'/%3E%3Cpath d='M12 13 L12 5'/%3E%3Cpath d='M12 13 L19 6'/%3E%3C/g%3E%3C/svg%3E") no-repeat center/contain;
+  animation:fallGinkgo linear infinite}
+@media (prefers-reduced-motion:reduce){.card.hero>.fest-scene .fx,.fest-full-scene .fx,.fest-clouds .cloud,.fest-deco .willow-art,.fest-deco .swallow,.fest-deco .geese-art,.fest-deco .autumn-moon,.fest-deco .moon-disc,.fest-deco .rabbit-art,.fest-deco .newyear-art,.fest-deco .season-art,.fx-plum,.fx-splash,.fx-ginkgo{animation:none!important}}
 .rules{margin:14px 0 0;padding:0;font-size:13px;line-height:2;color:var(--ink2)}
 .rules li{list-style:none;position:relative;padding-left:16px}
 .rules li::before{content:"";position:absolute;left:2px;top:13px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
@@ -595,13 +641,23 @@ body.pill-pending .bn-pill-ink{opacity:0}
 body.fest-spring{--pill-bg:linear-gradient(135deg,#5d8e6d,#4e7a5c);--pill-shadow:rgba(78,122,92,.32)}
 body.fest-summer{--pill-bg:linear-gradient(135deg,#c2674e,#b5563f);--pill-shadow:rgba(181,86,63,.32)}
 body.fest-autumn{--pill-bg:linear-gradient(135deg,#ad7c30,#9a6b28);--pill-shadow:rgba(154,107,40,.32)}
-body.fest-newyear,body.fest-national{--pill-bg:linear-gradient(135deg,#c04a40,var(--red));--pill-shadow:rgba(168,50,45,.32)}
+body.fest-newyear{--pill-bg:linear-gradient(135deg,#c04a40,var(--red));--pill-shadow:rgba(168,50,45,.32)}
+/* 国庆·五星红旗融入胶囊本体：国旗红底 + 左上角一大四小金星纹理，白字压在其上依旧清晰 */
+body.fest-national{--pill-bg:linear-gradient(135deg,#e5392c,#c31f16);--pill-shadow:rgba(190,38,28,.36)}
+body.fest-national .bn-pill-ink::before{content:"";position:absolute;left:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;
+  background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Cg%20fill='%23ffe15a'%3E%3Cpolygon%20points='30%2C6%2036.7%2C24.5%2056%2C24.5%2040.5%2C36%2046.2%2C54.5%2030%2C43%2013.8%2C54.5%2019.5%2C36%204%2C24.5%2023.3%2C24.5'/%3E%3Cpolygon%20points='62%2C12%2064.3%2C19.2%2072%2C19.2%2065.9%2C23.6%2068.2%2C30.8%2062%2C26.4%2055.8%2C30.8%2058.1%2C23.6%2052%2C19.2%2059.7%2C19.2'/%3E%3Cpolygon%20points='78%2C30%2080.3%2C37.2%2088%2C37.2%2081.9%2C41.6%2084.2%2C48.8%2078%2C44.4%2071.8%2C48.8%2074.1%2C41.6%2068%2C37.2%2075.7%2C37.2'/%3E%3Cpolygon%20points='78%2C52%2080.3%2C59.2%2088%2C59.2%2081.9%2C63.6%2084.2%2C70.8%2078%2C66.4%2071.8%2C70.8%2074.1%2C63.6%2068%2C59.2%2075.7%2C59.2'/%3E%3Cpolygon%20points='62%2C70%2064.3%2C77.2%2072%2C77.2%2065.9%2C81.6%2068.2%2C88.8%2062%2C84.4%2055.8%2C88.8%2058.1%2C81.6%2052%2C77.2%2059.7%2C77.2'/%3E%3C/g%3E%3C/svg%3E") no-repeat center/contain;opacity:.92;pointer-events:none;z-index:0}
 body.fest-newyearday{--pill-bg:linear-gradient(135deg,#c2674e,#b5563f);--pill-shadow:rgba(181,86,63,.32)}
 /* 元旦胶囊专属：右上角别一朵红梅（内嵌五瓣梅花 SVG），暖红底更暖的内高光；仅元旦皮肤 */
 body.fest-newyearday .bn-pill-ink{box-shadow:0 4px 12px rgba(150,66,58,.30),inset 0 1px 0 rgba(255,240,232,.5)}
 body.fest-newyearday .bn-pill-ink::after{content:"";position:absolute;top:-6px;right:-3px;width:24px;height:24px;
   background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Cdefs%3E%3ClinearGradient%20id%3D'g'%20x1%3D'0'%20y1%3D'0'%20x2%3D'0'%20y2%3D'1'%3E%3Cstop%20offset%3D'0'%20stop-color%3D'%23ffe6ec'%2F%3E%3Cstop%20offset%3D'.55'%20stop-color%3D'%23ef8aa8'%2F%3E%3Cstop%20offset%3D'1'%20stop-color%3D'%23cd4168'%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cg%20fill%3D'url(%23g)'%3E%3Cellipse%20cx%3D'50'%20cy%3D'30'%20rx%3D'15'%20ry%3D'23'%2F%3E%3Cellipse%20cx%3D'50'%20cy%3D'30'%20rx%3D'15'%20ry%3D'23'%20transform%3D'rotate(72%2050%2050)'%2F%3E%3Cellipse%20cx%3D'50'%20cy%3D'30'%20rx%3D'15'%20ry%3D'23'%20transform%3D'rotate(144%2050%2050)'%2F%3E%3Cellipse%20cx%3D'50'%20cy%3D'30'%20rx%3D'15'%20ry%3D'23'%20transform%3D'rotate(216%2050%2050)'%2F%3E%3Cellipse%20cx%3D'50'%20cy%3D'30'%20rx%3D'15'%20ry%3D'23'%20transform%3D'rotate(288%2050%2050)'%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'8'%20fill%3D'%23a81f42'%2F%3E%3Cg%20fill%3D'%23ffd76a'%3E%3Ccircle%20cx%3D'50'%20cy%3D'43'%20r%3D'2.2'%2F%3E%3Ccircle%20cx%3D'56'%20cy%3D'48'%20r%3D'2.2'%2F%3E%3Ccircle%20cx%3D'54'%20cy%3D'55'%20r%3D'2.2'%2F%3E%3Ccircle%20cx%3D'46'%20cy%3D'55'%20r%3D'2.2'%2F%3E%3Ccircle%20cx%3D'44'%20cy%3D'48'%20r%3D'2.2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") no-repeat center/contain;opacity:.9;transform:rotate(-18deg);pointer-events:none}
-body.fest-dragon{--pill-bg:linear-gradient(135deg,#4c8a60,#3f7250);--pill-shadow:rgba(63,114,80,.32)}
+/* 端午·粽子融入胶囊本体：粽叶绿底 + 斜向叶脉 + 两道绑绳，白字压其上清晰 */
+body.fest-dragon{--pill-bg:linear-gradient(135deg,#5c9b5e,#3a7043);--pill-shadow:rgba(52,104,60,.34)}
+body.fest-dragon .bn-pill-ink::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:
+    repeating-linear-gradient(115deg,rgba(255,255,255,.10) 0px,rgba(255,255,255,.10) 1px,transparent 1px,transparent 6px),
+    repeating-linear-gradient(65deg,rgba(20,60,28,.16) 0px,rgba(20,60,28,.16) 1px,transparent 1px,transparent 9px),
+    linear-gradient(90deg,transparent 0%,transparent 30%,rgba(224,196,138,.85) 30%,rgba(224,196,138,.85) 33%,transparent 33%,transparent 67%,rgba(224,196,138,.85) 67%,rgba(224,196,138,.85) 70%,transparent 70%)}
 body.fest-midautumn{--pill-bg:linear-gradient(135deg,#a5813f,var(--gold-deep));--pill-shadow:rgba(140,106,52,.32)}
 /* 小雪/冬季：白云质感胶囊 —— 白蓝渐变 + 云团纹理，文字转冷蓝灰保证可读 */
 body.fest-winter{--pill-bg:linear-gradient(160deg,var(--white),#eaf1f7 60%,#dde8f2);--pill-ink:#3f5a72;--pill-shadow:rgba(72,104,136,.20)}
@@ -934,12 +990,25 @@ textarea.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,141,87,
 /* P1：确认弹窗（带取消）、编辑表单、危险按钮醒目与分行 */
 .dialog .btns{display:flex;gap:10px;padding:0 20px 20px;flex:0 0 auto}
 .dialog .btns .btn{margin:0;flex:1;width:auto}
-#admDlgFields{padding:0 20px;flex:0 0 auto}
-#admDlgFields .fi,#regProfileFields .fi{margin-top:8px}
-#admDlgFields .fl{margin:10px 0 2px}
-/* 登记弹窗：标题左对齐、输入框两侧收窄 */
-#regProfileFields{padding:0 20px 16px}
-#regProfileFields .fl{text-align:left;margin:10px 0 2px}
+/* ===== 弹窗表单统一标准（登记/找回/组织者/反馈）：左右留白对齐标题、标签左对齐、字号16防聚焦缩放、间距透气 =====
+   作用域各自限定 id，不动后台面板里的 .row input.fi 等紧凑控件。 */
+#maskRecover .rc-fields,
+#regProfileFields,
+#admDlgFields{padding:2px 20px 10px;flex:0 0 auto}
+#maskRecover .rc-fields label.fl,
+#regProfileFields label.fl,
+#admDlgFields label.fl{text-align:left;display:block;margin:12px 0 7px;font-size:13px;letter-spacing:1px}
+#maskRecover .rc-fields label.fl:first-child,
+#regProfileFields label.fl:first-child,
+#admDlgFields label.fl:first-child{margin-top:6px}
+#maskRecover .rc-fields input.fi,
+#regProfileFields input.fi,
+#admDlgFields input.fi{padding:14px 14px;font-size:16px;line-height:1.4;margin:0}
+/* 反馈文本域：字号16防聚焦缩放、左右对齐标题、上方留白 */
+#maskFeedback textarea.fi{font-size:16px!important;padding:13px 14px;line-height:1.5}
+/* 前台报名页表单：与弹窗同标准，字号16防聚焦缩放、标签间距放宽；后台面板紧凑控件不受影响 */
+#s-reg input.fi{padding:14px 14px;font-size:16px;line-height:1.4}
+#s-reg label.fl{margin:14px 0 8px}
 .mini.danger{color:var(--white);background:var(--red);border-color:var(--red);font-weight:600}
 .mini.ok{color:var(--ok);border-color:var(--ok-line);background:var(--ok-wash);font-weight:600}
 .evrow .evgrp{flex:0 0 100%;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
@@ -1310,12 +1379,8 @@ body.fest-newyear .bn-pill::after{content:"";position:absolute;top:-9px;right:-7
 /* 中秋·月牙 */
 body.fest-midautumn .bn-pill::after{content:"";position:absolute;top:-9px;right:-7px;width:23px;height:23px;z-index:2;
   background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Cpath%20d='M62%2012a40%2040%200%201%200%2026%2062A42%2042%200%200%201%2062%2012z'%20fill='%23ffe6a0'/%3E%3Ccircle%20cx='26'%20cy='34'%20r='3.5'%20fill='%23ffd76a'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-8deg);opacity:.94;pointer-events:none}
-/* 国庆·五角星 */
-body.fest-national .bn-pill::after{content:"";position:absolute;top:-9px;right:-7px;width:23px;height:23px;z-index:2;
-  background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20x='8'%20y='6'%20width='5'%20height='88'%20rx='2.5'%20fill='%23e0c060'/%3E%3Cpath%20d='M16%2012%20L94%2020%20L89%2066%20Q52%2072%2016%2063%20Z'%20fill='%23e8342e'%20stroke='%23fff6e8'%20stroke-width='4'%20stroke-linejoin='round'/%3E%3Cpolygon%20points='37.0%2C25.0%2039.7%2C33.3%2048.4%2C33.3%2041.4%2C38.4%2044.1%2C46.7%2037.0%2C41.6%2029.9%2C46.7%2032.6%2C38.4%2025.6%2C33.3%2034.3%2C33.3'%20fill='%23ffdf5c'/%3E%3Cpolygon%20points='56.0%2C19.0%2057.1%2C22.5%2060.8%2C22.5%2057.8%2C24.6%2058.9%2C28.0%2056.0%2C25.9%2053.1%2C28.0%2054.2%2C24.6%2051.2%2C22.5%2054.9%2C22.5'%20fill='%23ffdf5c'/%3E%3Cpolygon%20points='66.0%2C29.0%2067.1%2C32.5%2070.8%2C32.5%2067.8%2C34.6%2068.9%2C38.0%2066.0%2C35.9%2063.1%2C38.0%2064.2%2C34.6%2061.2%2C32.5%2064.9%2C32.5'%20fill='%23ffdf5c'/%3E%3Cpolygon%20points='66.0%2C42.0%2067.1%2C45.5%2070.8%2C45.5%2067.8%2C47.6%2068.9%2C51.0%2066.0%2C48.9%2063.1%2C51.0%2064.2%2C47.6%2061.2%2C45.5%2064.9%2C45.5'%20fill='%23ffdf5c'/%3E%3Cpolygon%20points='56.0%2C52.0%2057.1%2C55.5%2060.8%2C55.5%2057.8%2C57.6%2058.9%2C61.0%2056.0%2C58.9%2053.1%2C61.0%2054.2%2C57.6%2051.2%2C55.5%2054.9%2C55.5'%20fill='%23ffdf5c'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-8deg);opacity:.94;pointer-events:none}
-/* 端午·艾草粽 */
-body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7px;width:23px;height:23px;z-index:2;
-  background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Cpath%20d='M50%2016%20L86%2080%20Q50%2094%2014%2080%20Z'%20fill='%23f3e3b8'%20stroke='%233f6b2f'%20stroke-width='4'%20stroke-linejoin='round'/%3E%3Cpath%20d='M50%2016%20L14%2080%20L30%2085%20L50%2032%20Z'%20fill='%235a8f4a'/%3E%3Cpath%20d='M50%2016%20L86%2080%20L70%2085%20L50%2032%20Z'%20fill='%2372a85a'/%3E%3Cpath%20d='M50%2016%20L44%207%20L50%2013%20L56%207%20Z'%20fill='%235a8f4a'%20stroke='%233f6b2f'%20stroke-width='2'/%3E%3Cpath%20d='M22%2060%20Q50%2052%2078%2060'%20stroke='%23c0392b'%20stroke-width='7'%20fill='none'%20stroke-linecap='round'/%3E%3Ccircle%20cx='50'%20cy='58'%20r='5.5'%20fill='%23a93226'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-8deg);opacity:.94;pointer-events:none}
+/* 国庆·五角星：旗面已融入胶囊本体，取消角落单独小旗，避免旗子元素重复 */
+/* 端午·艾草粽：粽子已融入胶囊本体，取消角落单独小粽，避免元素重复 */
 /* ===== 胶囊装饰·物理动效：右滑弹散 + 回目录飘落（仅外层 ::after 装饰，元旦内层红梅不受影响）===== */
 .bn-pill.deco-bursting::after{opacity:0!important}
 .bn-deco-chip{position:absolute;z-index:3;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain;will-change:transform,opacity}
@@ -1333,6 +1398,26 @@ body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7p
    降级：no-fade(右滑返回) / reduced-motion / 不支持 WAAPI 时，JS 直接跳过，瞬间到位。
    新功能接入：页面顶层内容块自动纳入错峰编排；不想入场就加 data-no-enter 属性。 */
 /* titleRise/cardRise 关键帧保留作语义说明，实际播放由 playEnter() 用 WAAPI 完成 */
+
+/* ==================== R4 竞墨·前端错误红点 ==================== */
+#errDot{position:fixed;right:16px;bottom:92px;z-index:9990;width:44px;height:44px;border-radius:50%;
+  background:var(--red,#C0392B);color:#FFFFFF;display:none;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+  border:2px solid rgba(255,255,255,.7)}
+#errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
+  background:var(--red,#C0392B);border:1.5px solid #FFFFFF;color:#FFFFFF;font-size:11px;line-height:16px;
+  text-align:center;padding:0 3px;box-sizing:border-box}
+#errPanel{position:fixed;left:12px;right:12px;bottom:150px;z-index:9991;max-height:60vh;overflow:auto;
+  display:none;background:#FFFFFF;border-radius:14px;padding:14px 16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.25);
+  font-size:14px;color:#222;line-height:1.7}
+#errPanel h4{margin:0 0 6px;font-size:15px;font-weight:600}
+#errPanel .hint{font-size:12.5px;color:rgba(34,34,34,.7);margin-bottom:8px}
+#errPanel .row{padding:6px 0;border-bottom:1px solid rgba(0,0,0,.12);overflow-wrap:break-word}
+#errPanel .row .t{font-size:11.5px;color:rgba(34,34,34,.55)}
+#errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;
+  background:var(--red,#C0392B);color:#FFFFFF;font-size:14px;cursor:pointer}
+
 </style>
 </head>
 <style>
@@ -1347,7 +1432,7 @@ body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7p
 <div class="boot-cover" id="bootCover" aria-hidden="true"></div>
 <div id="wm"></div>
 <div id="app">
-<div class="fest-full" id="festFull" aria-hidden="true"><div class="fest-full-wash"></div><div class="fest-clouds"><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="cloud c4"></i></div><div class="fest-deco deco-spring"><div class="willow-art"></div><i class="swallow sw1"></i><i class="swallow sw2"></i></div><div class="fest-deco deco-autumn"><div class="autumn-moon"></div><div class="geese-art"></div></div><div class="fest-full-scene" id="festFullScene"></div></div>
+<div class="fest-full" id="festFull" aria-hidden="true"><div class="fest-full-wash"></div><div class="fest-clouds"><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="cloud c4"></i></div><div class="fest-full-scene" id="festFullScene"></div></div>
 <div class="wrap">
 
   <!-- 赛事目录（第 2 步新增；/ 不带 e 时显示） -->
@@ -1395,6 +1480,12 @@ body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7p
     <!-- 彩蛋·每日名言：仿黄庭坚帖，竖排右起 + 落款 + 朱印；从报名页移到赛事目录页，避开报名首屏 -->
     <div class="daily-quote" id="dailyQuote" style="margin-top:18px">
       <div class="fest-clouds dq-clouds"><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="cloud c4"></i></div>
+      <div class="fest-deco deco-spring"><div class="willow-art"></div><i class="swallow sw1"></i><i class="swallow sw2"></i></div>
+      <div class="fest-deco deco-autumn"><div class="autumn-moon"></div><div class="geese-art"></div></div>
+      <div class="fest-deco deco-summer"><div class="season-art summer-art"></div></div>
+      <div class="fest-deco deco-newyear"><div class="season-art newyear-spring-art"></div></div>
+      <div class="fest-deco deco-dragon"><div class="season-art dragon-art"></div></div>
+      <div class="fest-deco deco-national"><div class="season-art national-art"></div></div>
       <div class="fest-deco deco-midautumn"><div class="moon-disc"></div><div class="rabbit-art"></div></div>
       <div class="fest-deco deco-newyearday"><div class="newyear-art"></div></div>
       <div class="dq-body">
@@ -2026,6 +2117,23 @@ body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7p
     <button class="btn red" id="profileOk">确 认 并 继 续</button>
   </div>
 </div></div>
+<!-- 跨设备找回：换浏览器/换手机后，凭报名时姓名+学号取回本机令牌（服务器只读匹配，不改数据） -->
+<div class="mask" id="maskRecover"><div class="dialog">
+  <h3>找回我的报名记录</h3>
+  <p style="font-size:12.5px;color:var(--mute);line-height:1.7;margin:2px 0 12px">
+    报名记录保存在赛事平台，不会丢失。换手机或换浏览器打开时，填写报名时用的<b>姓名</b>和<b>学号</b>，即可把记录显示在这台设备上。
+  </p>
+  <div class="rc-fields">
+    <label class="fl">姓 名 <span style="color:var(--danger)">*</span></label>
+    <input class="fi" id="rcName" placeholder="报名时填写的姓名" maxlength="30" autocomplete="off">
+    <label class="fl">学 号 <span style="color:var(--danger)">*</span></label>
+    <input class="fi" id="rcSid" placeholder="报名时填写的学号" maxlength="30" autocomplete="off" inputmode="numeric">
+  </div>
+  <div class="btns">
+    <button class="btn ghost" id="rcCancel">取 消</button>
+    <button class="btn red" id="rcOk">找 回 记 录</button>
+  </div>
+</div></div>
 <!-- 组织者身份识别：首次设置密码 / 已有密码登录 -->
 <div class="mask" id="maskAdmin"><div class="dialog">
   <h3 id="admDlgT">组织者</h3>
@@ -2093,6 +2201,67 @@ body.fest-dragon .bn-pill::after{content:"";position:absolute;top:-9px;right:-7p
 </div></div>
 
 <script>
+/* R4 竞墨·前端错误红点：必须置于所有业务脚本之前，否则早期错误漏记。
+   记录：JS错误 + Promise未处理 + fetch包装(状态码>=400/网络层失败) → localStorage jm_errlog_v1(上限50)。
+   只记录不改行为：fetch 包装在失败时原样 rethrow，业务层 catch 照常工作。 */
+(function(){
+  var KEY='jm_errlog_v1', MAX=50;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+  function fmt(ts){var d=new Date(ts);function p(x){return(x<10?'0':'')+x}
+    return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  function add(msg){var a=load();a.push({t:Date.now(),m:String(msg).slice(0,300)});
+    try{localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX)))}catch(e){} render()}
+  window.addEventListener('error',function(e){
+    add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''))},true);
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'))});
+  /* fetch 包装：接口失败也记录（<400 不记，避免正常响应刷爆） */
+  var of=window.fetch;
+  if(of){window.fetch=function(){
+    var url=(arguments[0]&&arguments[0].url)||arguments[0];
+    return of.apply(this,arguments).then(function(r){
+      if(r.status>=400){add('接口 '+r.status+'：'+String(url).slice(0,120))}
+      return r;
+    },function(err){
+      add('接口网络失败：'+String(url).slice(0,120)+'（'+(err&&err.message||'连接中断')+'）');
+      throw err;
+    });
+  };}
+  function render(){
+    if(!document.body)return;
+    var a=load(),n=a.length,dot=document.getElementById('errDot');
+    if(!n){if(dot){dot.style.display='none'}var p0=document.getElementById('errPanel');if(p0){p0.style.display='none'}return}
+    if(!dot){
+      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      dot.onclick=function(){
+        var cur=load(),c=cur.length;
+        var p=document.getElementById('errPanel');
+        if(!p)return;
+        if(p.style.display==='block'){p.style.display='none';return}
+        var b='';cur.forEach(function(x){
+          b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
+        p.innerHTML='<h4>&#9888; 页面出过错（'+c+' 条）</h4>'
+          +'<div class="hint">发生了什么：打开网站以来捕获到 '+c+' 条脚本/接口错误。'
+          +'<br>为什么：某次运行有代码或接口出错，红点不会自动消失、刷新仍在。'
+          +'<br>怎么办：把下面带时间的几行截图发给制作方定位；确认无需处理后点「清除全部」。</div>'
+          +b+'<button class="clr">清除全部</button>';
+        p.style.display='block';
+        p.querySelector('.clr').onclick=function(){
+          localStorage.removeItem(KEY);p.style.display='none';render()};
+      };
+      document.body.appendChild(dot);
+      var pnl=document.createElement('div');pnl.id='errPanel';pnl.style.display='none';
+      document.body.appendChild(pnl);
+    }
+    dot.style.display='flex';
+    dot.querySelector('.n').textContent=(n>9?'9+':n);
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render)}else{render()}
+})();
+</script>
+
+<script>
 (function(){
 "use strict";
 var $ = function(s){ return document.querySelector(s); };
@@ -2141,7 +2310,7 @@ var S = { questions: [], answers: [], idx: 0, total: 0, endAt: 0, left: 0, leave
 /* ===== 彩蛋·节气/节日就近皮肤 =====
    按「比赛日期」找日历上最近的节气或节日（非今天），一年里间隔最多十余天，几乎每场都能落到应景皮肤。
    24 节气用公历近似日（±1~2 天不影响就近），按季节共用 4 套主题色；4 个节日各一套。纯前端展示。 */
-/* fx = 该节气专属粒子动画：snow雪/petal花瓣/rain雨/leaf落叶/glow光斑/lantern灯笼/osmanthus桂花/star礼花 */
+/* fx = 该节气专属粒子动画：snow雪/petal花瓣/rain雨/leaf落叶/glow光斑/lantern灯笼/osmanthus桂花/star礼花/plum红梅/splash水花/ginkgo银杏 */
 var SOLAR_TERMS = [
   {n:"小寒",m:1,d:6,fx:"snow"},{n:"大寒",m:1,d:20,fx:"snow"},{n:"立春",m:2,d:4,fx:"petal"},{n:"雨水",m:2,d:19,fx:"rain"},
   {n:"惊蛰",m:3,d:6,fx:"petal"},{n:"春分",m:3,d:21,fx:"petal"},{n:"清明",m:4,d:5,fx:"rain"},{n:"谷雨",m:4,d:20,fx:"rain"},
@@ -2152,10 +2321,10 @@ var SOLAR_TERMS = [
 ];
 var FESTIVALS = [
   {key:"newyearday",n:"元旦",m:1,d:1,type:"fest",fx:"star"},    // 公历新年，独立于春节
-  {key:"newyear",n:"春节",m:1,d:22,type:"fest",fx:"lantern"},   // 农历近似，仅用于就近判定
-  {key:"dragon",n:"端午",m:6,d:10,type:"fest",fx:"rain"},
+  {key:"newyear",n:"春节",m:1,d:22,type:"fest",fx:"plum"},    // 农历近似，仅用于就近判定
+  {key:"dragon",n:"端午",m:6,d:10,type:"fest",fx:"splash"},
   {key:"midautumn",n:"中秋",m:9,d:20,type:"fest",fx:"osmanthus"},
-  {key:"national",n:"国庆",m:10,d:1,type:"fest",fx:"star"}
+  {key:"national",n:"国庆",m:10,d:1,type:"fest",fx:"ginkgo"}
 ];
 /* 按节气序号定季节（四立为界）：0-1 小寒大寒=冬；2-7 立春~谷雨=春；8-13 立夏~大暑=夏；14-19 立秋~霜降=秋；20-23 立冬~冬至=冬 */
 function termSeason(i){ return (i<=1||i>=20) ? "winter" : (i<=7 ? "spring" : (i<=13 ? "summer" : "autumn")); }
@@ -2182,7 +2351,7 @@ function renderFestFx(fx){
   var cardScenes = [document.getElementById("festScene"), document.getElementById("dirFestScene")].filter(Boolean);
   var fullScene  = document.getElementById("festFullScene");
   if (!cardScenes.length && !fullScene) return;
-  var COUNT = {snow:18,petal:13,rain:20,leaf:12,glow:11,lantern:6,osmanthus:15,star:12};
+  var COUNT = {snow:18,petal:13,rain:20,leaf:12,glow:11,lantern:6,osmanthus:15,star:12,plum:13,splash:11,ginkgo:13};
   var cls = "fx-" + fx;
   // 整屏粒子倍率：早期为2倍偏密（组织者反馈满屏太多），改为1倍疏朗适当；改这一个数即可整体调整
   var FULL_FACTOR = 1;
@@ -2199,9 +2368,15 @@ function renderFestFx(fx){
       if (fx === "snow" && i % 3 === 0) p.classList.add("fx-flake");  // 每3片混入一朵六角雪花，层次更分明
       p.style.left = (Math.random()*100).toFixed(1) + "%";
       p.style.animationDelay = (-Math.random()*7).toFixed(2) + "s";
-      p.style.animationDuration = (3.4 + Math.random()*3.2).toFixed(2) + "s";
+      // 银杏叶轻而缓：单独用更长、更集中的时长区间，避免个别个体 3 秒掠过整屏显得忽快
+      if (fx === "ginkgo"){
+        p.style.animationDuration = (8.5 + Math.random()*2.5).toFixed(2) + "s";
+        p.style.setProperty("--fall", "92vh");   // 落距略收，配合长时长让速度匀速从容
+      } else {
+        p.style.animationDuration = (3.4 + Math.random()*3.2).toFixed(2) + "s";
+      }
       p.style.setProperty("--dx", ((Math.random()*2-1)*44).toFixed(0) + "px");
-      var sc = (0.75 + Math.random()*0.55).toFixed(2);
+      var sc = (fx === "lantern") ? (0.92 + Math.random()*0.28).toFixed(2) : (0.75 + Math.random()*0.55).toFixed(2);
       p.style.zoom = sc;
       frag.appendChild(p);
     }
@@ -2235,7 +2410,7 @@ function applyFestSkin(startAt){
   try {
     var _pf = new URLSearchParams(location.search).get("fest");
     if (_pf && FEST_THEMES.indexOf(_pf) >= 0){
-      var _pfx = {winter:"snow",newyearday:"star",newyear:"lantern",spring:"petal",autumn:"leaf",summer:"glow",midautumn:"osmanthus",national:"star",dragon:"glow"};
+      var _pfx = {winter:"snow",newyearday:"star",newyear:"plum",spring:"petal",autumn:"leaf",summer:"glow",midautumn:"osmanthus",national:"ginkgo",dragon:"splash"};
       var _pname = {winter:"小雪",newyearday:"元旦",newyear:"春节",spring:"春分",autumn:"秋分",summer:"夏至",midautumn:"中秋",national:"国庆",dragon:"端午"};
       hit = {n:_pname[_pf]||_pf, type:"fest", idx:0, theme:_pf, key:_pf, fx:_pfx[_pf]||"glow", days:0, d:ref};
     }
@@ -2878,11 +3053,51 @@ function myRecordsRender(r){
   if (!r.list || !r.list.length) return '<div class="tip">暂无参赛记录。报名比赛后即可在这里查看成绩与名次。</div>';
   return myRecordsHtml(r.list);
 }
+/* ---- 跨设备找回：姓名+学号向服务器取回报名令牌（只读匹配，不改任何数据） ---- */
+function openRecoverDlg(){
+  var p = loadProfile() || {};
+  $("#rcName").value = p.name || "";
+  $("#rcSid").value  = p.sid || "";
+  $("#maskRecover").classList.add("on");
+  setTimeout(function(){ $("#rcName").focus(); }, 60);
+}
+$("#rcCancel").onclick = function(){ $("#maskRecover").classList.remove("on"); };
+$("#maskRecover").onclick = function(ev){ if (ev.target === this) this.classList.remove("on"); };
+$("#rcOk").onclick = function(){
+  var name = $("#rcName").value.trim(), sid = $("#rcSid").value.trim();
+  if (!name){ toast("请填写姓名", "warn"); return; }
+  if (!sid){ toast("请填写学号", "warn"); return; }
+  var btn = this, mg = morph(btn);
+  req("/api/recover", { method:"POST", body:{ name:name, sid:sid, device:devId() } }).then(function(r){
+    if (r.error){ mg.fail(function(){ dlg("无法找回", esc(r.error)); }); return; }
+    mg.success(function(){
+      $("#maskRecover").classList.remove("on");
+      T.token = r.token;
+      localStorage.setItem("lt_token", r.token);
+      localStorage.setItem("lt_name", r.name || name);
+      saveProfile({ name: r.name || name, sid: r.sid || sid, cls: (loadProfile()||{}).cls || "" });
+      toast("已找回，正在载入你的记录", "ok");
+      invalidateCache("meRecords");
+      loadMyRecords();
+      /* 若当前停在作品赛详情页，找回后重渲染该页：已报名者直接显示自己的作品，而非空白报名表 */
+      if (typeof wkRefresh === "function"){
+        var active = document.querySelector(".screen.active");
+        if (active && active.id === "s-works") wkRefresh();
+      }
+      /* 报名页/成绩页的按钮状态同步 */
+      if (T.token && $("#btnMyResult")) $("#btnMyResult").style.display = "block";
+    });
+  });
+};
+
 function loadMyRecords(){
   var box = $("#meRecords");
   if (!T.token){
     invalidateCache("meRecords");
-    box.innerHTML = '<div class="tip">你还没有在本机报名参赛。请在「赛事目录」选择一场比赛报名，成绩与名次会显示在这里。</div>';
+    box.innerHTML = '<div class="tip">这台设备还没有你的报名记录。若已在别处（微信 / 另一台手机 / 电脑）报过名，'+
+      '点下方按钮即可把记录取回；或在「赛事目录」选择一场比赛新报名。</div>'+
+      '<button class="btn ghost sm" id="btnRecover" style="margin-top:10px">换设备 / 换浏览器，找回我的记录</button>';
+    $("#btnRecover").onclick = openRecoverDlg;
     return;
   }
   cachedLoad({
@@ -3545,10 +3760,10 @@ function syncBotNav(id){
   if (!isNavScreen) return;
   /* 目录页高亮“赛事目录”，我的页高亮“我的”，管理端高亮“管理后台”，其余页不高亮 */
   var which = (id === "#s-dir") ? "dir" : (id === "#s-me") ? "me" : (id === "#s-admin") ? "admin" : "";
-  var admin = (typeof isAdminLocal === "function") && isAdminLocal();
+  /* 管理后台入口常驻：不再按本机令牌隐藏。老师换电脑/换浏览器打开同样能看到入口，
+     未登录时点击进登录页输组织者姓名+密码即可，安全性由密码保证，不依赖某台设备。 */
   var target = null;
   document.querySelectorAll("#botnav .bn").forEach(function(b){
-    if (b.dataset.bn === "admin") b.style.display = admin ? "" : "none";
     var on = (b.dataset.bn === which);
     b.classList.toggle("on", on);
     if (on) target = b;
@@ -4908,7 +5123,9 @@ function renderWorks(er){
       '<label class="fl">学 号 *</label><input class="fi" id="wkSid" placeholder="8 位学号，如 20240001" maxlength="8" autocomplete="off" inputmode="numeric">'+
       '<label class="fl">班级 / 专业</label><input class="fi" id="wkCls" maxlength="30" autocomplete="off">'+
       (er.needCode?'<label class="fl">比赛口令</label><input class="fi" id="wkCode" maxlength="20" autocomplete="off">':'')+
-      '<button class="btn red" id="btnWkJoin" style="margin-top:12px">报 名 并 前 往 投 稿</button></div>';
+      '<button class="btn red" id="btnWkJoin" style="margin-top:12px">报 名 并 前 往 投 稿</button>'+
+      '<button class="btn ghost sm" id="btnWkRecover" style="margin-top:10px">换设备 / 换浏览器，找回我的记录</button></div>';
+    $("#btnWkRecover").onclick = openRecoverDlg;
     $("#btnWkJoin").onclick = function(){
       var nm=$("#wkName").value.trim(), sd=$("#wkSid").value.trim();
       if(!nm){toast("请填写姓名","warn");return;} if(!sd){toast("请填写学号","warn");return;}
@@ -5834,7 +6051,7 @@ syncEvTypeSettings();
 /* ===================== UI 交互增强第二批 ===================== */
 /* 1) 浮动标签：白名单输入框空且失焦时 label 复原、聚焦或有值时上浮高亮。
    只作用于指定 id（登记/报名/登录/投稿），绝不触碰后台几十个表单，避免回归。 */
-var FF_IDS = ["inName","inSid","inCls","inCode","pfName","pfSid","pfCls",
+var FF_IDS = ["inName","inSid","inCls","inCode","pfName","pfSid","pfCls","rcName","rcSid",
   "wkName","wkSid","wkCls","wkTitleIn","inAdminName","maName","maKlass","maTitle","maStyle","maComment"];
 function initFloatLabels(){
   FF_IDS.forEach(function(id){
@@ -6393,6 +6610,7 @@ try {
   enterChain(["inAdminName","inPass"], "btnLogin");
   enterChain(["inName","inSid","inCls","inCode"], "btnReg");
   enterChain(["pfName","pfSid","pfCls"], "profileOk");
+  enterChain(["rcName","rcSid"], "rcOk");
   enterChain(["accName","accPass"], "btnAddAcc");
 } catch(e){}
 </script>

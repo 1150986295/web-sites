@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI 工具导航 · 一页收好</title>
+<meta name="description" content="写作、绘图、编程、办公四类 AI 工具的本地单页导航，纯前端实现，断网也能打开。">
+<style>
+/* ========== 一、设计令牌 ========== */
+:root{
+  --bg:#06070C;
+  --bg-2:#0A0C14;
+  --card:rgba(255,255,255,.055);
+  --card-2:rgba(255,255,255,.085);
+  --ink:#F3F4F8;
+  --ink-2:rgba(243,244,248,.72);
+  --ink-3:rgba(243,244,248,.54);
+  --line:rgba(255,255,255,.11);
+  --line-2:rgba(255,255,255,.2);
+  --primary:#6E8CFF;
+  --accent:#B07CFF;
+  --cyan:#5EE7FF;
+  --danger:#D22B4C;
+
+  /* 分类色（只用于图标与标签，不抢主操作） */
+  --c-writing:#8FB2FF; --c-writing-soft:rgba(143,178,255,.12); --c-writing-line:rgba(143,178,255,.32);
+  --c-image:#C39BFF;  --c-image-soft:rgba(195,155,255,.12);  --c-image-line:rgba(195,155,255,.32);
+  --c-code:#6FE0F2;   --c-code-soft:rgba(111,224,242,.12);   --c-code-line:rgba(111,224,242,.32);
+  --c-office:#8BE3B4; --c-office-soft:rgba(139,227,180,.12); --c-office-line:rgba(139,227,180,.32);
+
+  /* 字号五档：正文不小于 16px */
+  --fs-hero:clamp(36px,6.4vw,60px);
+  --fs-h1:21px;
+  --fs-body:16px;
+  --fs-sub:15px;
+  --fs-mini:13px;
+
+  /* 间距四档 / 圆角两档 */
+  --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
+  --r-s:14px; --r-l:22px;
+
+  /* 阴影：X 恒为 0，模糊 > 偏移，扩散全为负，颜色 rgba(0,0,0,.14~.18) */
+  --sh-1:0 4px 12px -2px rgba(0,0,0,.18), 0 12px 30px -8px rgba(0,0,0,.16);
+  --sh-2:0 8px 32px -6px rgba(0,0,0,.18), 0 2px 10px -2px rgba(0,0,0,.14);
+  --sh-float:0 14px 40px -10px rgba(0,0,0,.18), 0 4px 14px -4px rgba(0,0,0,.16);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%; overflow-x:hidden}
+body{
+  margin:0; min-height:100vh; overflow-x:hidden;
+  background:var(--bg); color:var(--ink);
+  font-size:var(--fs-body); line-height:1.7;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+  touch-action:pan-y;
+}
+img{max-width:100%; display:block}
+h1,h2,h3,p{margin:0}
+button{font-family:inherit; cursor:pointer; border:0; color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+
+/* 背景：近黑底 + 蓝紫冷光 + 极淡网格 */
+.bg{position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(56vw 42vw at 6% -8%, rgba(110,140,255,.22), transparent 64%),
+    radial-gradient(50vw 36vw at 97% 0%, rgba(176,124,255,.18), transparent 62%),
+    radial-gradient(64vw 40vw at 50% 108%, rgba(94,231,255,.08), transparent 62%),
+    linear-gradient(180deg,#06070C 0%,#090B12 48%,#06070C 100%);
+}
+.bg::after{content:""; position:absolute; inset:0; opacity:.55;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size:76px 76px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%);
+  mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%);
+}
+
+/* ========== 二、头部 ========== */
+.wrap{width:100%; max-width:1120px; margin:0 auto;
+  padding:calc(34px + env(safe-area-inset-top)) clamp(18px,4vw,40px) calc(40px + env(safe-area-inset-bottom))}
+.hd{max-width:820px; margin:0 auto; text-align:center}
+.kicker{display:inline-flex; align-items:center; gap:8px; padding:7px 14px;
+  font-size:var(--fs-mini); letter-spacing:.16em; color:var(--ink-2);
+  border:1px solid var(--line); border-radius:999px;
+  background:rgba(255,255,255,.04); box-shadow:var(--sh-1)}
+.kicker i{width:6px; height:6px; border-radius:50%; background:linear-gradient(120deg,var(--primary),var(--accent))}
+.hd h1{margin-top:var(--sp-3); font-size:var(--fs-hero); line-height:1.1; font-weight:800; letter-spacing:.01em}
+.hd h1 span{background:linear-gradient(100deg,#7FA0FF 0%,#B58CFF 55%,#6FE6FF 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent}
+.lede{max-width:620px; margin:var(--sp-2) auto 0; font-size:var(--fs-body); color:var(--ink-2); line-height:1.75}
+.stats{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:var(--sp-3);
+  font-size:var(--fs-mini); color:var(--ink-3)}
+.stats span{padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.03)}
+.stats b{color:var(--ink); font-weight:600}
+
+/* ========== 三、搜索与筛选 ========== */
+.panel{position:relative; overflow:hidden;
+  margin:clamp(26px,4vw,40px) auto 0; padding:clamp(14px,2.4vw,20px);
+  border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-1);
+  background:
+    radial-gradient(120% 110% at 100% 0%, rgba(176,124,255,.08), transparent 58%),
+    linear-gradient(150deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+  -webkit-backdrop-filter:blur(20px) saturate(135%); backdrop-filter:blur(20px) saturate(135%);
+}
+.panel::before{content:""; position:absolute; left:8%; right:8%; top:0; height:1px; opacity:.85;
+  background:linear-gradient(90deg,transparent,rgba(110,140,255,.65),rgba(176,124,255,.7),rgba(94,231,255,.45),transparent)}
+.search{display:flex; align-items:center; gap:10px; height:54px; padding:0 14px;
+  border:1px solid var(--line); border-radius:var(--r-s); background:rgba(8,10,18,.55);
+  transition:border-color .2s ease, background .2s ease;
+}
+.search:focus-within{border-color:rgba(150,160,255,.6); background:rgba(10,12,22,.72);
+  outline:2px solid rgba(150,160,255,.22); outline-offset:2px}
+.search>svg{flex:none; width:20px; height:20px; color:var(--ink-3)}
+#q{flex:1; min-width:0; height:100%; background:none; border:0; outline:none;
+  color:var(--ink); font-size:var(--fs-body)}
+#q::placeholder{color:var(--ink-3)}
+#q::-webkit-search-cancel-button{-webkit-appearance:none; appearance:none}
+#clearBtn{flex:none; display:grid; place-items:center; width:30px; height:30px; padding:0;
+  border-radius:50%; background:rgba(255,255,255,.06); color:var(--ink-2);
+  transition:background .2s ease}
+#clearBtn:hover{background:rgba(255,255,255,.12)}
+#clearBtn svg{width:14px; height:14px}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:var(--sp-2)}
+.chip{display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:7px 14px;
+  border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.035);
+  color:var(--ink-2); font-size:var(--fs-sub); font-weight:500;
+  transition:color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.chip b{font-size:12px; font-weight:600; color:var(--ink-3); transition:color .2s ease}
+.chip:hover{border-color:var(--line-2); color:var(--ink)}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed="true"]{color:#07090F; border-color:transparent; font-weight:650;
+  background:linear-gradient(120deg,#7FA0FF,#B58CFF); box-shadow:var(--sh-1)}
+.chip[aria-pressed="true"] b{color:rgba(7,9,15,.56)}
+.hitline{margin:var(--sp-2) 2px 0; min-height:22px; font-size:var(--fs-mini); color:var(--ink-3)}
+
+/* ========== 四、卡片列表 ========== */
+.list{margin-top:clamp(18px,2.6vw,26px)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:clamp(12px,2vw,18px);
+  transition:opacity .18s ease, transform .18s ease;
+}
+.grid.switching{opacity:0; transform:translateY(6px)}
+.card{position:relative; display:flex; flex-direction:column; gap:var(--sp-2);
+  padding:clamp(18px,2.4vw,24px); overflow:hidden;
+  border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-1);
+  background:linear-gradient(155deg, rgba(255,255,255,.10), rgba(255,255,255,.032) 62%, rgba(255,255,255,.058));
+  -webkit-backdrop-filter:blur(18px) saturate(130%); backdrop-filter:blur(18px) saturate(130%);
+  transition:transform .24s cubic-bezier(.2,.7,.2,1), border-color .24s ease, box-shadow .24s ease;
+}
+.card::before{content:""; position:absolute; inset:0 0 auto; height:1px; opacity:.85;
+  background:linear-gradient(90deg,var(--cat),rgba(255,255,255,.2) 38%,transparent 82%)}
+.card::after{content:""; position:absolute; right:-40px; top:-50px; width:180px; height:150px;
+  pointer-events:none; opacity:.55;
+  background:radial-gradient(circle at 50% 50%, var(--cat-soft), transparent 70%)}
+.card:hover{transform:translateY(-4px); border-color:var(--cat-line); box-shadow:var(--sh-2)}
+.card.anim{animation:rise .5s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i,0) * 45ms)}
+.card-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.icon{width:48px; height:48px; flex:none; display:grid; place-items:center; border-radius:13px;
+  color:var(--cat); border:1px solid var(--cat-line);
+  background:linear-gradient(145deg, var(--cat-soft), rgba(255,255,255,.02))}
+.icon svg{width:24px; height:24px}
+.tag{flex:none; padding:6px 10px; border-radius:999px; font-size:var(--fs-mini); line-height:1;
+  letter-spacing:.04em; color:var(--cat); background:var(--cat-soft); border:1px solid var(--cat-line)}
+.card h3{font-size:var(--fs-h1); line-height:1.3; font-weight:650; letter-spacing:.01em}
+.card p{font-size:var(--fs-body); line-height:1.72; color:var(--ink-2)}
+.cat-writing{--cat:var(--c-writing); --cat-soft:var(--c-writing-soft); --cat-line:var(--c-writing-line)}
+.cat-image{--cat:var(--c-image); --cat-soft:var(--c-image-soft); --cat-line:var(--c-image-line)}
+.cat-code{--cat:var(--c-code); --cat-soft:var(--c-code-soft); --cat-line:var(--c-code-line)}
+.cat-office{--cat:var(--c-office); --cat-soft:var(--c-office-soft); --cat-line:var(--c-office-line)}
+
+/* ========== 五、三态 ========== */
+.state{padding:clamp(26px,4vw,44px) 18px; text-align:center;
+  border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-1);
+  background:linear-gradient(150deg, rgba(255,255,255,.085), rgba(255,255,255,.03));
+  -webkit-backdrop-filter:blur(18px) saturate(130%); backdrop-filter:blur(18px) saturate(130%);
+}
+.state-icon{width:56px; height:56px; margin:0 auto var(--sp-2); display:grid; place-items:center;
+  border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.05); color:var(--ink-2)}
+.state-icon svg{width:26px; height:26px}
+.state h2{font-size:19px; line-height:1.4; margin-bottom:6px}
+.state p{max-width:480px; margin:0 auto; font-size:var(--fs-sub); line-height:1.75; color:var(--ink-2)}
+.state .act{margin-top:var(--sp-3); padding:10px 22px; min-height:44px; border-radius:999px;
+  color:#07090F; font-size:var(--fs-sub); font-weight:650;
+  background:linear-gradient(120deg,#7FA0FF,#B58CFF); box-shadow:var(--sh-1)}
+.loading p{margin-top:var(--sp-3); color:var(--ink-3); font-size:var(--fs-mini)}
+.sk-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; text-align:left}
+.sk-card{height:168px; padding:20px; border:1px solid var(--line); border-radius:var(--r-l);
+  background:rgba(255,255,255,.035)}
+.sk-line{height:13px; border-radius:7px;
+  background:linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.05) 75%);
+  background-size:200% 100%; animation:sk 1.2s linear infinite}
+.sk-line+.sk-line{margin-top:12px}
+.sk-line.short{width:64%}
+.sk-line.tiny{width:38%}
+.err-state{border-color:rgba(255,90,118,.34); background:linear-gradient(150deg, rgba(255,90,118,.08), rgba(255,255,255,.02))}
+.err-state .state-icon{color:var(--danger); border-color:rgba(255,90,118,.3); background:rgba(255,90,118,.08)}
+.err-state .act{background:var(--danger); color:#fff}
+.empty .act{background:rgba(255,255,255,.08); border:1px solid var(--line-2); color:var(--ink)}
+
+/* ========== 六、页脚 ========== */
+.ft{max-width:820px; margin:clamp(32px,5vw,50px) auto 0; padding-top:var(--sp-3);
+  border-top:1px solid var(--line); text-align:center;
+  font-size:var(--fs-mini); line-height:1.9; color:var(--ink-3)}
+
+/* ========== 七、错误红点（内置能力，勿删） ========== */
+#errDot{position:fixed; right:18px; bottom:22px; z-index:9990; width:44px; height:44px;
+  border-radius:50%; background:var(--danger); color:#fff; display:none;
+  align-items:center; justify-content:center; font-size:18px; cursor:pointer;
+  box-shadow:0 4px 12px -2px rgba(0,0,0,.18); border:2px solid rgba(255,255,255,.7)}
+#errDot .n{position:absolute; top:-4px; right:-6px; min-width:18px; height:18px; padding:0 3px;
+  border-radius:9px; background:var(--danger); border:1.5px solid var(--bg);
+  color:#fff; font-size:11px; line-height:16px; text-align:center; box-sizing:border-box}
+#errPanel{position:fixed; left:12px; right:12px; bottom:84px; z-index:9991; max-height:60vh; overflow:auto;
+  display:none; padding:14px 16px; border:1px solid var(--line); border-radius:14px;
+  background:linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
+  -webkit-backdrop-filter:blur(20px) saturate(130%); backdrop-filter:blur(20px) saturate(130%);
+  box-shadow:var(--sh-float); font-size:var(--fs-mini); color:var(--ink); line-height:1.7}
+#errPanel h4{margin:0 0 6px; font-size:15px; font-weight:600}
+#errPanel .hint{font-size:12.5px; color:var(--ink-2); margin-bottom:8px}
+#errPanel .row{padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); overflow-wrap:break-word}
+#errPanel .row .t{font-size:11.5px; color:var(--ink-3)}
+#errPanel .clr{margin-top:10px; width:100%; min-height:40px; border-radius:10px;
+  background:var(--danger); color:#fff; font-size:13px}
+
+/* ========== 八、动效与响应式 ========== */
+@keyframes rise{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+@keyframes sk{from{background-position:200% 0} to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important}
+}
+@media (max-width:560px){
+  .wrap{padding-left:16px; padding-right:16px}
+  .hd h1{letter-spacing:0}
+  .stats{gap:6px}
+  .stats span{padding:5px 10px}
+  .card h3{font-size:20px}
+  .chips{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px}
+  .chip{justify-content:center; gap:4px; padding:6px 4px; font-size:13px; min-height:36px}
+  .chip b{font-size:11px}
+  .sk-card{height:150px}
+}
+@media (max-width:380px){
+  .card-top{gap:8px}
+  .icon{width:44px; height:44px}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<main class="wrap">
+  <header class="hd">
+    <p class="kicker"><i></i>TOOL ATLAS · OFFLINE READY</p>
+    <h1>AI <span>工具导航</span></h1>
+    <p class="lede">写作、绘图、编程、办公——把真正用得上的工具，收进一页。搜名字，或按分类看。</p>
+    <div class="stats">
+      <span><b>9</b> 个工具</span>
+      <span><b>4</b> 个分类</span>
+      <span><b>0</b> 外部依赖</span>
+    </div>
+  </header>
+
+  <section class="panel" aria-label="搜索与分类筛选">
+    <div class="search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.4"></circle>
+        <path d="m16 16 4.2 4.2"></path>
+      </svg>
+      <input id="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="搜索工具名，如 Cursor" aria-label="搜索工具名">
+      <button id="clearBtn" type="button" aria-label="清除搜索" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="chips" id="chips" role="group" aria-label="按分类筛选">
+      <button class="chip" type="button" data-cat="all" aria-pressed="true">全部 <b data-count="all">9</b></button>
+      <button class="chip" type="button" data-cat="writing" aria-pressed="false">写作 <b data-count="writing">3</b></button>
+      <button class="chip" type="button" data-cat="image" aria-pressed="false">绘图 <b data-count="image">2</b></button>
+      <button class="chip" type="button" data-cat="code" aria-pressed="false">编程 <b data-count="code">2</b></button>
+      <button class="chip" type="button" data-cat="office" aria-pressed="false">办公 <b data-count="office">2</b></button>
+    </div>
+
+    <p class="hitline" id="hit" aria-live="polite">正在载入工具索引…</p>
+  </section>
+
+  <section class="list" id="list" aria-label="工具列表">
+    <div class="state loading" id="listLoading" aria-busy="true">
+      <div class="sk-grid" aria-hidden="true">
+        <div class="sk-card"><div class="sk-line short"></div><div class="sk-line"></div><div class="sk-line tiny"></div></div>
+        <div class="sk-card"><div class="sk-line short"></div><div class="sk-line"></div><div class="sk-line tiny"></div></div>
+        <div class="sk-card"><div class="sk-line short"></div><div class="sk-line"></div><div class="sk-line tiny"></div></div>
+      </div>
+      <p>正在载入工具索引…</p>
+    </div>
+
+    <div class="state empty" id="listEmpty" hidden>
+      <div class="state-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10.6" cy="10.6" r="6.2"></circle>
+          <path d="m15.4 15.4 4.4 4.4"></path>
+          <path d="M8 10.6h5.2"></path>
+        </svg>
+      </div>
+      <h2 id="emptyTitle">没有找到匹配的工具</h2>
+      <p>换个关键词试试；也可以清空条件，回到全部 9 个工具。</p>
+      <button class="act" id="emptyReset" type="button">清空条件，看全部</button>
+    </div>
+
+    <div class="state err-state" id="listErr" hidden>
+      <div class="state-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3.8 20.2 19H3.8z"></path>
+          <path d="M12 9v4.4"></path>
+          <path d="M12 16.4h.01"></path>
+        </svg>
+      </div>
+      <h2>工具索引没有载入</h2>
+      <p>发生了什么：页面内的工具数据没有读取成功。<br>
+         为什么：通常是脚本被浏览器拦截，或文件在传输中被改动。<br>
+         怎么办：点下方重试；仍然失败就检查文件是否完整。</p>
+      <p id="errMsg" style="margin-top:8px; color:var(--ink-3); font-size:13px"></p>
+      <button class="act" id="retryBtn" type="button">重新载入索引</button>
+    </div>
+
+    <div class="grid" id="grid" hidden></div>
+  </section>
+
+  <footer class="ft">
+    本站为纯前端单文件索引，不含登录、推广与任何外部请求，断网也能打开。<br>
+    工具简介为人工整理，仅供检索参考；具体功能、收费与隐私条款以各产品官网为准。
+  </footer>
+</main>
+
+<script>
+/* 主逻辑：路由表 → 数据 → 三态 → 搜索/筛选 */
+(function(){
+  'use strict';
+
+  /* 路由表：分类的唯一来源 */
+  var ROUTES = {all:'全部', writing:'写作', image:'绘图', code:'编程', office:'办公'};
+
+  var TOOLS = [
+    {name:'Notion AI', cat:'writing', keys:'notion ai 笔记 文档 写作', icon:'doc',
+     desc:'在笔记里改写、总结、起稿，资料和思路放在一处。'},
+    {name:'秘塔写作猫', cat:'writing', keys:'秘塔 写作猫 中文 校对 润色', icon:'pen',
+     desc:'中文错别字、语病和措辞检查，改稿快一步。'},
+    {name:'DeepL Write', cat:'writing', keys:'deepl write 英文 改写 翻译', icon:'globe',
+     desc:'英文句子改写与语气调整，邮件和论文都能用。'},
+    {name:'Midjourney', cat:'image', keys:'midjourney mj 绘图 出图 插画', icon:'image',
+     desc:'一句提示词出图，风格化视觉与概念图首选。'},
+    {name:'Stable Diffusion', cat:'image', keys:'stable diffusion sd 开源 绘图 本地', icon:'layers',
+     desc:'开源绘图模型，本地部署，参数与风格全在手。'},
+    {name:'Cursor', cat:'code', keys:'cursor 编辑器 编程 补全 重构', icon:'cursor',
+     desc:'把 AI 放进编辑器，整段改写、补全与解释代码。'},
+    {name:'GitHub Copilot', cat:'code', keys:'copilot github 编程 ide 补全', icon:'code',
+     desc:'在 IDE 里边写边补全，测试和注释也能生成。'},
+    {name:'WPS AI', cat:'office', keys:'wps ai 办公 文档 表格 演示', icon:'grid',
+     desc:'文档、表格、演示里的中文助手，起草与整理。'},
+    {name:'讯飞听见', cat:'office', keys:'讯飞 听见 iflytek 录音 转写 纪要', icon:'wave',
+     desc:'录音转文字，会议结束就有可改的纪要底稿。'}
+  ];
+
+  var ICONS = {
+    doc:'<path d="M6.5 3.5h6.9L18 8.1v12.4H6.5z"></path><path d="M13.1 3.5v4.9h4.9"></path><path d="M9.2 12.2h5.6M9.2 15.6h3.9"></path><path d="M17 14.6v3.2M15.4 16.2h3.2"></path>',
+    pen:'<path d="m4.2 19.8 1.1-4.3 9.6-9.6a1.9 1.9 0 0 1 2.7 2.7l-9.6 9.6z"></path><path d="m13.4 7.2 3.4 3.4"></path>',
+    globe:'<circle cx="12" cy="12" r="8.4"></circle><path d="M3.8 12h16.4"></path><path d="M12 3.6c2.4 2.3 3.6 5.2 3.6 8.4s-1.2 6.1-3.6 8.4c-2.4-2.3-3.6-5.2-3.6-8.4S9.6 5.9 12 3.6z"></path>',
+    image:'<rect x="3.6" y="4.6" width="16.8" height="14.8" rx="2.2"></rect><circle cx="8.6" cy="9.4" r="1.6"></circle><path d="m5.4 17.4 4.4-4.6 2.6 2.5 3.2-3.4 3 3.2"></path>',
+    layers:'<path d="m12 4 8.4 4.6-8.4 4.6-8.4-4.6z"></path><path d="m4.6 12.6 7.4 4 7.4-4"></path><path d="m4.6 16.6 7.4 4 7.4-4"></path>',
+    cursor:'<path d="m5 3.2 13.4 7.6-6.1 1.1-2.6 6.9z"></path>',
+    code:'<path d="m8.2 7.4-4.6 4.6 4.6 4.6"></path><path d="m15.8 7.4 4.6 4.6-4.6 4.6"></path><path d="m13.6 5.6-3.2 12.8"></path>',
+    grid:'<rect x="3.8" y="4.2" width="16.4" height="15.6" rx="2"></rect><path d="M9.4 4.4v15.2M3.9 12h16.2"></path><path d="M15.8 8.2v2.2M15.8 13.4v2.2"></path>',
+    wave:'<path d="M3.8 10.8v2.4M7 8.6v6.8M10.2 5.6v12.8M13.4 8v8M16.6 6.4v11.2M19.8 9.4v5.2"></path>'
+  };
+
+  var STATE = {cat:'all', q:'', ready:false, animate:true};
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var switchSeq = 0;
+
+  var grid = document.getElementById('grid');
+  var listLoading = document.getElementById('listLoading');
+  var listEmpty = document.getElementById('listEmpty');
+  var listErr = document.getElementById('listErr');
+  var emptyTitle = document.getElementById('emptyTitle');
+  var errMsg = document.getElementById('errMsg');
+  var hit = document.getElementById('hit');
+  var q = document.getElementById('q');
+  var clearBtn = document.getElementById('clearBtn');
+  var chips = document.getElementById('chips');
+
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function svg(inner){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
+      + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + '</svg>';
+  }
+  function shortQ(s){
+    return s.length > 18 ? s.slice(0,18) + '…' : s;
+  }
+  function matches(t){
+    var kw = STATE.q.trim().toLowerCase();
+    if(STATE.cat !== 'all' && t.cat !== STATE.cat) return false;
+    if(!kw) return true;
+    return (t.name + ' ' + t.keys).toLowerCase().indexOf(kw) > -1;
+  }
+  function syncChips(){
+    for(var i=0;i<chips.children.length;i++){
+      var b = chips.children[i];
+      b.setAttribute('aria-pressed', b.getAttribute('data-cat') === STATE.cat ? 'true' : 'false');
+    }
+  }
+  function setCounts(){
+    Object.keys(ROUTES).forEach(function(k){
+      var n = k === 'all' ? TOOLS.length : TOOLS.filter(function(t){return t.cat === k;}).length;
+      var el = document.querySelector('[data-count="' + k + '"]');
+      if(el) el.textContent = n;
+    });
+  }
+  function cardHTML(t,i){
+    return '<article class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '" style="--i:' + i + '">'
+      + '<div class="card-top"><span class="icon" aria-hidden="true">' + svg(ICONS[t.icon]) + '</span>'
+      + '<span class="tag">' + ROUTES[t.cat] + '</span></div>'
+      + '<h3>' + esc(t.name) + '</h3>'
+      + '<p>' + esc(t.desc) + '</p>'
+      + '</article>';
+  }
+
+  function render(animate){
+    STATE.animate = animate !== false;
+    var list = TOOLS.filter(matches);
+    grid.innerHTML = list.map(cardHTML).join('');
+    grid.hidden = list.length === 0;
+    listLoading.hidden = true;
+    listErr.hidden = true;
+    listEmpty.hidden = list.length > 0;
+
+    var kw = STATE.q.trim();
+    if(kw){
+      hit.textContent = '命中 ' + list.length + ' 个工具 · 关键词「' + shortQ(kw) + '」';
+      emptyTitle.textContent = '没有找到「' + shortQ(kw) + '」';
+    }else{
+      hit.textContent = list.length + ' 个工具 · 当前分类「' + ROUTES[STATE.cat] + '」';
+      emptyTitle.textContent = '这个分类还没有工具';
+    }
+  }
+
+  /* 切场：只动 opacity/transform，播一次即固化 */
+  function goto(cat, opts){
+    opts = opts || {};
+    if(!ROUTES[cat]) cat = 'all';
+    if(STATE.cat === cat && opts.instant) syncChips();
+    STATE.cat = cat;
+    syncChips();
+    try{ history.replaceState(null, '', '#' + cat); }catch(e){}
+
+    if(!STATE.ready || opts.instant || reduce){
+      switchSeq++;
+      if(STATE.ready) render(!opts.instant);
+      return;
+    }
+    var my = ++switchSeq;
+    grid.classList.add('switching');
+    setTimeout(function(){
+      if(my !== switchSeq) return;
+      render(true);
+      requestAnimationFrame(function(){ grid.classList.remove('switching'); });
+    }, 170);
+  }
+
+  function readHash(){
+    var h = (location.hash || '').replace(/^#/, '');
+    return ROUTES[h] ? h : 'all';
+  }
+
+  function boot(){
+    STATE.ready = false;
+    listLoading.hidden = false;
+    listEmpty.hidden = true;
+    listErr.hidden = true;
+    grid.hidden = true;
+    grid.innerHTML = '';
+    hit.textContent = '正在载入工具索引…';
+    setTimeout(function(){
+      try{
+        if(!TOOLS || !TOOLS.length) throw new Error('工具索引为空');
+        STATE.ready = true;
+        setCounts();
+        syncChips();
+        render(true);
+        grid.classList.remove('switching');
+      }catch(err){
+        STATE.ready = false;
+        listLoading.hidden = true;
+        grid.hidden = true;
+        listEmpty.hidden = true;
+        listErr.hidden = false;
+        errMsg.textContent = '错误信息：' + (err && err.message ? err.message : String(err));
+        hit.textContent = '索引载入失败';
+        if(window.__errLogAdd) window.__errLogAdd('工具索引载入失败：' + (err && err.message ? err.message : err));
+      }
+    }, 260);
+  }
+
+  chips.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('.chip') : null;
+    if(!btn) return;
+    goto(btn.getAttribute('data-cat'));
+  });
+
+  q.addEventListener('input', function(){
+    STATE.q = q.value;
+    clearBtn.hidden = !q.value;
+    if(!STATE.ready) return;
+    switchSeq++;
+    render(false);
+  });
+  q.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && q.value){
+      q.value = '';
+      STATE.q = '';
+      clearBtn.hidden = true;
+      switchSeq++;
+      if(STATE.ready) render(false);
+    }
+  });
+
+  clearBtn.addEventListener('click', function(){
+    q.value = '';
+    STATE.q = '';
+    clearBtn.hidden = true;
+    switchSeq++;
+    if(STATE.ready) render(false);
+    q.focus();
+  });
+
+  document.getElementById('emptyReset').addEventListener('click', function(){
+    q.value = '';
+    STATE.q = '';
+    clearBtn.hidden = true;
+    STATE.cat = 'all';
+    syncChips();
+    try{ history.replaceState(null, '', '#all'); }catch(e){}
+    switchSeq++;
+    if(STATE.ready) render(false);
+    q.focus();
+  });
+
+  document.getElementById('retryBtn').addEventListener('click', boot);
+
+  STATE.cat = readHash();
+  syncChips();
+  boot();
+})();
+</script>
+
+<script>
+/* 前端错误红点：捕获脚本错误 → localStorage 持久 → 角落红点。勿删。 */
+(function(){
+  var KEY = 'ainav_errlog_v1', MAX = 50;
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
+  function fmt(ts){
+    var d = new Date(ts);
+    function p(x){ return (x < 10 ? '0' : '') + x; }
+    return (d.getMonth()+1) + '-' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function add(msg){
+    var a = load();
+    a.push({t:Date.now(), m:String(msg).slice(0,300)});
+    try{ localStorage.setItem(KEY, JSON.stringify(a.slice(-MAX))); }catch(e){}
+    render();
+  }
+  window.__errLogAdd = add;
+
+  window.addEventListener('error', function(e){
+    add((e.message || '脚本错误') + (e.lineno ? (' @行' + e.lineno) : ''));
+  }, true);
+  window.addEventListener('unhandledrejection', function(e){
+    var r = e.reason;
+    add('Promise未处理: ' + ((r && r.message) || (r && String(r)) || '无信息'));
+  });
+
+  function render(){
+    var a = load(), n = a.length, dot = document.getElementById('errDot');
+    if(!n){ if(dot) dot.style.display = 'none'; return; }
+    if(!dot){
+      dot = document.createElement('div');
+      dot.id = 'errDot';
+      dot.innerHTML = '&#9888;<span class="n"></span>';
+      dot.onclick = function(){
+        var p = document.getElementById('errPanel');
+        if(p.style.display === 'block'){ p.style.display = 'none'; return; }
+        var b = '';
+        a.forEach(function(x){
+          b += '<div class="row"><div class="t">' + fmt(x.t) + '</div><div>' + esc(x.m) + '</div></div>';
+        });
+        p.innerHTML = '<h4>&#9888; 页面出过错（' + n + ' 条）</h4>'
+          + '<div class="hint">打开以来捕获的脚本错误记录。有红点说明某次运行中有代码出错。'
+          + '把带时间的几行截图发给制作方定位；看完了可清除。</div>'
+          + b + '<button class="clr">清除全部</button>';
+        p.style.display = 'block';
+        p.querySelector('.clr').onclick = function(){
+          localStorage.removeItem(KEY); p.style.display = 'none'; render();
+        };
+      };
+      document.body.appendChild(dot);
+      var pnl = document.createElement('div');
+      pnl.id = 'errPanel';
+      pnl.style.display = 'none';
+      document.body.appendChild(pnl);
+    }
+    dot.style.display = 'flex';
+    dot.querySelector('.n').textContent = (n > 9 ? '9+' : n);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', render);
+  }else{
+    render();
+  }
+})();
+</script>
+</body>
+</html>

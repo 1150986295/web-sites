@@ -168,7 +168,7 @@ footer{text-align:center; margin-top:36px; font-size:var(--fs-mini); color:var(-
   flex-direction:column; align-items:center; justify-content:center; padding:20px}
 .lb.open{display:flex}
 .lb-img{max-width:100%; max-height:74vh; object-fit:contain; border-radius:8px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  box-shadow:0 20px 60px rgba(0,0,0,.5); transition:opacity .18s ease}
 .lb-bar{margin-top:16px; color:#F2EBDD; font-size:14px; text-align:center; line-height:1.7}
 .lb-bar .lbt{font-weight:700}
 .lb-close{position:absolute; top:18px; right:18px; width:40px; height:40px; border-radius:50%;
@@ -488,23 +488,47 @@ footer{text-align:center; margin-top:36px; font-size:var(--fs-mini); color:var(-
   var lbImg = document.getElementById('lbImg');
   var lbTitle = document.getElementById('lbTitle');
   var lbSub = document.getElementById('lbSub');
+  var PX = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  var lbCache = {}, lbLoadToken = 0;
+  /* 预加载：打开灯箱时把整组图塞进浏览器缓存，切图才不会「名字变了图没变」 */
+  function preloadLB(src){
+    if(!src) return null;
+    if(!lbCache[src]){ var im=new Image(); im.src=src; lbCache[src]=im; }
+    return lbCache[src];
+  }
+  function applyFrame(img,title,sub){
+    lbImg.src=img||PX; lbImg.alt=title||'大图';
+    lbTitle.textContent=title||''; lbSub.textContent=sub||'';
+    lbImg.style.opacity='1';
+  }
   function openLB(o){
     lbState.list=o.list||[]; lbState.idx=o.idx||0; lbState.single=!!o.single;
-    lbImg.src=o.img||''; lbImg.alt=o.title||'大图';
-    lbTitle.textContent=o.title||''; lbSub.textContent=o.sub||'';
+    lbState.list.forEach(function(s){ preloadLB(s.img); });
+    preloadLB(o.img);
+    lbLoadToken++;
+    applyFrame(o.img,o.title,o.sub);
     document.getElementById('lbPrev').style.display = (lbState.single||lbState.list.length<2)?'none':'block';
     document.getElementById('lbNext').style.display = (lbState.single||lbState.list.length<2)?'none':'block';
     lb.classList.add('open');
     document.body.style.overflow='hidden';
   }
   function closeLB(){
-    lb.classList.remove('open'); lbImg.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; document.body.style.overflow='';
+    lb.classList.remove('open'); lbImg.src=PX; document.body.style.overflow='';
   }
   function stepLB(d){
     if(lbState.single || lbState.list.length<2) return;
     lbState.idx=(lbState.idx+d+lbState.list.length)%lbState.list.length;
     var s=lbState.list[lbState.idx];
-    lbImg.src=s.img; lbTitle.textContent=s.title; lbSub.textContent=s.sub||'';
+    var im=preloadLB(s.img);
+    var token=++lbLoadToken;
+    /* 图未就绪：先淡出，等图真正加载好再图文同步更新，避免名字跑在前面 */
+    if(im && !im.complete){
+      lbImg.style.opacity='.35';
+      im.onload=function(){ if(token===lbLoadToken) applyFrame(s.img,s.title,s.sub); };
+      im.onerror=function(){ if(token===lbLoadToken) lbImg.style.opacity='1'; };
+    }else{
+      applyFrame(s.img,s.title,s.sub);
+    }
   }
   document.getElementById('lbClose').addEventListener('click',closeLB);
   document.getElementById('lbPrev').addEventListener('click',function(){stepLB(-1);});

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品集 · 网页仓库</title>
+<style>
+:root{
+  --paper:#EAE6DC; --ink:#2E2A24; --sub:#6B6455; --line:#C9C2B0;
+  --zhu:#B03A2E; --card:#EAE6DC;
+  --shadow-lt:#FFFFFF; --shadow-dk:#C9C2B0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#1D1A16; --ink:#EAE4D8; --sub:#A69D8B; --line:#3B352C;
+    --zhu:#D67C6F; --card:#1D1A16;
+    --shadow-lt:rgba(255,241,214,.05); --shadow-dk:rgba(0,0,0,.52); }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.75;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.wrap{max-width:520px;width:100%;padding:36px 22px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:1px}
+.sub{font-size:13px;color:var(--sub);margin-bottom:26px}
+.card{display:block;text-decoration:none;color:inherit;background:var(--card);
+  border-radius:18px;padding:18px 20px;margin-bottom:16px;
+  box-shadow:6px 6px 14px var(--shadow-dk),-6px -6px 14px var(--shadow-lt);
+  transition:transform .15s}
+.card:active{transform:scale(.98)}
+.card-hd{display:flex;align-items:center;gap:10px}
+.seal{width:34px;height:34px;border-radius:8px;background:var(--zhu);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex:none}
+.t{font-size:16px;font-weight:800}
+.go{margin-left:auto;color:var(--zhu);font-weight:800;font-size:13px;white-space:nowrap}
+.d{font-size:12.5px;color:var(--sub);margin-top:6px}
+.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:10.5px;color:var(--sub);background:rgba(138,130,116,.1);padding:2px 9px;border-radius:999px}
+footer{margin-top:24px;font-size:11px;color:var(--sub);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>作品集</h1>
+  <div class="sub">纯静态小站 · 全部源码开源在 GitHub</div>
+
+  <a class="card" href="https://1150986295.github.io/zsb-study/">
+    <div class="card-hd"><span class="seal">修</span><span class="t">专升本每日修炼</span><span class="go">进入 ›</span></div>
+    <div class="d">830题刷题站 · 记忆曲线 · 番茄钟 · 深色纸墨模式 · 备份导出导入</div>
+    <div class="tags"><span class="tag">多页应用</span><span class="tag">localStorage</span><span class="tag">KaTeX公式</span></div>
+  </a>
+
+  <a class="card" href="./lanting-xinyou/">
+    <div class="card-hd"><span class="seal">蘭</span><span class="t">兰亭招新 · 演练站</span><span class="go">进入 ›</span></div>
+    <div class="d">书画协会招新页 · SVG线性图标 · 暖墨深色 · 报名表单</div>
+    <div class="tags"><span class="tag">单页站</span><span class="tag">视觉施工v2</span></div>
+  </a>
+
+  <a class="card" href="./ziliao-tpl/">
+    <div class="card-hd"><span class="seal">库</span><span class="t">网页模板资料仓库</span><span class="go">进入 ›</span></div>
+    <div class="d">全部模板方案与规格书的移动导航 · 页内搜索 · 文档全文嵌入</div>
+    <div class="tags"><span class="tag">文档站</span><span class="tag">资料导航</span></div>
+  </a>
+
+  <a class="card" href="./tpl-a/">
+    <div class="card-hd"><span class="seal">A</span><span class="t">模板A · 单页站</span><span class="go">进入 ›</span></div>
+    <div class="d">活动页通用模板 · 单文件+图片资源</div>
+    <div class="tags"><span class="tag">模板</span><span class="tag">脱平台</span></div>
+  </a>
+
+  <a class="card" href="./tpl-b/">
+    <div class="card-hd"><span class="seal">B</span><span class="t">模板B · 多页应用</span><span class="go">进入 ›</span></div>
+    <div class="d">带登录系统的通用模板 · 模拟接口层 · 幂等提交 · 兜底测试</div>
+    <div class="tags"><span class="tag">模板</span><span class="tag">身份系统</span></div>
+  </a>
+
+  <footer>2026-11-25 · GitHub Pages 托管 · 换平台随时可搬</footer>
+</div>
+</body>
+</html>

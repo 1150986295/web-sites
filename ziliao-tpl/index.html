@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>网页通用模板方案 · 资料仓库</title>
+<meta name="description" content="AI 做网页的通用模板方案全套资料：索引、规格书、经验库、速查表、模板A/B、巡检脚本。移动仓库，一眼找齐。">
+<style>
+/* ========== 设计令牌（继承模板A：宣纸×青墨×朱砂） ========== */
+:root{
+  --paper:#EAE6DC; --card:#FFFFFF;
+  --ink:#2E2A24; --ink-2:rgba(46,42,36,.75); --ink-3:rgba(46,42,36,.55);
+  --primary:#4A6B57; --accent:#B03A2E; --line:#C9C2B0;
+  --fs-hero:26px; --fs-h1:20px; --fs-body:16px; --fs-sub:14px; --fs-mini:13px;
+  --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
+  --r-s:10px; --r-l:16px;
+  --sh-out:2px 2px 6px rgba(201,194,176,.55), -2px -2px 6px rgba(255,255,255,.85);
+  --sh-in:inset 1px 1px 3px rgba(201,194,176,.5), inset -1px -1px 3px rgba(255,255,255,.75);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#26241F; --card:#32302A;
+    --ink:#EAE6DC; --ink-2:rgba(234,230,220,.78); --ink-3:rgba(234,230,220,.55);
+    --primary:#8FB49C; --accent:#D98878; --line:#54513F;
+    --sh-out:2px 2px 6px rgba(0,0,0,.45), -2px -2px 6px rgba(255,255,255,.04);
+    --sh-in:inset 1px 1px 3px rgba(0,0,0,.4), inset -1px -1px 3px rgba(255,255,255,.05);
+  }
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; background:var(--paper); color:var(--ink); font-size:var(--fs-body); line-height:1.75;
+  font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y}
+img{max-width:100%} h1,h2,h3{margin:0} button{font-family:inherit; cursor:pointer; border:0}
+.wrap{max-width:680px; margin:0 auto}
+.hd{padding:calc(var(--sp-4) + env(safe-area-inset-top)) var(--sp-2) var(--sp-2); text-align:center}
+.hd .ttl{font-size:var(--fs-hero); font-weight:700; letter-spacing:.04em}
+.hd .sub{font-size:var(--fs-sub); color:var(--ink-2); margin-top:var(--sp-1)}
+.hd .upd{font-size:var(--fs-mini); color:var(--ink-3); margin-top:6px}
+.sec{margin:var(--sp-3) var(--sp-2) 0; background:var(--card); border-radius:var(--r-l);
+  box-shadow:var(--sh-out); padding:var(--sp-3)}
+.sec h2{font-size:var(--fs-h1); margin-bottom:var(--sp-2)}
+.ft{margin:var(--sp-4) var(--sp-2) 0; padding:var(--sp-2) 0 24px; text-align:center;
+  font-size:var(--fs-mini); color:var(--ink-3); border-top:1px solid var(--line)}
+
+/* ========== 仓库站扩展样式 ========== */
+.nav{position:sticky; top:0; z-index:800; background:var(--paper); border-bottom:1px solid var(--line);
+  padding:var(--sp-1) var(--sp-2); display:flex; gap:var(--sp-1); align-items:center; flex-wrap:wrap}
+.nav a.anchor{padding:6px 12px; border-radius:999px; background:var(--card); box-shadow:var(--sh-out);
+  font-size:var(--fs-mini); color:var(--ink-2); text-decoration:none; font-weight:600}
+.nav input{flex:1; min-width:140px; padding:7px 12px; border:1px solid var(--line); border-radius:999px;
+  background:var(--card); color:var(--ink); font-size:var(--fs-sub); font-family:inherit}
+#sCount{font-size:var(--fs-mini); color:var(--ink-3); min-width:52px}
+mark.s-hi{background:rgba(176,58,46,.28); color:inherit; padding:0 1px; border-radius:3px}
+.catalog table{width:100%; border-collapse:collapse; font-size:var(--fs-sub)}
+.catalog th{text-align:left; color:var(--ink-3); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--line); font-size:var(--fs-mini)}
+.catalog td{padding:9px 8px; border-bottom:1px solid var(--line-soft, rgba(201,194,176,.35)); vertical-align:top}
+.catalog .cno{color:var(--accent); font-weight:700; white-space:nowrap}
+.catalog .cdesc{display:block; color:var(--ink-3); font-size:var(--fs-mini); margin-top:2px}
+.catalog .lib, .dops .lib{color:var(--primary); text-decoration:none; font-weight:600; white-space:nowrap}
+.doc .dhead{display:flex; justify-content:space-between; align-items:baseline; gap:var(--sp-2); flex-wrap:wrap}
+.doc .ddesc{font-size:var(--fs-sub); color:var(--ink-2)}
+.mdbody{font-size:var(--fs-body); overflow-wrap:break-word}
+.mdbody h1{font-size:21px; margin:var(--sp-3) 0 var(--sp-2)}
+.mdbody h2{font-size:18px; margin:var(--sp-3) 0 var(--sp-2); padding-left:10px; border-left:3px solid var(--primary)}
+.mdbody h3{font-size:16px; margin:var(--sp-2) 0 var(--sp-1)}
+.mdbody h4{font-size:15px; margin:var(--sp-2) 0 6px; color:var(--ink-2)}
+.mdbody table{width:100%; border-collapse:collapse; font-size:13.5px; margin:var(--sp-2) 0; display:block; overflow-x:auto}
+.mdbody th,.mdbody td{border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top}
+.mdbody th{background:rgba(74,107,87,.08); font-weight:600}
+.mdbody code{background:rgba(74,107,87,.1); border-radius:4px; padding:1px 5px; font-size:13px; font-family:ui-monospace,Menlo,Consolas,monospace}
+.mdbody pre{background:var(--ink); color:var(--paper); border-radius:var(--r-s); padding:12px 14px; overflow-x:auto; line-height:1.6}
+.mdbody pre code{background:none; color:inherit; padding:0; font-size:12.5px}
+.mdbody blockquote{margin:var(--sp-2) 0; padding:8px 14px; border-left:3px solid var(--accent);
+  background:rgba(176,58,46,.06); border-radius:0 var(--r-s) var(--r-s) 0; color:var(--ink-2)}
+.mdbody ul,.mdbody ol{padding-left:1.4em; margin:var(--sp-1) 0 var(--sp-2)}
+.mdbody li{margin:3px 0}
+.mdbody hr{border:0; border-top:1px solid var(--line); margin:var(--sp-3) 0}
+.mdbody a{color:var(--primary)}
+.scriptbox{position:relative}
+.scriptbox pre{max-height:420px; overflow:auto; margin:0}
+.copybtn{position:absolute; top:10px; right:10px; padding:6px 14px; border-radius:999px;
+  background:var(--primary); color:#fff; font-size:var(--fs-mini); font-weight:600}
+.guide textarea{width:100%; min-height:110px; border:1px solid var(--line); border-radius:var(--r-s);
+  background:var(--card); color:var(--ink); padding:10px 12px; font-size:var(--fs-sub); line-height:1.7;
+  font-family:inherit; resize:vertical}
+.copyrow{margin-top:var(--sp-1); text-align:right}
+.copyrow button{padding:7px 16px; border-radius:999px; background:var(--accent); color:#fff;
+  font-size:var(--fs-mini); font-weight:600}
+.tips li{margin:6px 0}
+
+/* ========== 红点（仓库专属键） ========== */
+#errDot{position:fixed;right:16px;bottom:20px;z-index:9990;width:44px;height:44px;border-radius:50%;
+  background:var(--accent);color:#FFF;display:none;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(46,42,36,.35);border:2px solid rgba(255,255,255,.7)}
+#errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
+  background:var(--accent);border:1.5px solid var(--paper);color:#FFF;font-size:11px;line-height:16px;
+  text-align:center;padding:0 3px}
+#errPanel{position:fixed;left:12px;right:12px;bottom:76px;z-index:9991;max-height:60vh;overflow:auto;
+  display:none;background:var(--card);border-radius:14px;padding:14px 16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.3); font-size:var(--fs-sub);color:var(--ink);line-height:1.7}
+#errPanel h4{margin:0 0 6px;font-size:15px}
+#errPanel .hint{font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+#errPanel .row{padding:6px 0;border-bottom:1px solid rgba(201,194,176,.4);overflow-wrap:break-word}
+#errPanel .row .t{font-size:11.5px;color:var(--ink-3)}
+#errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;background:var(--accent);color:#FFF;font-size:14px}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <h1 class="ttl">网页通用模板方案 · 资料仓库</h1>
+  <p class="sub">AI 建站的全套家当：索引 → 规格书 → 经验 → 速查 → 模板A/B → 巡检</p>
+  <p class="upd">正本存于资料库 · 本页为可浏览镜像 · 更新于 2026-11-25 05:41</p>
+</header>
+
+<nav class="nav">
+  <a class="anchor" href="#sec-cat">总览</a>
+  <a class="anchor" href="#doc00">索引</a>
+  <a class="anchor" href="#doc01">规格书</a>
+  <a class="anchor" href="#doc02">经验</a>
+  <a class="anchor" href="#doc03">速查</a>
+  <a class="anchor" href="#sec-py">巡检脚本</a>
+  <a class="anchor" href="#sec-guide">用法</a>
+  <input id="searchBox" type="search" placeholder="页内搜索： symptoms / 红点 / 幂等…" autocomplete="off">
+  <span id="sCount"></span>
+</nav>
+
+<div class="wrap">
+
+<section class="sec catalog" id="sec-cat">
+  <h2>总览 · 13 件套 + 4 张视觉参考板 + 2 附件</h2>
+  <p style="font-size:var(--fs-sub); color:var(--ink-2)">命名规则：<b>网页通用模板方案-NN_名称</b>，资料库按前缀搜全齐。带"新"= 现行正本。<b>内容以资料库正本为准，本页仅供浏览与分发。</b></p>
+  <table>
+    <thead><tr><th>编号</th><th>名称 / 用途</th><th>原件</th></tr></thead>
+    <tbody>
+<tr><td class="cno">00</td><td><b>索引·先读我_新</b><span class="cdesc">半页一张表，先看这个</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/o6zv4upyP7hiIgvPncqieW" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">01</td><td><b>施工规格书·修正版_新</b><span class="cdesc">AI施工总章程：视觉工序+参考板+实测值声明</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/kyYwRJ63a0BM0vvGUod0IZ" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">02</td><td><b>施工通用经验·三项目复盘</b><span class="cdesc">踩坑复盘+三头会审机制</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/TLP4m7eqEh1OaSNcSB0j5E" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">03</td><td><b>症状速查表</b><span class="cdesc">出事按现象查，11行</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/oeQAULwOAn3h3rYlFRHZ7G" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">04</td><td><b>模板A单页站·整包zip</b><span class="cdesc">人下载用：复制即开工</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/G0hON1KRYZiDnKryNm2RJs" target="_blank" rel="noopener">zip ↗</a></td></tr>
+<tr><td class="cno">05</td><td><b>模板B多页应用·整包zip_新</b><span class="cdesc">人下载用：五阶段+首注册兜底</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/RLaZNtR1hgZUKNIbKuJera" target="_blank" rel="noopener">zip ↗</a></td></tr>
+<tr><td class="cno">06</td><td><b>模板A单页站 index</b><span class="cdesc">AI 读代码用（不打zip）</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/BfRYPvq4wDsi2hxvxppeAs" target="_blank" rel="noopener">html ↗</a></td></tr>
+<tr><td class="cno">07</td><td><b>模板A单页站 使用说明</b><span class="cdesc">AI 读用</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/fl9cPa2BO7E1QFN5uPxXr2" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">08</td><td><b>模板B多页应用 index_新</b><span class="cdesc">AI 读代码用（含首注册兜底）</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/rsLc00H4D2brtniCwr9etn" target="_blank" rel="noopener">html ↗</a></td></tr>
+<tr><td class="cno">09</td><td><b>模板B多页应用 使用说明_新</b><span class="cdesc">AI 读用：复制8步</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/puwYdyl8BXMwD32TgejgKq" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">10</td><td><b>模板B多页应用 交接决策</b><span class="cdesc">AI 读用：三决策+各阶段证据索引</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/CXlDMv8IX6dVhine9j9lhx" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">11</td><td><b>通用巡检脚本.py</b><span class="cdesc">巡检工具本体，新站照抄改URL</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/a0k0v6Xc93xYXZjxFgiSd5" target="_blank" rel="noopener">py ↗</a></td></tr>
+<tr><td class="cno">12</td><td><b>做网页的规矩·总纲</b><span class="cdesc">开工前的纸上功夫：基线三问/五阶段/五行提需求</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/a4fO4d9067zMETtXQTgA62" target="_blank" rel="noopener">md ↗</a></td></tr>
+<tr><td class="cno">13</td><td><b>视觉参考板·坏例 美化前 浅色</b><span class="cdesc">只改3色就交货的真实样子</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/jGaO4dCdovioSA5Q89pzjq" target="_blank" rel="noopener">png ↗</a></td></tr>
+<tr><td class="cno">14</td><td><b>视觉参考板·坏例 美化前 深色</b><span class="cdesc">冷灰蓝深色=老软件感</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/6QrxthIyGYSJJcYnP1vSqc" target="_blank" rel="noopener">png ↗</a></td></tr>
+<tr><td class="cno">15</td><td><b>视觉参考板·好例 美化后 浅色</b><span class="cdesc">按第九章工序做完的水平</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/qbUE9QiAugkbHCwWQRZAil" target="_blank" rel="noopener">png ↗</a></td></tr>
+<tr><td class="cno">16</td><td><b>视觉参考板·好例 美化后 深色</b><span class="cdesc">暖墨调深色样板</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/yg8pudxoKP2sYcuxbaWcYV" target="_blank" rel="noopener">png ↗</a></td></tr>
+<tr><td class="cno">附</td><td><b>演练站成品·兰亭招新v2</b><span class="cdesc">模板B实战+视觉工序验收品</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/euGjyEVOTOwFcqOskUsNYS" target="_blank" rel="noopener">页 ↗</a></td></tr>
+<tr><td class="cno">附</td><td><b>演练站代码包zip</b><span class="cdesc">回传施工对话用</span></td><td><a class="lib" href="https://www.workbuddy.cn/space/d/k4yLOaCLOUFtHSM1ygHjHT" target="_blank" rel="noopener">zip ↗</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="sec doc" id="doc00"><div class="dhead"><h2>00 索引·先读我</h2><div class="dops"><a class="lib" href="https://www.workbuddy.cn/space/d/o6zv4upyP7hiIgvPncqieW" target="_blank" rel="noopener">资料库原件 ↗</a></div></div><p class="ddesc">半页一张表：什么场景翻哪份文件</p><div class="mdbody"><h1>模板使用索引（入口页，永远只有这一张表）</h1>
+<blockquote>
+<p>用途只有一个：后来的 AI 和你自己，<strong>第一眼知道该翻哪一页</strong>。
+内容永远只存一份，改的时候只改那一处；这里绝不复制任何文件的内容。</p>
+<p><strong>资料库版</strong>：本方案全套文件已传 WorkBuddy 资料库，统一前缀 <strong>「网页通用模板方案-」</strong>：
+00 索引 → 01 规格书修正版 → 02 经验库 → 03 症状速查表 → 04 模板A整包zip → 05 模板B整包zip → 06 模板A代码本体 → 07 模板A使用说明 → 08 模板B代码本体 → 09 模板B使用说明 → 10 模板B交接决策 → 11 通用巡检脚本 → 12 做网页的规矩总纲。
+<strong>下载规矩</strong>：zip 与 html 本体内容相同——人下载用 zip；<strong>AI 读用 06/08 的 html 本体</strong>（直接下载 zip 容易拿到分享页而不是文件，豆包就栽在这）。本地的巡检配置 <code>tools/巡检配置_*.json</code> 不随库走，以沙箱 <code>/workspace/tools/</code> 为准。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>我要做什么</th>
+<th>先读哪份文件</th>
+<th>什么时候读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>从零新建一个站</td>
+<td>资料库《01_施工规格书_修正版_新》→ 按站型复制模板A（代码06+说明07，纯浏览展示）或模板B（代码08+说明09+交接10，要登录/后台/多人数据）</td>
+<td>开工前</td>
+</tr>
+<tr>
+<td>换一个 AI 接手在做/已做的站</td>
+<td>资料库《10_模板B交接决策》（含决策记录与红线）；模板A看 06/07 本体与说明</td>
+<td>接手第一眼</td>
+</tr>
+<tr>
+<td>上线前验收</td>
+<td>对应模板的 <code>README_使用说明.md</code>（"上线前自查"节）</td>
+<td>发版前</td>
+</tr>
+<tr>
+<td>巡检</td>
+<td><code>tools/网页巡检.py</code> + <code>tools/巡检配置_*.json</code>（照抄改 URL/动作即可给新站配一份）</td>
+<td>每次改完代码、发版前后</td>
+</tr>
+<tr>
+<td>出故障（报错/白屏/点不动）</td>
+<td><code>症状速查表.md</code> 对症入座 → 细节翻 <code>网页施工通用经验与模板_三项目复盘_20261124.md</code></td>
+<td>用户报障或红点亮起时</td>
+</tr>
+<tr>
+<td>接单报价交付</td>
+<td><code>网页施工通用经验与模板_三项目复盘_20261124.md</code>（工期/坑价参考）+ 模板 <code>巡检结果_*</code> 当验收证据交付</td>
+<td>谈单和交付时</td>
+</tr>
+<tr>
+<td>网页报错想自查</td>
+<td>模板内已内置错误红点（右下角朱砂徽标），点开截图即可报障；修法在 <code>症状速查表.md</code></td>
+<td>随时</td>
+</tr>
+</tbody>
+</table>
+<h2>基础文档（资料库编号即正本）</h2>
+<ul>
+<li>《12_做网页的规矩_总纲》—— 开工前的纸上功夫：基线三问、五阶段不跳、五行提需求格式</li>
+<li>《01_施工规格书_修正版_新》—— 施工总章程：规矩、巡检、第八章脱平台、第九章视觉工序</li>
+<li>《02_施工通用经验_三项目复盘》—— 经验库：墨缘/竞墨/专升本踩过的坑</li>
+<li>《03_症状速查表》—— 11 行症状→病因速查</li>
+</ul>
+<h2>两条铁律</h2>
+<ol>
+<li><strong>内容只存一份</strong>：新经验写进对应正文文件，不新开文档、不在索引里复制。</li>
+<li><strong>改完必跑巡检</strong>：PASS 只是"已覆盖范围干净"，结论看 <code>巡检结果_*/index.md</code> 里的证据，不看口头"已完成"。</li>
+</ol>
+<h2>模板A/B 同标准对照（2026-11-25 核验）</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>模板A 单页站</th>
+<th>模板B 多页应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>设计令牌（3色换肤+深色模式）</td>
+<td>✅ 同一套变量名</td>
+<td>✅ 同一套变量名</td>
+</tr>
+<tr>
+<td>三态（加载/空/错误）</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>错误红点</td>
+<td>✅ <code>tplA_errlog_v1</code></td>
+<td>✅ <code>tplB_errlog_v1</code></td>
+</tr>
+<tr>
+<td>巡检配置+证据</td>
+<td>✅</td>
+<td>✅ 五阶段 <strong>217 项断言全 PASS</strong>（阶段2=52 / 3=54 / 4=56 / 5浅=34 / 5深=21，出处：<code>巡检结果_模板B_*/results.json</code>，逐条可查）</td>
+</tr>
+<tr>
+<td>减弱动效支持</td>
+<td>✅（2026-11-25 补齐）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>深色模式</td>
+<td>✅（2026-11-25 补齐，对比度 12.44:1）</td>
+<td>✅（11.44:1 / 深 12.44:1）</td>
+</tr>
+<tr>
+<td>级联入场动画</td>
+<td>—（单页无切场，不适用）</td>
+<td>✅ 8级</td>
+</tr>
+<tr>
+<td>路由表自检</td>
+<td>—（单页无路由，不适用）</td>
+<td>✅ 启动即报</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>对照结论：两套模板同一套令牌、同一套深色规矩、同一套巡检工具。差异项均为站型差异，不是标准差异。</p>
+</blockquote></div></section>
+<section class="sec doc" id="doc01"><div class="dhead"><h2>01 施工规格书·修正版</h2><div class="dops"><a class="lib" href="https://www.workbuddy.cn/space/d/bWGBklLSMKZXPqS3LSxr1k" target="_blank" rel="noopener">资料库原件 ↗</a></div></div><p class="ddesc">AI 施工的总章程：两套模板规矩+巡检+第九章视觉工序</p><div class="mdbody"><h1>网页模板施工规格书（两套：单页站 / 多页应用）· 修正版</h1>
+<blockquote>
+<p>读者：执行施工的 AI（WorkBuddy）
+用法：整份发给 AI，先按「〇 总要求」开工，再按「二 / 三」分模板施工
+核心原则：<strong>模板不是"更好看的页面"，是"把已知的坑提前做进骨架里"</strong></p>
+<p><strong>⚠ 实测值声明（2026-11-25 增补）</strong>：本方案所有具体数字（长边 1080、红点 50 条上限、对比度 4.5/实测 11.4~12.4、断连阈值、分页 20 等）均为 <strong>2026-11 WorkBuddy 平台三个项目的实测值</strong>。换平台、换托管、换流量规模时<strong>必须重测再改写，禁止照抄</strong>——经验库的价值是"踩坑的方法与顺序"，不是数字本身。</p>
+<p><strong>修正记录（2026-11-25，以模板 A/B 实际施工与巡检验收为准）</strong>：
+① §1.5 压缩参数统一为长边 1080（原 1600，与模板 B 实测实现不一致）；
+② §2.2 "微信分享卡片"降级为可选（纯静态单文件拿不到微信 JS-SDK 签名，做不到缩略图，硬性要求会误导验收）；
+③ §1.3 红点补充：localStorage 键名必须按站独立命名（如 zx_errlog_v1 / jm_errlog_v1），防止多站互相污染；
+④ §1.7 巡检更新：工具已支持 fill/check/run/upload 动作、深色模式模拟、对比度计算（现实测 11.4~12.4:1）；
+⑤ §七 省钱纪律修正：数据正确性/权限类施工不许用最低档模型（实测 Flash 档会产出"看着对其实错"的代码），只有纯机械贴码用 Flash。</p>
+</blockquote>
+<hr />
+<h1>〇 给 AI 的总要求（先读这一节）</h1>
+<h2>0.1 一句话</h2>
+<p>我要的不是两个成品网站，是<strong>两个可以复制、改文案换图就能交付的骨架</strong>。判断做得好不好，标准只有一个：<strong>下一个新站复制它，能不能不返工就上线。</strong></p>
+<h2>0.2 五条不可协商</h2>
+<ol>
+<li><strong>不许一次做完。</strong> 按本文档的"阶段"分批交付，每阶段我验收通过才进下一阶段。一次做完必炸。</li>
+<li><strong>不许自行发布上线。</strong> 每阶段做完给我预览，我确认后才进正式。</li>
+<li><strong>不许顺手优化。</strong> 我列的范围之外一律不动；改完必须汇报"改了哪几个文件、每个改了什么、没动哪些"。</li>
+<li><strong>验收只认证据</strong>：手机打开看见 + 截图 / 巡检产物文件。你说的"已完成 / 测试通过"一律不算。</li>
+<li><strong>删除任何东西前，先答影响面四问</strong>（谁在读 / 谁会静默失败 / 能否先加后删 / 怎么证明没人用），答不出不许删。</li>
+</ol>
+<h2>0.3 两套模板的关系</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>模板 A · 单页站</th>
+<th>模板 B · 多页应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用途</td>
+<td>活动页、请柬、门店介绍、工具页</td>
+<td>报名投稿、打卡、带后台的系统（墨缘级）</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>纯静态，无后端</td>
+<td>身份 + 数据库 + 后台接口</td>
+</tr>
+<tr>
+<td>施工量</td>
+<td>1–2 轮</td>
+<td>6–8 轮，分 5 阶段</td>
+</tr>
+<tr>
+<td>复制成本</td>
+<td>改文案换图，20 分钟上线</td>
+<td>改表结构 + 品牌，1–2 天</td>
+</tr>
+</tbody>
+</table>
+<p><strong>先做 A，再做 B。</strong> A 是 B 的地基（骨架、令牌、三态、红点、巡检都在 A 里先跑通）。</p>
+<hr />
+<h1>一、两套模板共用部分（必须先做，B 会直接复用）</h1>
+<h2>1.1 设计令牌（一个文件管全站）</h2>
+<pre><code>:root 里定义：主色 / 强调色 / 底色 / 文字三级 / 字号 5 档 / 间距 4 档 / 圆角 2 档 / 阴影 2 档
+规则：组件只引用变量，全文件禁止出现裸色值（除 :root）
+要求：改一个 --color-primary，全站主色同时变
+</code></pre>
+<ul>
+<li><strong>强调色全站只有 1 个</strong>，专给主操作；标签、装饰不许抢</li>
+<li>正文 ≥16px，辅助 ≥13px，行高 1.75</li>
+<li>涉及书法的站，笔类文案统一写「毛笔 / 硬笔」，不写「软笔」</li>
+</ul>
+<h2>1.2 六态（比三态多三个，这是大项目的安全网）</h2>
+<table>
+<thead>
+<tr>
+<th>态</th>
+<th>触发</th>
+<th>必须给什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>加载</td>
+<td>请求发出后</td>
+<td>骨架屏或明确"正在加载"，&gt;1 秒必须有反馈</td>
+</tr>
+<tr>
+<td>空</td>
+<td>请求成功但无数据</td>
+<td>一句"这里该有什么" + 一个下一步按钮</td>
+</tr>
+<tr>
+<td>错误</td>
+<td>请求失败</td>
+<td>三段式：发生了什么 + 为什么 + 现在怎么办（带重试）</td>
+</tr>
+<tr>
+<td>未登录</td>
+<td>无 token</td>
+<td>引导登录，<strong>不要白屏</strong></td>
+</tr>
+<tr>
+<td>无权限</td>
+<td>403</td>
+<td>说明"你没有这个权限"，<strong>绝不清空登录态</strong></td>
+</tr>
+<tr>
+<td>成功</td>
+<td>操作完成</td>
+<td>明确的成功反馈 + 下一步（别只 toast 一句"成功"）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>禁止文案</strong>："请稍后重试""操作失败""网络异常"。必须写具体原因和下一步。</p>
+<h2>1.3 前端错误记录（红点）</h2>
+<ul>
+<li>监听 <code>window.onerror</code> + <code>unhandledrejection</code>，把「时间 / 页面 / 错误信息 / 前 3 行调用栈」写进 localStorage 环形缓冲（最多 50 条）</li>
+<li><strong>红点键名按站独立命名</strong>（如 <code>zx_errlog_v1</code> / <code>jm_errlog_v1</code>），多站共用一个键会互相污染历史记录</li>
+<li>页面角落显示一个小红点：有未读错误时亮，点开能看到错误码</li>
+<li>用途：<strong>用户截图来报，或我自己打开就看见</strong>，不再"听别人说才知道坏了"</li>
+<li>验收判据：<strong>断网提交一次 → 刷新 → 红点还在</strong></li>
+</ul>
+<h2>1.4 首屏与切场</h2>
+<ul>
+<li>入口 HTML 自带底色（<code>body{background:...}</code>），遮罩先于内容挂载——<strong>不许冷启动白屏</strong></li>
+<li>切页统一走一套引擎：只动 <code>opacity/transform</code>，播一次即固化（幂等标记），禁止用 <code>display/height/width</code> 做动画，禁止刷新重复播</li>
+</ul>
+<h2>1.5 图片与体积</h2>
+<ul>
+<li>上传前 canvas 压缩：长边 ≤1080px、转 JPEG 质量 80、单张 &lt;1MB（模板 B 实测：2000×1500 的 73KB 图 → 1080×810 的 14KB）</li>
+<li>列表用缩略图 + <code>loading="lazy"</code> + <code>decoding="async"</code>；详情/下载用原图</li>
+<li>提交前估算总量，&gt;25MB 拦下并提示"图片过大，请减少张数"</li>
+<li>错误提示必须区分"体积过大"和"网络异常"</li>
+<li>图片只用站内相对路径（<code>assets/…</code>），<strong>不许外部短链</strong></li>
+</ul>
+<h2>1.6 移动端四条硬规矩</h2>
+<ol>
+<li><code>input.files</code> 是 live FileList：先 <code>Array.from()</code> 拷贝，再 <code>value=''</code></li>
+<li>弹层/面板高度要扣掉底部导航，"保存/提交"必须在可视区内</li>
+<li>装饰层（水印、悬浮球）z-index 低于可点元素</li>
+<li><code>touch-action</code> 用 <code>pan-y</code>，不要 <code>none</code></li>
+</ol>
+<h2>1.7 巡检配置（每个新站一份）</h2>
+<ul>
+<li>一个 <code>巡检配置.json</code>：填 <code>url</code> + 关键动作（点哪 → 截图；已支持 click/goto/wait/fill/check/run/upload，可断言状态、可填表单、可测文件上传）</li>
+<li>固定检查项：HTTP 状态 / 标题 / 入口底色 / console 报错 / 资源 4xx / 横向溢出 / 禁词扫描 / 红点历史 / 动作回放截图 / <strong>对比度计算（≥4.5:1）</strong> / 可选深色模式与"减弱动效"模拟</li>
+<li><strong>产物落目录</strong>（PNG + results.json + index.md 的 FAIL 表），AI 转述的"X 项过"不算</li>
+<li>结论表述规范：每条 PASS 标明覆盖范围（如"首屏 PASS"），不许把动作回放范围写成"全站全 PASS"</li>
+<li>排查纪律：FAIL 连锁出现时，先看链条第一环是<strong>巡检时序</strong>（动作比切场快，加等待重跑）还是真 bug</li>
+</ul>
+<h2>1.8 交付物（每个模板都必须带）</h2>
+<pre><code>index.html（或入口文件）
+assets/（图片、字体；字体必须可商用）
+README_使用说明.md（怎么改字、怎么换图、怎么上线、出问题找谁）
+HANDOVER.md（项目结构 + 红线 + 当前状态）
+巡检配置.json
+</code></pre>
+<hr />
+<h1>二、模板 A · 单页站（第一阶段，1–2 轮）</h1>
+<h2>2.1 目标与结构</h2>
+<ul>
+<li><strong>一个文件优先</strong>：<code>index.html</code>（内联 CSS/JS）+ <code>assets/</code>。理由：单文件复制最不容易出错，无构建依赖、无路径问题</li>
+<li>一个页面，五个区块：头部（标题/副标题/二维码位）→ 主视觉（图/视频）→ 信息区（时间地点/流程/介绍）→ 行动区（报名/加微信/导航）→ 页脚</li>
+<li>只做三类动作：<strong>看信息、点按钮跳转、长按/保存图片</strong></li>
+</ul>
+<h2>2.2 必须内置</h2>
+<ul>
+<li>设计令牌 + 六态（简化为三态：加载/错误/空）</li>
+<li>首屏底色 + 一张主图的渐进加载（先底色，再淡入，避免白屏）</li>
+<li>全部内容手机 375px 可读：无横向滚动、无文字溢出、英文整词换行</li>
+<li>底部固定行动按钮（一个，不重复）</li>
+<li>分享卡片（可选）：设置 <code>title</code> 与 <code>meta</code> 描述即可；微信转发缩略图需公众号 JS-SDK 签名，<strong>纯静态单文件做不到，不作硬性验收项</strong></li>
+<li>红点 + 巡检配置</li>
+</ul>
+<h2>2.3 禁止</h2>
+<ul>
+<li>不加登录、不加后台、不加数据库、不做表单自建收集（表单走第三方跳转）</li>
+<li>不引入任何需要联网加载的第三方库（离线打不开就是坏的）</li>
+</ul>
+<h2>2.4 验收（逐条打勾才交付）</h2>
+<pre><code>□ 手机 4G 打开，3 秒内看见内容，无白屏
+□ 375 / 390 宽无横向滚动，无文字溢出
+□ 每个按钮点得到，在可视区内
+□ 断网：显示错误态而不是空白
+□ 主图加载前有底色，加载失败有占位
+□ 改一个令牌颜色，全站同步变
+□ 巡检跑一次，首屏 PASS，无 console 报错
+□ README 能让一个没看过这个项目的人独立改文案换图
+</code></pre>
+<h2>2.5 复制出新站的做法（写进 README）</h2>
+<pre><code>1. 复制整个文件夹，改名项目
+2. 改 :root 里 3 个颜色（主色/强调色/底色）
+3. 换 assets 里的图和文字
+4. 改 title 和分享卡片信息
+5. 上传托管 → 手机验收 → 结束
+</code></pre>
+<hr />
+<h1>三、模板 B · 多页应用（墨缘级，第二阶段，5 阶段 6–8 轮）</h1>
+<h2>3.1 开工前必须先定三件事（我拍板，你记录）</h2>
+<table>
+<thead>
+<tr>
+<th>决策</th>
+<th>选项</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>身份从哪来</td>
+<td>平台身份 / 自建账号</td>
+<td>决定能不能搬走，<strong>选了平台就不可移植</strong></td>
+</tr>
+<tr>
+<td>数据存哪</td>
+<td>平台数据库 / 自建（Supabase 类）</td>
+<td>决定备份方式和迁移成本</td>
+</tr>
+<tr>
+<td>谁在用什么</td>
+<td>学生看作品 / 管理员审作品 / 都要</td>
+<td>决定权限模型复杂度</td>
+</tr>
+</tbody>
+</table>
+<p><strong>这三条没定，不许开工。</strong> 定了写进 <code>HANDOVER.md</code> 的决策记录：选了什么、代价是什么、什么情况下重审。</p>
+<h2>3.2 阶段 1 · 骨架（最容易偷懒、也最致命）</h2>
+<ul>
+<li><strong>单入口 + 路由表</strong>：所有页面在路由表里登记，路由表是<strong>唯一来源</strong></li>
+<li>目的：杜绝"两个按钮跳同一页""入口和页面对不上"</li>
+<li>每个入口都要能在路由表里查到；加页必须先加路由表</li>
+<li><strong>切场引擎</strong>：统一一套入场/退场，只动 <code>opacity/transform</code>，200ms 退场</li>
+<li><strong>布局壳</strong>：顶部安全区 + 内容区 + 底部 tab；内容区高度必须扣掉底部 tab</li>
+<li><strong>装饰层</strong>：水印/悬浮球统一放在低于交互层的层级</li>
+</ul>
+<p><strong>阶段门（不过不许进下一阶段）</strong>：</p>
+<pre><code>□ 每个 tab 都跳到它该去的页面（逐个点验，记下&quot;tab → 页面&quot;对照）
+□ 切页有过渡，无闪断、无重复播
+□ 底部按钮全部可点，无被遮挡
+□ 手机 375 宽无溢出
+</code></pre>
+<h2>3.3 阶段 2 · 身份与权限（P0 高发区）</h2>
+<ul>
+<li><strong>身份只有一个源</strong>：登录返回 <code>{token, who}</code>，<strong>绝不并存 <code>isAdmin</code> 这类第二身份源</strong></li>
+<li><strong>双键成对</strong>：<code>token</code> + <code>who</code> 一起写、一起清；401 清空整套，<strong>403 绝不清空</strong></li>
+<li><strong>双层守卫</strong>：前端藏入口（<code>display:none</code>）+ 后端每个 <code>/api/admin/*</code> 独立校验 token</li>
+<li>只做一层都会被绕过</li>
+<li><strong>身份数据只存一张表</strong>：不许"登录查 A 表、改密写 B 表"（会导致改密永远失败）</li>
+<li><strong>姓名等不可信字段从 token 取</strong>，不许前端传（前端传等于可伪造）</li>
+<li><strong>首登改密必须能走通</strong>，不能把人锁死在"必须改密"里</li>
+</ul>
+<p><strong>阶段门</strong>：</p>
+<pre><code>□ 未登录点后台入口 → 引导登录，不白屏
+□ 登录后访问无权限接口 → 403 提示，但仍是登录状态（不强制登出）
+□ token 失效 → 401 → 清空并回登录页
+□ 连续刷新 5 次、进出后台 3 次，不掉登录
+□ 首登改密走通，改完能用新密码登录
+□ 管理员和学生在同一接口下看到的数据范围正确
+</code></pre>
+<h2>3.4 阶段 3 · 数据与接口</h2>
+<ul>
+<li><strong>接口统一返回</strong> <code>{code, message, traceId}</code>；生产环境<strong>绝不返回 SQL、堆栈、表结构</strong></li>
+<li><strong>缺参返回 400 + 中文提示</strong>，不许 500</li>
+<li><strong>列表接口分页</strong>（默认 20/页），排序稳定</li>
+<li><strong>时间、状态、编号</strong>都用固定格式，全站统一</li>
+<li><strong>备份</strong>：一键导出 JSON（全表）+ 导入校验；每次结构变更前先导出</li>
+<li><strong>写操作要有幂等</strong>：重复提交不产生两条数据（按钮防连点 + 后端去重）</li>
+</ul>
+<p><strong>阶段门</strong>：</p>
+<pre><code>□ 增删改查各跑通一遍，刷新后数据还在
+□ 故意不传参数 → 返回 400 + 中文提示
+□ 故意触发异常 → 返回 code/message，看不到 SQL
+□ 连点提交 3 次 → 只产生 1 条数据
+□ 导出 JSON → 删一条测试数据 → 导入 → 数据还原
+</code></pre>
+<h2>3.5 阶段 4 · 上传与后台</h2>
+<ul>
+<li>上传：压缩 → 进度 → 失败可重试；<strong>不允许"上传中点了没反应"</strong></li>
+<li>后台列表：分页 + 筛选 + 批量操作，<strong>批量删除要二次确认</strong></li>
+<li>后台每个操作要能看到结果（成功提示 + 列表变化）</li>
+<li>删除是软删除（可恢复），或删除前自动导出备份</li>
+<li>后台操作记录：谁、什么时候、改了什么（一行一条）</li>
+</ul>
+<p><strong>阶段门</strong>：</p>
+<pre><code>□ 传 4 张大图（每张 5MB 级）→ 成功，无断连，有压缩
+□ 传 1 张 30MB 图 → 明确提示&quot;体积过大&quot;，不是&quot;网络异常&quot;
+□ 上传中切后台再回来 → 状态正确，不重复提交
+□ 批量删除 → 有二次确认 → 删完列表刷新正确
+</code></pre>
+<h2>3.6 阶段 5 · 动效与打磨</h2>
+<ul>
+<li>统一引擎（骨架阶段已内建，这里只做调优）：入场级联延迟、退场 200ms、回弹曲线</li>
+<li><strong>进度口径唯一</strong>：同一屏只允许一个分母，且<strong>分母由数据算出来</strong>，不许写死</li>
+<li>角色/图标朝向由单一变量控制，左右都要验</li>
+<li>弱光可读：对比度 ≥4.5:1，可点区域 ≥24×24px</li>
+</ul>
+<p><strong>阶段门</strong>：</p>
+<pre><code>□ 同一屏所有进度数字分母一致，且与真实数据条数相符
+□ 空数据时显示空态，不是&quot;0/0 完成&quot;
+□ 弱光下正文能看清，按钮点得到
+</code></pre>
+<h2>3.7 模板 B 的复用方式（复制出新项目）</h2>
+<pre><code>1. 复制整个项目 → 改名
+2. 改设计令牌（3 个颜色 + 字体）
+3. 改表结构（保留身份表、权限表的设计，只改业务字段）
+4. 改路由表（增删页面必须先动这里）
+5. 改文案 + 换图
+6. 跑一次全量验收（5 个关键路径）
+7. 导出一次备份，记版本
+</code></pre>
+<hr />
+<h1>四、两套模板合用的验收总清单</h1>
+<pre><code>【静态层】
+□ 手机 4G 打开正式地址，3 秒内看见内容（无白屏）
+□ 375 / 390 宽无横向滚动、无文字溢出、英文整词换行
+□ 正文 ≥16px、行高 1.75、对比度 ≥4.5:1
+□ 强调色全站唯一
+□ 无裸 LaTeX / 无占位文字 / 无 TODO
+
+【交互层】
+□ 每个入口逐个点验，去的是它该去的页面
+□ 每个按钮点得到（不被装饰层盖、不落在可视区外）
+□ 弹层高度扣掉底部 tab
+□ 列表能用手指滑动（未被 touch-action 锁死）
+□ 删除/清空有二次确认，关窗后数据真的变了
+
+【数据层】
+□ 六态齐全（加载/空/错误/未登录/无权限/成功）
+□ 断网有错误态和三段式提示
+□ 连点提交只产生 1 条数据
+□ 刷新后数据还在，进度分母唯一且与数据一致
+
+【身份层】
+□ 401 清空整套并回登录，403 只提示不登出
+□ 前端藏入口 + 后端守卫都在
+□ 首登改密能走通，不锁死
+
+【可观测】
+□ 断网 → 红点亮 → 刷新后红点还在
+□ 巡检跑一次，产物目录里有 PNG + results.json + index.md
+□ 结论只写&quot;首屏 PASS&quot;，没有&quot;全 PASS&quot;
+
+【交付】
+□ README 能让外人独立改文案换图
+□ HANDOVER 有结构、红线、当前状态
+□ 备份导出过一次，且能恢复
+</code></pre>
+<hr />
+<h1>五、给 AI 的开工指令（按阶段发，不要一次全发）</h1>
+<h2>5.1 第一句（做模板 A）</h2>
+<pre><code>按《网页模板施工规格书》做模板 A 单页站。
+
+先只做骨架和内置能力，不要填业务内容：设计令牌、首屏底色、三态、红点、移动端四条、图片压缩、巡检配置、README。
+
+做完给我：
+1) 文件清单 + 每个文件干什么
+2) 一份截图（手机宽度）
+3) 巡检产物目录路径
+
+不要自行发布。我确认后再进模板 B。
+</code></pre>
+<h2>5.2 第二阶段（做模板 B 阶段 1）</h2>
+<pre><code>进入模板 B 阶段 1（骨架）。开工前先回答三个决策问题：身份从哪来、数据存哪、谁在用什么。我拍板后你再动手。
+
+本阶段只做：路由表 + 切场引擎 + 布局壳（含底部 tab 高度） + 装饰层层级。
+对照阶段门逐条自检，把自检结果写进产物目录，不要口头报&quot;通过&quot;。
+</code></pre>
+<h2>5.3 每轮固定汇报格式</h2>
+<pre><code>改了哪几个文件：逐个列名
+每个改了什么：一句话
+没动哪些：明确列出克制没碰的部分
+阶段门自检：逐条 PASS/FAIL，FAIL 的写原因
+我没验证的：直说
+</code></pre>
+<hr />
+<h1>六、已知坑固化表（做进骨架，不要靠记）</h1>
+<table>
+<thead>
+<tr>
+<th>坑</th>
+<th>固化方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>冷启动白屏</td>
+<td>入口 HTML 带底色，遮罩先挂载</td>
+</tr>
+<tr>
+<td>切页像划照片</td>
+<td>骨架期就内建统一引擎</td>
+</tr>
+<tr>
+<td>删请求头全站崩</td>
+<td>平台注入物列入红线，不许删</td>
+</tr>
+<tr>
+<td>401/403 混用致登出死循环</td>
+<td>403 绝不触发登出</td>
+</tr>
+<tr>
+<td>双表密码不同步</td>
+<td>身份只存一张表</td>
+</tr>
+<tr>
+<td>已加入仍显示"我要加入"</td>
+<td>按钮必须套状态判断</td>
+</tr>
+<tr>
+<td>两个入口跳同一页</td>
+<td>路由表唯一来源，逐入口点验</td>
+</tr>
+<tr>
+<td>选完图零请求</td>
+<td><code>input.files</code> 先拷贝再清空</td>
+</tr>
+<tr>
+<td>保存按钮点不到</td>
+<td>弹层高度扣底部 tab</td>
+</tr>
+<tr>
+<td>装饰遮住按钮</td>
+<td>z-index 分层，装饰在下</td>
+</tr>
+<tr>
+<td>大图上传断连</td>
+<td>前端压缩 + 总量拦截 + 分清两种错误</td>
+</tr>
+<tr>
+<td>关窗不等于删除</td>
+<td>删除后验后端数据</td>
+</tr>
+<tr>
+<td>列表滑不动</td>
+<td><code>touch-action:pan-y</code></td>
+</tr>
+<tr>
+<td>进度多个分母</td>
+<td>分母唯一且由数据算</td>
+</tr>
+<tr>
+<td>断网白屏</td>
+<td>六态含错误态</td>
+</tr>
+<tr>
+<td>生产吐 SQL</td>
+<td>只回 code/message/traceId</td>
+</tr>
+<tr>
+<td>缺参 500</td>
+<td>入口必填校验返回 400</td>
+</tr>
+<tr>
+<td>测数据污染真实数据</td>
+<td>测试只用假数据，测完还原</td>
+</tr>
+<tr>
+<td>发布误判</td>
+<td>唯一判据：手机看见内容 + 截图</td>
+</tr>
+<tr>
+<td>静默故障无人知</td>
+<td>红点 + 巡检</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>七、预算与节奏（重要）</h1>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>轮次</th>
+<th>积分量级</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模板 A</td>
+<td>1–2 轮</td>
+<td>100–200</td>
+<td>单文件，输出不大</td>
+</tr>
+<tr>
+<td>B 阶段 1 骨架</td>
+<td>1–2 轮</td>
+<td>150–250</td>
+<td>路由 + 引擎 + 壳</td>
+</tr>
+<tr>
+<td>B 阶段 2 身份</td>
+<td>1–2 轮</td>
+<td>150–250</td>
+<td>最容易返工，别省</td>
+</tr>
+<tr>
+<td>B 阶段 3 数据</td>
+<td>1–2 轮</td>
+<td>150–250</td>
+<td>接口 + 备份</td>
+</tr>
+<tr>
+<td>B 阶段 4 上传后台</td>
+<td>1–2 轮</td>
+<td>150–250</td>
+<td>上传最容易炸</td>
+</tr>
+<tr>
+<td>B 阶段 5 动效打磨</td>
+<td>1 轮</td>
+<td>80–150</td>
+<td>只调参</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两条省钱纪律</strong>：</p>
+<ol>
+<li><strong>模型按活选，不许一律最低档</strong>：数据正确性 / 权限 / 接口类施工用口碑档（GLM-5.3，0.69x）——这类 bug 的代价是丢数据、重复提交，Flash 档实测会产出"看着对其实错"的代码；<strong>只有纯机械贴码</strong>（照抄既定代码段、换文案）用 Flash 档（0.08x）。</li>
+<li><strong>一件事一个会话</strong>，别让一个会话从头做到尾（每轮都在重读全文，越到后面越贵）</li>
+</ol>
+<hr />
+<h1>八、脱平台与可移植性（发布前必查）</h1>
+<blockquote>
+<p>背景：我们的站都跑在 WorkBuddy 平台托管上（<code>*.app.workbuddy.host</code> + sharecode 链接）。模板要保证：哪天要搬走，随时能搬。</p>
+</blockquote>
+<h2>8.1 可移植性四查（每个新站交付前过一遍）</h2>
+<pre><code>□ 零外部依赖：不引用任何需联网才能加载的第三方库（模板 A/B 均为单文件零依赖）
+□ 无平台注入残留：页面 JS 里搜平台注入物（如平台 boot 脚本、统计脚本），列入红线不许依赖
+□ 无平台专有接口：数据层不依赖平台私有 API——模板 B 的所有数据走 mock() 一层，换后端只改这一处
+□ 路径全相对：assets 引用全部相对路径，拖到任何静态托管直接打开
+</code></pre>
+<h2>8.2 mock 替换表（模板 B 换真实后端的施工地图）</h2>
+<p>模板 B 全部接口收敛在<strong>一个 <code>mock()</code> 函数</strong>里（这是设计，不是偷懒）。换后端 = 只改这一层：</p>
+<table>
+<thead>
+<tr>
+<th>mock 接口名</th>
+<th>换后端时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>register / login / changePwd</td>
+<td>换成真实身份接口，返回体形状不变 <code>{code,message,traceId,data}</code></td>
+</tr>
+<tr>
+<td>addItem / list</td>
+<td>换真实增查接口，分页形状不变 <code>{list,total}</code></td>
+</tr>
+<tr>
+<td>exportAll / importAll</td>
+<td>换真实备份接口；导出脱敏规矩不变</td>
+</tr>
+<tr>
+<td>deleteItems / getLogs / adminStat</td>
+<td>换真实管理接口，401/403 语义不变</td>
+</tr>
+</tbody>
+</table>
+<p><strong>替换纪律</strong>：一次只换一个接口 → 跑巡检 → PASS 再换下一个。页面代码零改动。</p>
+<h2>8.3 导出包验证与域名归属</h2>
+<ul>
+<li><strong>搬运验证</strong>：把整包拖到任一自有静态托管（或本地双击打开模板 A），能开、红点能亮，才算"可移植"成立</li>
+<li><strong>域名归属</strong>：给客户/社团做站，正式域名必须落在<strong>对方名下</strong>（备案主体写对方），平台托管只作过渡——防止"站在我账号上，人走了站没了"</li>
+</ul>
+<hr />
+<h1>九、视觉施工工序（每站标配，骨架验收后必做）</h1>
+<blockquote>
+<p>定位：骨架=毛坯房，视觉施工=装修。<strong>跳过这轮，站就是"能用但难看"</strong>——演练站（兰亭招新页）已验证：只改3色交付必然难看，此工序必须列为标配。</p>
+</blockquote>
+<h2>9.1 范围纪律（写死）</h2>
+<ul>
+<li><strong>只许动 CSS 和 HTML 展示层</strong>（配色层次、卡片质感、字体排印、间距节奏、头图区、插画/纹样装饰）</li>
+<li><strong>JS 逻辑零改动</strong>：mock()、goto()、WHO、401/403、红点、上传、备份、幂等、确认词，一个字不碰</li>
+<li><code>:root</code> 三色可调但不许加第二个强调色（强调色全站唯一，专给主操作+红点）</li>
+</ul>
+<h2>9.2 流程（五步）</h2>
+<pre><code>① 定母题：按站型定调性（活动页热闹 / 系统站素雅 / 书法类纸墨调）
+② 扩令牌：新颜色一律定义进 :root，组件禁写裸色值
+③ 改展示层：头图区、卡片质感、字体排印（系统字体栈，不外链字体文件）、留白宁大勿挤
+④ 每站一个记忆点：强制想一个&quot;别人没有的小东西&quot;（墨缘的每日名言行书、竞墨的强制登记都是这么来的）
+⑤ 验收：浅色+深色巡检全 PASS + 对比度≥4.5 + 三页截图（首页/列表/关键页）给用户看
+</code></pre>
+<h2>9.3 模型与轮次</h2>
+<ul>
+<li>视觉调优是"改一步看一步"的判断型工作：用口碑档（GLM-5.3），不用 Flash 档（会调出"技术正确但呆板"的效果）</li>
+<li>1–2 轮；每轮验收只认截图+巡检，不认"已美化"</li>
+</ul>
+<h2>9.4 图标与美术规范（大厂惯例，写死——兰亭招新演练站视觉施工验证）</h2>
+<ul>
+<li><strong>图标一律内联 SVG 线性风格</strong>：24 viewBox、stroke-width 1.7、圆头圆角（round cap/join）、<code>stroke="currentColor"</code> 随文字变色、底栏图标统一 22px 网格。<strong>禁止 emoji 当图标</strong>——设备字体差异大（部分机型显示方框）、风格不可控</li>
+<li><strong>母题先行</strong>：动 CSS 前先写一句母题（如"宣纸 × 墨 × 朱砂"），之后每个颜色决定回溯这句</li>
+<li><strong>深色不是变灰蓝</strong>：深色必须延续同一母题重调色相（纸墨调 → 暖墨底 + 宣纸字 + 提亮朱砂 + 淡金主色），禁止简单把亮色变暗了事</li>
+<li><strong>强调色的唯一豁口</strong>：除主操作与红点外，全站只允许一处"品牌印记"用强调色（如顶栏朱砂小印），其余装饰一律禁用强调色</li>
+<li><strong>质感用纸纹不用重投影</strong>：细描边 + 双层淡阴影 + 细纹理线；禁 heavy box-shadow</li>
+<li><strong>字体不外链</strong>：标题楷体/衬线系统栈，正文无衬线系统栈；对比度浅深两套实测 ≥4.5</li>
+</ul>
+<h2>9.5 视觉参考板（好/坏对照，照着这个水平交货）</h2>
+<blockquote>
+<p>来源：兰亭招新演练站同一文件美化前后实拍（2026-11-25）。坏例是"只改 3 色就交货"的真实样子，好例是按本章工序做完的样子。资料库编号 13~16，或直接看演练站线上版。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>对照项</th>
+<th>坏例（美化前，13/14 号图）</th>
+<th>好例（美化后，15/16 号图）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>底部 tab 图标</td>
+<td>emoji（部分机型方框、风格不可控）</td>
+<td>内联 SVG 线性图标，随文字变色</td>
+</tr>
+<tr>
+<td>深色模式</td>
+<td>冷灰蓝，像老软件</td>
+<td>暖墨底+宣纸字+提亮朱砂，同一母题延续</td>
+</tr>
+<tr>
+<td>顶栏</td>
+<td>空荡</td>
+<td>右肩一枚朱砂小印（全站唯一豁口）</td>
+</tr>
+<tr>
+<td>质感</td>
+<td>平面无层次</td>
+<td>纸纹阴影、细描边、水印淡染</td>
+</tr>
+<tr>
+<td>水印/点缀</td>
+<td>大字水印发灰突兀</td>
+<td>母题色淡染、kicker 落强调色</td>
+</tr>
+</tbody>
+</table>
+<p><strong>验收口径</strong>：新站视觉施工完，对照本表逐行自查——五项都达到"好例"水平才算过；拿不准就把截图和 13~16 号并排发给验收方。</p>
+<hr />
+<h1>十、最后</h1>
+<p><strong>这两套模板的价值不在"好看"，在于：下一个新站复制它，20 分钟能上线、一晚上不会炸。</strong></p>
+<p>所以施工顺序只能是：<strong>A 先跑通 → B 分五阶段 → 每阶段过门</strong>。任何"一次做完"的要求，都会让这套东西退回成"又一个需要返工的站"。</p></div></section>
+<section class="sec doc" id="doc02"><div class="dhead"><h2>02 施工通用经验·三项目复盘</h2><div class="dops"><a class="lib" href="https://www.workbuddy.cn/space/d/xjt4R1nsm2mahIyk9Z02QX" target="_blank" rel="noopener">资料库原件 ↗</a></div></div><p class="ddesc">墨缘/竞墨/专升本踩坑复盘与报价参考</p><div class="mdbody"><h1>网页施工通用经验与模板 · 三项目复盘</h1>
+<blockquote>
+<p>整理日期：2026-11-24
+来源项目：<strong>墨缘</strong>（豆包·大）、<strong>竞墨</strong>（WorkBuddy·大）、<strong>专升本每日修炼</strong>（WorkBuddy·小）
+用途：<strong>以后开新网页前先读这份</strong>。第一部分看同类项目踩过什么坑，第二部分记通用规律，第四部分直接抄模板。
+使用方式：新会话开场把这份文件发给 AI，说"按里面的模板和规矩来"。
+<strong>出事急救</strong>：人自己查独立的《症状速查表.md》（按现象找第一动作），再翻项目档案；AI 只记模板 J 里三条提炼。</p>
+</blockquote>
+<hr />
+<h2>〇、一句话总纲</h2>
+<blockquote>
+<p><strong>小项目拼"克制"，大项目拼"地基"。而所有项目都死在同一个地方——轻信 AI 的自报、没有唯一判据、一个页一个改法。</strong></p>
+</blockquote>
+<p>三个项目体量不同，但真正让人返工的坑高度重合：</p>
+<table>
+<thead>
+<tr>
+<th>反复出现的坑</th>
+<th>在哪几个项目都中招</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>骨架选型决定手感上限，先天不足后期补不回</strong></td>
+<td>竞墨（划照片，最典型）、专升本（引擎先行才避开）</td>
+</tr>
+<tr>
+<td>信了"已修复/构建成功/本地测是好的"，实际没生效</td>
+<td>墨缘、竞墨、专升本</td>
+</tr>
+<tr>
+<td><strong>"删了没报错"却全站打不开（静默失败）</strong></td>
+<td>墨缘（11-09 删请求头事故）</td>
+</tr>
+<tr>
+<td>没有唯一判据，靠感觉判断"改好没"</td>
+<td>墨缘、竞墨</td>
+</tr>
+<tr>
+<td>视觉/样式没总纲，做一个改一个</td>
+<td>专升本（最典型）、墨缘</td>
+</tr>
+<tr>
+<td>数据只存本地，没备份 / 没权限分层</td>
+<td>三个都有</td>
+</tr>
+<tr>
+<td>图片不压、请求体过大，真机上炸</td>
+<td>墨缘、竞墨</td>
+</tr>
+<tr>
+<td>身份/鉴权混乱（多源、双表、401/403 误伤）</td>
+<td>墨缘（最惨）、竞墨（做对了）</td>
+</tr>
+<tr>
+<td>前端交互"点了没反应"（白屏/按钮被遮/上传无响应）</td>
+<td>墨缘</td>
+</tr>
+<tr>
+<td>把"运营数据没填"误判成"代码 bug"</td>
+<td>墨缘</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>第一部分 · 三个项目分别踩的坑</h1>
+<h2>一、墨缘（豆包平台 · 大项目 · 带后台的多页 Web App）</h2>
+<p><strong>性质</strong>：书画协会作品征集平台，20 天工期，多页面 + 完整后台 + 身份认证 + 数据库。发布在豆包/秒哒平台。</p>
+<h3>发布与判据（最惨痛的一类）</h3>
+<p>• <strong>"构建成功"不等于"发上去了"。</strong> 唯一判据是 <strong>CDN 目录名 = commit 完整 hash</strong>，hash 没变就是没发布。曾靠"构建成功"提示误判多次。
+• <strong>发布前先弄清这次会带上哪些 commit</strong>——rebase 曾一次带进 7 个主分支提交，自己却只知道"修了什么"。
+• <strong>主分支禁止 force push</strong>；特性分支 rebase 后用 <code>--force-with-lease</code>，不用 <code>--force</code>。
+• 靠主包<strong>字节数 + md5 差异</strong>判断"这版到底改没改前端"——字节数完全相同、md5 只差几处，说明前端零实质改动，全在后端。</p>
+<h3>2026-11-09 全站打不开事故：删了一个"看起来没用"的请求头</h3>
+<blockquote>
+<p>这就是"改功能 → 发现要补功能 → 页面打不开"那次。用户记忆模糊，这里记全，因为它是最阴的一类故障——<strong>静默失败</strong>。</p>
+</blockquote>
+<p>• <strong>起因</strong>：为了修一个 bug，删掉了请求头 <code>x-larkgw-suda-*</code>。它"看起来没用"——删完<strong>代码不报错、构建成功、资源全返回 200</strong>。
+• <strong>真相</strong>：平台靠这个头注入 <code>appId</code>。头没了 → 入口 HTML 注入出 <code>appId=""</code> → 前端判定"应用不存在"，<strong>全站打不开</strong>。
+• <strong>最阴的地方（分层验证的教训）</strong>：当时 L0 传输层全是 200（CLI 显示 finished、JS/CSS 都能下载），但 L2 渲染层是"页面不存在"、L3 运行时 <code>appId=""</code>。<strong>只看"资源 200"会得出"是好的"这种完全错误的结论。</strong>
+• <strong>事故前的原话信号</strong>："这个应该不影响别的功能"——后来这句话被列进"听到就立刻叫停"清单。
+• <strong>处置教训</strong>：先回退后查因。当时先分析再回退，用户在外面干等很久。</p>
+<p><strong>由此立下两条通用规矩（已沉淀到发版约束卡）：</strong></p>
+<ol>
+<li><strong>影响面四问</strong>（删除/重命名任何请求头、字段、环境变量、路由、策略前必答）：</li>
+<li>除了我，还有谁在读它？（平台注入层、框架、其他模块、外部脚本都算）</li>
+<li>删掉它，谁会<strong>静默失败</strong>——不报错、但行为变了？</li>
+<li>能不能<strong>先加后删</strong>（分两步）？</li>
+<li>我怎么在 5 分钟内<strong>证明</strong>没人用？（全仓搜引用 + 查平台行为 + 测试环境单独删一次观察，三者缺一视为未证明）</li>
+<li><strong>"不报错"不等于"没人用"</strong>——这是静默失败最贵的地方。以及发版后<strong>分层验证</strong>：L0 传输→L1 文档→L2 渲染→L3 运行时→L4 业务，必须"浏览器打开亲眼看见内容+截图"，状态码不算数。</li>
+</ol>
+<h3>认证与权限（技术债高发区）</h3>
+<p>• <strong>401 和 403 必须区别对待</strong>：401 → 清空 localStorage 并强制登出；403 → 不清空。曾因 <code>badges?studentId=</code> 带合法 token 仍返回 401，导致"登录后点我的被强制登出"的 P0。
+• <code>suda-csrf-token</code> cookie 只防跨站，<strong>不是身份凭证</strong>；光有 cookie 不算登录，必须带 Bearer token。
+• <strong>别"顺手写成统一守卫"</strong>：badges 接口兼着匿名公开的徽章墙，手写校验是有意为之，套硬守卫会把匿名请求也打成 401。
+• <strong>删字段要治本</strong>：让后端从 token 取 <code>studentName</code>，而不是前端补字段——前端补等于让客户端可伪造姓名。</p>
+<h3>身份失效循环 + 管理员/学生身份名单混乱（最大的 P0 区）</h3>
+<blockquote>
+<p>这是墨缘最纠缠的一类坑：一个"鉴权小改动"能引发"所有人一操作就被强制登出"的连环故障，且管理员和学生各有不同的触发原因。</p>
+</blockquote>
+<p>• <strong>别让 401 和 403 一起触发"身份失效"</strong>：旧代码写的是 <code>status !== 401 &amp;&amp; status !== 403</code> 就广播 auth-lost——结果<strong>任何 403 都清空登录态、弹"身份失效，请重新登录"</strong>。而登录成功时会重置一次性标志位，导致<strong>每次重新登录后遇到的第一个 403 又触发一次</strong>，形成可重复、不自愈的死循环。修法：只认 401，403 绝不登出。
+• <strong>"被强制登出"要分清环境再动手</strong>：用户报"所有账号一操作就掉线"，实测正式地址登录、进 4 个后台 tab、首页↔作品往返，全程 0 个 401/403——问题在<strong>豆包对话框预览（构建 dev）和正式版不是一套登录环境</strong>。先问"测的是哪个环境、版本号对不对"，别急着改代码。<strong>第一优先是分清环境，不是派活排查。</strong>
+• <strong>一个字段两套表，改密必失败</strong>：<code>admins</code> 和 <code>class_students</code> 双表密码哈希不同步——<strong>登录查一张、改密写另一张</strong>，导致改密码返回 403"当前密码不正确"，但同一个密码却能登录。身份数据<strong>绝不能散在两张表里</strong>。
+• <strong>身份判断别用前端硬编码/双身份源</strong>：曾出现"已登录已加入仍显示『我要加入』"（按钮无条件渲染、没套状态判断）；还有 localStorage 只有学生 token 没有管理员 token、靠 cookie 会话撑着的历史悬案。<strong>身份以服务端为准，前端只做展示。</strong>
+• <strong>名单/权限的错，很多是"前端多套了一层 isAdmin"</strong>：接口本就返回全量名单，前端却套 <code>isAdmin</code> 让普通会员看不到打卡名单；"学生管理页只剩删除"是操作列渲染被删减。<strong>先查接口返回，再看前端是不是自己把数据藏了。</strong>
+• <strong>两个入口跳同一个页面</strong>："开始打卡"和"硬笔书法"都跳 <code>/hard-pen</code>，是三元表达式第一个分支写错。这类"页面与入口不对应"要逐个入口点验，不能只看页面在不在。</p>
+<h3>判读规则（被坑两次，写死成规则）</h3>
+<p>• <strong>自检报 error ≠ 系统故障</strong>：后台那 12 项红黄灯反映的是<strong>数据完整度</strong>，是一份"运营待办清单"，不是 bug 列表。代码错的标志是接口 500 / 白屏 / 点了没反应 / 数据串位；人没填的标志是列表能打开、字段空着。
+• <strong>别把"最近才注意到"当"最近才加的"</strong>：扣子测评称"这版刚加了备份/自检"，据此推出 P0——前提是假的（建站起就有），前提假 → 后面再精确的观测因果链也是断的。
+• <strong>报 404 先怀疑自己的路径</strong>：曾把 <code>/api/calligraphy/all-works</code> 记成 <code>/api/all-works</code>，误以为路由被删。前端 bundle 里能 grep 出全部真实路径。
+• <strong>实测反证，不要"补功能"</strong>：曾以为作品墙缺收藏按钮，实测 <code>lucide-star=0</code> 证明本来就没有（收藏只在详情页），补了等于新增功能、引入风险。
+• <strong>"为修一个 bug 在生产开一个新口子"</strong>：为了让登录 500 的错误原文显示出来，给异常过滤器加了 <code>rawMessage</code>，结果<strong>把整条 SQL 和表结构返回给了前端</strong>——调试代码上了生产。教训：生产只返回 <code>{code,message,traceId}</code>，SQL 原文只写服务端日志，开发/预览环境才保留详细错误。
+• <strong>接口缺参别返回 500</strong>：多个接口不传参数直接 500 还吐 SQL，应在入口做必填校验、返回 400 + 中文提示。</p>
+<h3>性能与图片</h3>
+<p>• CDN 图片压缩参数<strong>必须编码形式</strong>：<code>?x-tos-process=image%2Fresize%2Cw_800</code>，裸写 <code>image/resize,w_800</code> 慢一倍。
+• 列表用缩略图 + <code>loading="lazy"</code> + <code>decoding="async"</code>，<strong>详情页/放大/下载继续用原图</strong>。实测 455→88KB（-81%），加载 1.0-1.8s→0.3-0.4s。
+• 等比缩放，<strong>不动 quality</strong>。</p>
+<h3>白屏、闪屏与"点了没反应"（前端交互层的高频坑）</h3>
+<p>• <strong>冷启动白屏 2.17s（4G）/ 4.25s（3G）</strong>：四条根因——①入口 HTML 是空壳（只有一个 <code>&lt;div id="root"&gt;</code>，0 个 style）；②遮罩和首页<strong>同帧挂载</strong>，没起到"先盖住"的作用；③云层与底色色差仅 11 阶，数学上有云、肉眼看不见；④<code>sessionStorage</code> 记忆导致刷新不播动画。压缩后仍有 0.86s。<strong>教训：入口 HTML 要有底色、遮罩要先于内容挂载。</strong>
+• <strong>"选完图零请求、零报错、连占位都没有"</strong>：根因是 <code>input.files</code> 是 <strong>live FileList</strong>，<code>e.target.value=''</code> 会把它清空，而代码存的是同一个引用，紧接着 <code>length===0</code> 成立直接 return。同一个 bug 在三个入口复制了三遍。修法：先 <code>Array.from(e.target.files)</code> 拷贝再清空。<strong>对比定位的关键</strong>："更换封面"是好的，因为它取的是单个 File 对象、不受 value 清空影响。
+• <strong>"保存点不到，其实命中底部 tab"</strong>：编辑面板高度没扣掉底部导航，按钮落在可视区外（y=843、屏高844、底栏56）。移动端弹层/面板要算上底部 tab 高度。
+• <strong>装饰层 z-index 高于交互层</strong>："我的"页按钮被水印遮挡；右侧悬浮球重复渲染遮挡内容。<strong>装饰永远不能盖住可点元素。</strong>
+• <strong>"点确认删除"弹窗关了但零请求</strong>：只关了弹窗、没调删除接口，刷新还在。<strong>关窗≠执行</strong>，要验后端数据真的变了。
+• <strong>自动化脚本命中不可见按钮导致误判</strong>："改图保存不生效"是脚本用了"页面上最后一个含『保存』的按钮"，命中的是隐藏候选元素；"共X张"读的是编辑区文案不是列表长度。<strong>脚本误判要复测推翻，别据此写根因</strong>（这条最后撤回留档）。
+• <strong>58 个元素带 <code>touch-action:none</code></strong> → 后台成员列表手指起滑无反应，只能在信息框外滑。应改 <code>pan-y</code>。移动端别乱禁触摸。</p>
+<h3>验收视角</h3>
+<p>• <strong>别用 admin 视图验视觉效果</strong>：admin 默认在"编辑态"，看到的是平铺管理列表；要关掉右上角编辑开关切到"浏览态"才是用户看到的 3D 轮播。曾因此误判"功能没上线"。</p>
+<h3>成本（豆包按 token 计费的特殊教训）</h3>
+<p>• <strong>同类改动合并发</strong>：三处"加一个 URL 参数"分三次发，烧了 285 积分，代码各 1 行——贵在每次新任务都要重读整个代码库。合并发能压到个位数。
+• <strong>按输出量选模型，不按任务类型选</strong>：纯样式/CSS → 最便宜的 Flash；改逻辑/状态/接口 → 主力模型；判影响面/长上下文 → 贵模型。
+• <strong>验收交给本地巡检脚本</strong>（如 <code>/workspace/tools/墨缘巡检.py</code>），别让 AI 自己 build + 截图，每轮多烧一次。
+• <strong>省积分提示词反而费积分</strong>："让模型自己找最省办法"是反效果（它会花推理去想怎么省）。要用明确的短指令：不展示推理、严格按清单改、验证只做列出的项、卡住就停。</p>
+<hr />
+<h2>二、竞墨（WorkBuddy 平台 · 大项目 · 单文件 HTML + 后台接口）</h2>
+<p><strong>性质</strong>：书法比赛征集系统，报名→投稿→后台评分→上墙→导出全链路。单文件 HTML 前端 + 后台接口，平台内已有真实数据（65 报名 / 63 交卷），<strong>测试时严禁碰 clearall / reset / remove</strong>。</p>
+<h3>最大的坑：骨架先天不是墨缘那种 → 切页像"划照片"（花大力气才补回来）</h3>
+<blockquote>
+<p>这是竞墨<strong>排第一的教训</strong>，比大图上传还根本——因为它决定了整个项目的"手感上限"。</p>
+</blockquote>
+<ol>
+<li><strong>起因</strong>：竞墨一开始的骨架就不是墨缘（豆包多页 App）那种带原生页面切换架构的形态，而是单文件 HTML。结果就是<strong>页面切换没有过渡，像划照片一样生硬</strong>——点一下 tab，整屏内容直接跳过来，没有墨缘那种丝滑切场。用户当时的原话诉求："它后面可以像墨缘一样拥有丝滑的切场动效吗？"</li>
+<li><strong>代价</strong>：这个"手感"是<strong>骨架层决定的，不是后期加个 CSS 动画能糊弄过去的</strong>。后来专门做了一套"统一入场引擎"才补回来：所有切页走同一套、只动 <code>opacity/transform</code>、幂等固化、级联延迟、回弹曲线、200ms 退场——等于在大项目后期回头补地基。</li>
+<li><strong>残酷的对比结论</strong>：因为骨架不同，竞墨在这项上<strong>对比墨缘天生没有优势</strong>，补救能做到"不生硬"，但要完全达到墨缘那种原生丝滑，成本很高。<strong>架构选型的债，最后是体验来还。</strong></li>
+<li><strong>教训（写进通用规律）</strong>：<strong>切场/导航/动效这类"全局手感机制"，必须在骨架阶段就定死</strong>。不要想着"先能用，动效以后再说"——后期补是补不回原生手感的，而且会牵动所有页面。</li>
+</ol>
+<h3>鉴权设计（做对了的部分，可作为范本）</h3>
+<ol>
+<li><strong>身份字段只定一个</strong>：登录返回 <code>{token, who, recovered}</code>，身份只有 <code>who</code>，绝不并存 <code>isAdmin</code> 这种第二身份源（两个源必然不同步）。</li>
+<li><strong>localStorage 双键成对</strong>：<code>lt_admin</code>（令牌）+ <code>lt_who</code>（身份），注释写明"成对写、成对清；401 统一清空整套"。</li>
+<li><strong>前端藏 tab + 后端守卫双保险</strong>：未登录时管理入口 <code>display:none</code>，同时每个 <code>/api/admin/*</code> 独立检查 token——只做一层都会被绕过。</li>
+<li><strong>首登改密不死锁</strong>：识别组织者 → 自动弹初始密码改密框；但 <code>needChange=true</code> 的账号只 toast 不自动弹（遗留差距）。</li>
+<li><strong>学生登记 ≠ 登录</strong>：登记是姓名+学号+班级+手机+口令，设备指纹一机一次；登录是另一套。别混。</li>
+</ol>
+<h3>P0：大图多张上传必炸（最有价值的一条）</h3>
+<ol>
+<li><strong>请求体 ≥ 约 38MB 时代理层直接断连</strong>（500 ECONNRESET）。手机照片 3~8MB，一次传 4 张大图就超，而前端只显示"网络异常，请检查网络后重试"——学生重试一百次也不会成功，现场会失控。</li>
+<li><strong>修法</strong>：上传前 canvas 压缩（长边 &gt;1600px 等比缩到 1600px，转 JPEG 质量 80，单张压到 1MB 内）；提交前估算 base64 总量，&gt;25MB 就拦下并提示"图片过大，请减少张数"；错误提示要<strong>区分</strong>"体积过大"和"网络异常"。</li>
+<li>7.8MB 原图 → 8KB 缩略图（-99.9%），上传速度和成功率都翻倍。</li>
+<li><strong>并发退化</strong>：60 并发刷墙，60/60 成功但中位 4.6s、P95 5.3s（单发只要 0.1~0.5s）。压缩后单请求变小会明显缓解；流程上分组上传避免集体齐发。</li>
+</ol>
+<h3>动效（先天不足后的补救方案，思路可跨项目复用）</h3>
+<ol>
+<li><strong>统一入场引擎（就是上面"划照片"坑的补救）</strong>：所有页面切换走同一套，只许 <code>opacity/transform</code>，播一次即固化（<code>ENTER_SEEN</code> 幂等标记）；用 <code>getAnimations()</code> 检测复播；禁止用 display/height/top/width 做动画。<strong>记住这是"亡羊补牢"——新项目应该在骨架阶段就把它内建进去，而不是事后补。</strong></li>
+<li><strong>角色动画的朝向要统一由一个变量控制</strong>（如 <code>scaleX(--dir)</code>），左右方向都要验。曾出现"身体朝前、方向朝后跳"的怪异画面，就是因为朝向散落在多处。</li>
+</ol>
+<h3>测试纪律</h3>
+<ol>
+<li><strong>压测后必须还原数据</strong>：测试作品/报名走正常删除通道清掉，复核真实数据原样（65/63、报名恢复 N 人、作品墙归零）。</li>
+<li><strong>危险操作要二次确认</strong>：删除报名需管理密码，clearall 需输入 <code>CLEAR</code>——测试时绝不碰。</li>
+<li><strong>声称的限流要实测</strong>：<code>/api/recover</code> 号称"5 次/分钟"，实测 20 次无 429 → 限流根本没生效。<strong>不要信注释里的数字。</strong></li>
+</ol>
+<hr />
+<h2>三、专升本每日修炼（WorkBuddy 平台 · 小项目 · 纯单文件 HTML + localStorage）</h2>
+<p><strong>性质</strong>：个人刷题备考站，5 页（今日/练习/知识/错题/我的），无后台、无账号、localStorage 存全部数据，只私发一两人用。</p>
+<h3>定位决策（小项目的核心是"克制"）</h3>
+<ol>
+<li><strong>不要为了一两个人上名单登录/后台</strong>：那是把"能直接发的链接"升级成"要长期维护的系统"。而且<strong>挡不住转发</strong>——对方把链接往群里一丢照样进。私发链接 + 叮嘱即可。想留底就给每人发带不同随机参数的链接，外流了能知道从谁那儿出去。</li>
+<li><strong>数据只存 localStorage 是真实风险</strong>：清缓存或换手机 = 全部记录没了。对小项目，加一层<strong>导出/导入 JSON</strong> 就够了（几行代码），不要上云端同步（要账号后台，与"一两人私用"冲突）。</li>
+<li><strong>单文件 HTML 也能做复杂功能</strong>：记忆引擎（SM-2 简化：1→2→4→7→15→30 天，答错重置，按考点聚类错题）、计划引擎（以日期字符串为种子，同日刷新计划不变）都能纯前端实现。</li>
+</ol>
+<h3>一个页一个坑 → 立"总纲"（本项目最大教训）</h3>
+<ol>
+<li><strong>视觉/排版没有总纲，就会"做一个改一个"</strong>：科目标签颜色反复改（实心绿太跳→朱砂撞按钮→蓝绿太像→最终黛蓝/紫檀/赭黄）；红字用 <code>nowrap</code> 撑出屏幕；字号 12~14px 费眼；公式是裸 LaTeX 源码 <code>$\frac{}{}$</code>。</li>
+<li><strong>根治</strong>：写一份 <strong>R3.8 全站排版总纲</strong>，优先级高于所有零散补丁，任何新页面动手前先过总纲（设计令牌、容器换行、通用组件、公式渲染、字号层级、自检清单）。</li>
+<li><strong>强调色只能有一个</strong>：朱砂红是全站唯一最高强调色，专留给"提交答案"这类主操作。科目标签也用朱砂，会稀释按钮、还带出"错误/警告"歧义。配色要在色环上<strong>拉开色相</strong>（蓝绿只差 60° 小标签上就糊成一类）。</li>
+<li><strong>字号别低于 16px 正文</strong>：手机上要逐字读的页面，12~14px 最费眼。辅助标签 ≥13px，行高 1.75。</li>
+<li><strong>英文单词断词</strong>：中文断行规则套到英文上会把 <code>abstract</code> 拆成 <code>ab</code>+<code>stract</code>。每个单词用 <code>&lt;span style="display:inline-block;white-space:nowrap"&gt;</code> 包起来，作为整词换行。</li>
+<li><strong>公式必须有渲染层</strong>：题库里是 LaTeX，必须有 KaTeX 渲染 + 离线降级（断网转 Unicode 符号），不能当纯文本输出。</li>
+<li><strong>跳转放最后</strong>：知识卡先讲透知识（定义→公式→题型识别→步骤→易错→例题），"相关题目 N 道"的跳转永远在最后一行，不得占主视觉。</li>
+</ol>
+<h3>交互与数据口径</h3>
+<ol>
+<li><strong>"翻面"和"跳题"不能糊成一个动作</strong>：用户想翻面看要点，却被送去做题——两个动作必须分开。</li>
+<li><strong>进度口径必须唯一</strong>：曾同屏出现"0/21 今日总进度""完成 1/3 组""已完成 0 段""0/4 段完成"四个数字三个分母，用户不知道信哪个。<strong>只保留一个分母，其余全删。</strong></li>
+<li><strong>倒计时日期要持久化</strong>：刷新后变"距考试 -- 天"，因为日期没存 localStorage / 首屏读取时机错。存本地 + 同步读取 + 解析失败给默认值，不许裸 <code>--</code>。</li>
+<li><strong>同一屏数据不能自相矛盾</strong>：上写"到期复习 0 项"下写"14 项"、上写"新考点 0 个"下列了 3 个——两处组件各读各的数据源。统一取数。</li>
+<li><strong>脏数据会毁可信度</strong>：解析里写"故选 C"但题目根本没有选项；参考答案写成"the; /"。题库内容要单独核验，不能只验功能。</li>
+</ol>
+<hr />
+<h1>第二部分 · 通用经验（提炼成可执行的规律）</h1>
+<h2>A. 开工前</h2>
+<ul>
+<li><strong>先写一页纸</strong>：谁用、每周来干的一件事、第一版必须有、第一版不要、三个月后只剩一个功能留哪个。写不出来就别开工——交给 AI 只会得到"什么都有、什么都不顺"。</li>
+<li><strong>先定体量</strong>：小项目（个人用/一两人）走单文件 + localStorage，<strong>不上后台不上登录</strong>；大项目（多人/要数据/要权限）才上后台 + 鉴权 + 数据库。体量选错，后面全是白干。</li>
+</ul>
+<h2>B. 骨架与鉴权</h2>
+<ul>
+<li>五阶段不跳：<strong>骨架 → 地基 → 内容 → 美化 → 试用</strong>。地基（权限、备份、错误提示、版本号）不产生界面变化，最容易被跳过，也最容易三个月后炸。</li>
+<li><strong>骨架阶段就要定死"全局手感机制"——页面切换/导航/动效引擎。</strong> 竞墨的教训：骨架不是墨缘那种架构 → 切页像划照片，后期花大力气补统一入场引擎，仍难完全追平原生丝滑。<strong>这是架构选型的债，最后用体验来还</strong>；别信"先能用，动效以后再说"。</li>
+<li>选骨架时直接问一句：<strong>它原生支持丝滑切场吗？</strong> 如果不支持，要么一开始就接受"手感次一档"并明确取舍，要么换架构——不要事后才发现。</li>
+<li>身份字段<strong>只定一个源</strong>；令牌与身份双键成对写、成对清；401 统一清空整套。</li>
+<li>前端藏入口 + 后端守卫<strong>双保险</strong>；401 登出 / 403 不登出要分清。<strong>403 绝不能触发登出</strong>——墨缘就是 401/403 一起广播"身份失效"，形成"重登→第一个403→又登出"的死循环。</li>
+<li><strong>身份数据只存一张表</strong>：墨缘的 <code>admins</code> 和 <code>class_students</code> 双表哈希不同步，登录查一张、改密写另一张 → 改密永远失败。身份别散在两处。</li>
+<li><strong>名单/权限显示异常，先查接口返回</strong>：很多是前端自己多套了一层 <code>isAdmin</code> 把数据藏了，接口本来就是全量。</li>
+<li><strong>页面与入口一一对应要逐个点验</strong>：墨缘两个按钮跳同一页面、已加入还显示"我要加入"，都是前端没套状态判断。</li>
+<li>首登改密的流程要能走通，别把用户锁死在"必须改密"的死锁里。</li>
+<li>删除/清空类操作要二次确认（管理密码 / 输入特定词）。</li>
+<li><strong>报"全员掉线"先分清环境</strong>：豆包/编辑器预览（dev）和正式版往往不是一套登录环境。先问版本号、测的是哪个环境，别急着改代码。</li>
+</ul>
+<h2>C. 数据层</h2>
+<ul>
+<li><strong>唯一判据思维</strong>：发布看 commit hash，不看"构建成功"；功能上线看实测接口/页面，不看自报。</li>
+<li>数据存本地就要有<strong>导出/导入</strong>兜底；存云端就要有备份策略。</li>
+<li>以日期字符串为随机种子，保证"同日刷新计划不变"。</li>
+<li>内容脏数据单独核验，功能对不代表内容对。</li>
+</ul>
+<h2>D. 性能与图片</h2>
+<ul>
+<li>列表一律缩略图 + 懒加载，详情用原图；CDN 参数要编码形式。</li>
+<li><strong>上传前必压缩</strong>：前端 canvas 压到长边 1600px / 单张 &lt;1MB；提交前估算总量拦截超限；错误提示区分"体积大"和"网络差"。38MB 是实测的代理断连阈值。</li>
+<li>声称的限流/上限要实测，不信注释。</li>
+</ul>
+<h2>E. 视觉与排版</h2>
+<ul>
+<li><strong>先立总纲再写页面</strong>（见第四部分模板 E）。设计令牌全变量化；容器 <code>box-sizing</code>+自动换行兜底；<code>nowrap</code> 只许用于单个英文单词；强调色唯一；正文 ≥16px；公式要渲染。</li>
+<li>配色在色环上拉开色相，别让两种小标签糊成一类。</li>
+<li>视觉验收用<strong>普通用户视角</strong>，别用 admin 编辑态。</li>
+</ul>
+<h2>E2. 前端交互高频坑（"点了没反应"类，最容易被漏测）</h2>
+<ul>
+<li><strong>入口 HTML 要有底色、遮罩先于内容挂载</strong>：否则手机上冷启动盯 2~4 秒白屏；装饰层对比度太低等于没有。</li>
+<li><strong><code>input.files</code> 是 live FileList</strong>：存引用后 <code>value=''</code> 会把它清空，导致"选完图零请求零报错"。先 <code>Array.from()</code> 拷贝再清空。同类 bug 常被复制到多个入口，修一处要全线排查。</li>
+<li><strong>移动端面板高度要扣掉底部 tab</strong>：否则"保存"按钮落在可视区外，点它其实命中底部导航。</li>
+<li><strong>装饰层（水印/悬浮球）不能盖住可点元素</strong>：z-index 分层要验。</li>
+<li><strong>"关窗≠执行"</strong>：确认弹窗关闭后要验后端数据真的变了（接口请求发出、刷新后状态改变）。</li>
+<li><strong>别用自动化脚本的"最后一个某文字按钮"定位元素</strong>：会命中隐藏候选导致误判；误判要复测推翻再写根因。</li>
+<li><strong>移动端别乱用 <code>touch-action:none</code></strong>：会让列表滑不动，用 <code>pan-y</code>。</li>
+</ul>
+<h2>F. 动效</h2>
+<ul>
+<li>统一引擎：只 <code>opacity/transform</code>，幂等标记，播一次固化，<code>getAnimations()</code> 检测复播，禁止 display/height/width 动画。</li>
+<li>进度条宽度是 layout 变化，入场时直接呈现最终宽度，不要逐帧 animate width。</li>
+<li>角色动画朝向由单一变量控制，左右方向都验。</li>
+</ul>
+<h2>G. 验收（最重要）</h2>
+<ul>
+<li><strong>别信自报</strong>："已修复""本地测是好的""发布一下才能看日志"——一律要它在<strong>预览里</strong>测、把错误原文露出来。</li>
+<li>自己点通关键动作，每轮发布后手机过 5 个关键路径。</li>
+<li><strong>证伪思维</strong>：看到"缺某功能"先实测确认它本来是不是就没有，别急着补。</li>
+<li>同一问题改 3 轮还不好 → 回退重新描述，别继续猜。</li>
+<li>把判读规则<strong>写进文件</strong>（如墨缘的"自检 error 是运营待办不是 bug"），不靠记忆。</li>
+</ul>
+<h2>H. 成本（用 AI 改代码时）</h2>
+<ul>
+<li>同类改动<strong>合并一次发</strong>，别切碎（每次新任务都要重读代码库）。</li>
+<li>机械活（加参数/改文案/换色）用最便宜的模型；判风险/大上下文用贵模型；别中途换模型。</li>
+<li>验收用本地脚本，别让 AI 反复 build + 截图。</li>
+<li>指令要明确具体，别用"自己找最省办法"这种会诱发过度推理的话。</li>
+</ul>
+<h2>I. 删除与发布安全（防"静默失败"）</h2>
+<ul>
+<li><strong>"不报错"不等于"没人用"</strong>：删掉一段代码/请求头/字段后不报错、构建成功、资源全 200，也可能被平台或别的模块悄悄依赖，一删全站崩。</li>
+<li><strong>删除/重命名前必答影响面四问</strong>：还有谁在读？删了谁会静默失败？能否先加后删？怎么在 5 分钟内证明没人用（全仓搜+查文档+测试环境单独删一次）。</li>
+<li><strong>分层验证，别只看 200</strong>：L0 传输（200）→L1 文档（HTML 对）→L2 渲染（浏览器看见内容）→L3 运行时（关键变量正确、无 console error）→L4 业务（写入读回）。<strong>状态码 200 只证明第一层。</strong></li>
+<li><strong>出事第一动作是回退，不是查因</strong>；回退目标=上一个已知良好版本；恢复后再分析。</li>
+<li><strong>线上正坏着时禁止顺手优化</strong>——只回退或等指令，别给下次故障埋变量。</li>
+<li><strong>听到"这个应该不影响别的功能""接口都 200 应该是好的"立刻叫停</strong>——这是事故前的原话信号。</li>
+</ul>
+<hr />
+<h1>第三部分 · 大项目 vs 小项目：怎么选架构</h1>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>小项目（专升本）</th>
+<th>大项目（墨缘 / 竞墨）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>典型场景</td>
+<td>个人用、一两人私发</td>
+<td>多人报名投稿、要统计和权限</td>
+</tr>
+<tr>
+<td>前端形态</td>
+<td>单文件 HTML</td>
+<td>多页 Web App / 单文件 + 后台接口</td>
+</tr>
+<tr>
+<td><strong>骨架选型（决定手感上限）</strong></td>
+<td>单文件也能丝滑，但<strong>切场机制要在骨架里就内建</strong></td>
+<td><strong>先问"原生支持丝滑切场吗"</strong>——竞墨选错骨架→像划照片，后期补引擎仍追不平墨缘</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>localStorage + 导出 JSON</td>
+<td>数据库 + 服务端接口</td>
+</tr>
+<tr>
+<td>登录</td>
+<td><strong>不要</strong>，私发链接即可</td>
+<td>必须，身份单一源 + 双保险守卫</td>
+</tr>
+<tr>
+<td>备份</td>
+<td>导出/导入 JSON</td>
+<td>服务端备份 + 发布纪律</td>
+</tr>
+<tr>
+<td>性能重点</td>
+<td>基本不用管</td>
+<td>图片压缩、上传体积、并发</td>
+</tr>
+<tr>
+<td>动效</td>
+<td>统一引擎骨架期就内建</td>
+<td>统一引擎 + 朝向变量 + 幂等；<strong>后期补=还架构债</strong></td>
+</tr>
+<tr>
+<td>主要风险</td>
+<td>数据丢失、样式失控、脏数据</td>
+<td>权限漏洞、发布误判、大图上传、测试污染真实数据</td>
+</tr>
+<tr>
+<td>施工节奏</td>
+<td>快速迭代，但先立总纲</td>
+<td>五阶段不跳，地基先行</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判断口诀</strong>：
+- 要不要登录？—— 超过"几个熟人私用"就要，否则不要。
+- 要不要后台？—— 需要跨设备同步、多人权限、数据统计才要。
+- 要不要总纲？—— <strong>永远要</strong>，哪怕只有一个页面。这是"做一个改一个"和"一次立规"的分水岭。</p>
+<hr />
+<h1>第四部分 · 可复用模板（直接抄）</h1>
+<h2>模板 A · 开工一页纸</h2>
+<pre><code>项目名：
+谁用：（具体到人/角色）
+他们每周来这儿干的一件事：
+第一版必须有：（≤3 条）
+第一版不要：（明确列出，防止 AI 加戏）
+体量：□ 小（单文件+localStorage）  □ 大（后台+鉴权+数据库）
+三个月后如果只剩一个功能，留哪个：
+唯一判据：（发布看什么？功能上线看什么？）
+</code></pre>
+<h2>模板 B · 提需求五行</h2>
+<pre><code>【改什么】一句话说清
+【在哪】哪个页面、哪个按钮
+【改成什么样】具体行为，不要形容词（&quot;好看一点&quot;不合格）
+【怎么算成功】我点几下、看到什么
+【不要动】列出绝对不能碰的模块（动效/计划/数据/其他页面）
+</code></pre>
+<p>反面例子："把页面优化一下""感觉很乱"——这类话会让它一次改五个文件。</p>
+<h2>模板 C · 施工提示词（R 编号制）</h2>
+<pre><code>### 提示词 R&lt;N&gt; · &lt;一句话标题&gt;（模型 &lt;档位&gt;；&lt;日期&gt;，&lt;触发原因&gt;）
+
+&gt; 【问题】用户原话 + 截图实证，写清现象，不写&quot;感觉&quot;
+&gt; 【根因】定位到具体机制（不要停在&quot;样式坏了&quot;）
+&gt; 【改法】分点，写到能直接抄的代码/CSS 级别
+&gt; 【红线】不许碰什么（列具体模块名）
+&gt; 【验收】点几下看到什么 + 报告计算样式/接口返回值
+</code></pre>
+<p><strong>规矩</strong>：一条需求一个 R 编号；复杂的用 R3.1/R3.2 递增；<strong>总纲类（如 R3.8）优先级最高，写明"其它条目与本节冲突以本节为准"</strong>。</p>
+<h2>模板 D · 验收清单</h2>
+<pre><code>□ 关键动作自己点通（不是听它说&quot;已修复&quot;）
+□ 预览里测，不是&quot;本地测是好的&quot;
+□ 手机窄屏无文字/红字/公式溢出
+□ 发布后判据确认（commit hash 变了 / 接口返回对了）
+□ 无 4xx/5xx、console 无错
+□ 数据串位/自相矛盾检查（多个进度口径是否唯一）
+□ 测试痕迹清理，真实数据原样
+□ 每做完 3-5 条导一次备份、记版本号
+</code></pre>
+<h2>模板 E · 全站排版总纲（每个项目都该有一份）</h2>
+<pre><code># 全站排版总纲（优先级高于所有零散补丁）
+
+1. 设计令牌：:root 里定义颜色/字号/间距/圆角/阴影，组件只引用变量，不写死值
+2. 容器与换行：*{box-sizing:border-box}；文本容器 max-width:100% + overflow-wrap:break-word；
+   nowrap 只许用于单个英文单词/数字
+3. 通用组件：警示条/按钮/标签/卡片/提示条统一 class，禁止浏览器默认样式露出
+4. 强调色唯一：主操作专用，标签/装饰不许抢
+5. 公式渲染：KaTeX + 离线降级，页面不得出现裸 LaTeX
+6. 字号层级：标题 20 / 正文 16 / 辅助 ≥13，行高 1.75
+7. 自检清单：每页上线前逐条过（见模板 D）
+</code></pre>
+<h2>模板 F · 发布纪律</h2>
+<pre><code>1. 发布生效唯一判据：commit hash / 版本号变化，不信&quot;构建成功&quot;
+2. 发布前弄清这次会带哪些 commit
+3. 主分支禁 force push，特性分支用 --force-with-lease
+4. 删除/重命名任何头/字段/路由/策略前，先答&quot;影响面四问&quot;，答不出不许删
+5. 发版后分层验证：L0传输→L1文档→L2渲染→L3运行时→L4业务，&quot;浏览器看见内容+截图&quot;才算数，200 不算
+6. 出事第一动作是回退（到上一个已知良好版本），不是查因；故障期禁止顺手优化
+7. 发布前自己点通，发布后手机过 5 个关键动作
+8. 每 3-5 条改动导一次备份、记版本号
+</code></pre>
+<h2>模板 G · 收工三行（每次会话结束写）</h2>
+<pre><code>日期：
+这一版能做什么：（三条以内）
+已知没做/没验：（一条一行）
+</code></pre>
+<p>下次开工先看这三行，就不会"完全搞混了"。</p>
+<h2>模板 H · 微文案表（M8 落地｜错误/状态提示只准从这里抄，AI 不许自己发挥）</h2>
+<p><strong>规矩</strong>：任何提示文案固定三段式——<strong>发生了什么 + 为什么 + 现在怎么办</strong>；按钮用动词；禁止"请稍后重试""网络异常""操作失败"这类零信息话。</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>固定文案（直接抄）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>图片体积过大</td>
+<td>「图片太大了（约 X MB），一次最多传 Y MB。请先删掉几张，或换小一点的图再试。」</td>
+</tr>
+<tr>
+<td>上传断连</td>
+<td>「上传中断了。图片总量太大时容易断，减少张数再试一次；还是不行就先把作品存好，稍后再传。」</td>
+</tr>
+<tr>
+<td>网络失败（一般接口）</td>
+<td>「刚才的请求没成功，可能是网络不稳。内容已帮你保留，点"重试"再试一次。」</td>
+</tr>
+<tr>
+<td>无数据（空态）</td>
+<td>「这里还没有内容——完成一次练习后就会出现在这里。」（+ 一个"去练习"按钮）</td>
+</tr>
+<tr>
+<td>未登录/登录失效</td>
+<td>「登录已过期，需要重新登录一次。你之前填写的内容不会丢，登录后可继续。」</td>
+</tr>
+<tr>
+<td>提交成功</td>
+<td>「已提交成功。」（需说明结果去向时补一句，如"评分结果稍后在我的作品里查看"）</td>
+</tr>
+<tr>
+<td>提交失败</td>
+<td>「提交没成功，内容还在页面上没有丢。点"重新提交"再试；连续失败请截图右下角红点发给制作方。」</td>
+</tr>
+<tr>
+<td>数据加载失败</td>
+<td>「内容加载失败（可能是网络或服务暂时不可用）。点"重新加载"；问题持续请截图右下角红点。」</td>
+</tr>
+</tbody>
+</table>
+<p><strong>注</strong>：文末"截图右下角红点"指向 R3.9 错误红点机制；红点未上线的站删掉这句。</p>
+<h2>模板 I · 发布台账 RELEASES.md（M2 落地｜防"线上旧产物 / 仓库新源码"分裂）</h2>
+<p>每个项目根目录建一个 <code>RELEASES.md</code>，<strong>每次发布后追加一行</strong>，新在上：</p>
+<pre><code>| 日期 | 改了什么 | 线上文件指纹（字节数+md5前8位） | 对应源码提交/备份文件名 | 谁验的、怎么验的 |
+|---|---|---|---|---|
+| 2026-11-24 | R3.9 错误红点 | 152,340 字节 / a1b2c3d4 | backup_20261124_2130.html | 本人：断网点提交→红点→刷新仍在 |
+</code></pre>
+<p><strong>三条规矩</strong>：
+1. <strong>发布前先存线上版</strong>（备份文件名写进台账），改完发布再补一行——顺序不能反。
+2. 回退 = 按台账找到上一个"已验收"行，取它的备份文件重传，<strong>不看别的</strong>。
+3. 台账里找不到对应备份的行，视为"这次发布没发生"，必须补齐才能继续发下一版。</p>
+<h2>模板 J · 症状速查表（M12 落地｜独立存放，给用户自己查，不随本文档喂 AI——省积分）</h2>
+<p><strong>不放在本文档里</strong>（本档是开工喂给 AI 的，症状表是出事时人自己查的，混在一起每次多读一屏字）。完整表格独立存于 <code>症状速查表.md</code>（11 行"症状 → 第一动作 → 高频根因"）。</p>
+<p>给 AI 只需记住三条提炼：
+1. 全站打不开 → <strong>先回退再查因</strong>（最大嫌疑：动了平台注入的东西）
+2. 白屏/点了没反应 → 先取证（红点、console、截图），别凭感觉改
+3. 提交"成功"数据没变 → 直接查数据源，别信界面</p>
+<h2>模板 K · 通用巡检（M1 落地｜证据制，结论看文件不看转述）</h2>
+<p><strong>工具</strong>：<code>/workspace/tools/网页巡检.py</code>（已在埋坑测试页上实测：console 报错、资源 404、横向溢出、裸 <code>\frac</code> 禁词、错误红点历史全部抓到）。</p>
+<p><strong>用法</strong>（每站一份配置 JSON，已建好骨架：<code>巡检配置_专升本.json</code> / <code>巡检配置_竞墨.json</code>，把线上链接填进去即可）：</p>
+<pre><code>python3 /workspace/tools/网页巡检.py --config /workspace/tools/巡检配置_专升本.json
+</code></pre>
+<p><strong>铁律</strong>：
+1. <strong>结论只在产物文件里</strong>——<code>巡检结果_&lt;站&gt;_&lt;时间&gt;/</code> 下的 PNG 截图 + results.json + index.md。<strong>AI 转述的"X 项过"不算数</strong>，你自己开 index.md 看 FAIL/WARN 表。
+2. 退出码 0=全过、1=有 FAIL，可用于自动拦截。
+3. 固定检查项不需要配置自动跑：HTTP 状态/重定向链、标题断言、入口底色（防白屏）、console 报错（滤噪声）、资源 4xx/5xx、<strong>横向溢出检测</strong>、禁词扫描（裸 LaTeX/零信息文案）、<strong>错误红点 localStorage 读取</strong>（与 R3.9 打通）、动作回放每步截图。
+4. 每站把"5 个关键动作"写进配置的 <code>actions</code>（点哪、等哪、截哪），巡检就替你把验收路径回放一遍。
+5. 噪声（如字体 CDN 的 octet-stream）写进配置 <code>noise</code>，不算错——<strong>但往 noise 里加东西前要说明理由，不许拿来掩盖真问题</strong>。</p>
+<hr />
+<h1>五、踩坑速查红线（打印贴墙上）</h1>
+<ol>
+<li><strong>"构建成功/已修复/本地测是好的"一律不算数</strong> —— 要唯一判据 + 预览实测。</li>
+<li><strong>发布看 hash，不看提示。</strong></li>
+<li><strong>骨架定手感上限——切场/导航/动效引擎在骨架期就定死，别信"以后再补"（竞墨划照片之痛）。</strong></li>
+<li><strong>身份只有一个源，401/403 分清，双键成对清。</strong></li>
+<li><strong>上传前必压缩，38MB 是断连阈值。</strong></li>
+<li><strong>删东西前答影响面四问——"不报错"不等于"没人用"（删请求头→全站打不开之痛）。</strong></li>
+<li><strong>发版分层验证，200 只证明第一层；出事先回退后查因。</strong></li>
+<li><strong>先立总纲再写页面，做一个改一个是万恶之源。</strong></li>
+<li><strong>强调色唯一，配色拉开色相。</strong></li>
+<li><strong>正文 ≥16px，英文单词整词换行，公式要渲染。</strong></li>
+<li><strong>进度口径唯一，数据不自相矛盾。</strong></li>
+<li><strong>自检报错先问"是代码错还是人没填"。</strong></li>
+<li><strong>看到"缺功能"先实测证伪，别急着补。</strong></li>
+<li><strong>测试不碰真实数据，压测后还原。</strong></li>
+<li><strong>同类改动合并发，机械活用便宜模型，验收用脚本。</strong></li>
+<li><strong>重要的事写进文件，不靠记忆。</strong></li>
+<li><strong>一小时交 3 个以上版本 → 停；开始"修上一个修复造成的问题" → 回退。</strong></li>
+</ol>
+<hr />
+<h1>六、AI 三头会审机制（2026-11-25 增补，模板方案全程实战验证）</h1>
+<h2>6.1 分工格局（实测有效）</h2>
+<table>
+<thead>
+<tr>
+<th>审查方</th>
+<th>擅长抓的错</th>
+<th>实战战绩</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>豆包</td>
+<td><strong>事实层</strong>：下载方式、文件真伪、行为 bug</td>
+<td>抓到"首账号不标管理员→后台永远进不去"真坑；也编造过 RELEASES.md、误判 zip 为空</td>
+</tr>
+<tr>
+<td>扣子</td>
+<td><strong>方法论层</strong>：经验过拟合、缺样例、文档膨胀</td>
+<td>抓到"实测值照抄风险"“视觉工序缺好坏对照"；也误报过"开场白重复两遍"</td>
+</tr>
+<tr>
+<td>主对话（执行者）</td>
+<td><strong>实测把关</strong>：每条外审意见逐条验证再采纳</td>
+<td>多次驳回外审误判（zip 是满的、索引已修、开场白仅1处）</td>
+</tr>
+</tbody>
+</table>
+<h2>6.2 会审规则（写死）</h2>
+<ol>
+<li><strong>外审意见一律实测再采纳，不照单全收</strong>——两个外审都有误判史，也都有真贡献，价值在交叉验证。</li>
+<li><strong>发外审前确认它拿到的是最新版本</strong>——豆包曾基于修正前的旧快照误判"问题仍未修"（快照陷阱）。</li>
+<li><strong>外审要能读到真内容</strong>：发 <code>.app.workbuddy.host</code> 线上链接或直接发文件本体；资料库 html 链接会变成 12KB 平台壳，别发那种。</li>
+<li><strong>采纳分两档</strong>：文档级（改文档）vs 代码级（改模板）——代码级修改必须回归巡检全 PASS 才算过。</li>
+<li><strong>审查结论也记账</strong>：谁的误判、谁的真贡献都留痕，防止"上次说过的错下次再信一遍"。</li>
+</ol></div></section>
+<section class="sec doc" id="doc03"><div class="dhead"><h2>03 症状速查表</h2><div class="dops"><a class="lib" href="https://www.workbuddy.cn/space/d/oeQAULwOAn3h3rYlFRHZ7G" target="_blank" rel="noopener">资料库原件 ↗</a></div></div><p class="ddesc">出事按现象查：11行症状→根因→修法</p><div class="mdbody"><h1>症状速查表（出事按现象查 · 给自己用的）</h1>
+<blockquote>
+<p>整理日期：2026-11-24　来源：三项目真实踩坑
+用法：<strong>出事先在这张表里找症状，照"第一动作"做，再顺着查根因。</strong>这张表优先于任何项目档案。
+注意：这是给人查的急救卡，不是每次开工喂给 AI 的文档——省积分。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>症状</th>
+<th>第一动作</th>
+<th>再查根因（高频原因）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全站打不开 / "应用不存在"</td>
+<td><strong>先回退</strong>（按 RELEASES.md 取上一版），恢复后再查</td>
+<td>① 删/改了平台注入的东西（请求头、appId）② 静默失败：资源全 200 但入口坏了</td>
+</tr>
+<tr>
+<td>白屏 / 长时间空白</td>
+<td>看右下角红点（有红点=JS 炸了，点开看面板）</td>
+<td>① 入口 HTML 无底色、遮罩同帧 ② 某段脚本报错中断渲染 ③ 冷启动慢（真机 4G/3G 复测）</td>
+</tr>
+<tr>
+<td>点了没反应</td>
+<td>打开浏览器 console，点一次看报错</td>
+<td>① 弹窗/水印 z-index 盖住按钮 ② 面板高度没扣底部 tab，点在可视区外 ③ <code>input.files</code> live 引用被清空</td>
+</tr>
+<tr>
+<td>提交/保存"成功"但数据没变</td>
+<td><strong>别信界面，直接查库里/localStorage 里有没有</strong></td>
+<td>① "关窗≠执行"：弹窗关了但请求没发 ② 请求发了但 4xx/5xx 被吞</td>
+</tr>
+<tr>
+<td>上传断连 / 重试一百次失败</td>
+<td>先算图片总量（含 base64 膨胀）</td>
+<td>总量超阈值（约 38MB 单次实测值，其他环境复测）→ 前端压缩 + 分批 + 明确报"体积过大"</td>
+</tr>
+<tr>
+<td>突然被登出 / 登录循环</td>
+<td>分清 401 还是 403：401 才清登录态，403 只提示无权限</td>
+<td>① 两个广播都清态→死循环 ② token 键被别处覆盖 ③ 多套身份字段不同源</td>
+</tr>
+<tr>
+<td>数据消失（清缓存后）</td>
+<td>看有没有导出 JSON 备份</td>
+<td>localStorage 无备份兜底=设计缺陷，补导出/导入</td>
+</tr>
+<tr>
+<td>刷新后数字/口径变了</td>
+<td>对表里两个数字的取数来源</td>
+<td>同屏多口径（复习 0 vs 14）：两处组件各读各的源</td>
+</tr>
+<tr>
+<td>动画重复播 / 乱跳</td>
+<td>查幂等标记是否被清</td>
+<td>ENTER_SEEN 标记被重置；或用了 display/height 做动画</td>
+</tr>
+<tr>
+<td>刷新后倒计时/统计归零或变 <code>--</code></td>
+<td>查这个值存没存 localStorage、读取时机在渲染前还是后</td>
+<td>① 没持久化 ② 解析失败无默认值兜底</td>
+</tr>
+<tr>
+<td>一切正常但"感觉不对"</td>
+<td><strong>停，别改</strong>——先截图/录屏取证</td>
+<td>感觉不能当判据；拿证据（console、红点、计算样式）说话</td>
+</tr>
+</tbody>
+</table>
+<h2>配套工具</h2>
+<ul>
+<li>巡检（采证据）：<code>python3 /workspace/tools/网页巡检.py --config 巡检配置_专升本.json</code> → 看 <code>巡检结果_*/index.md</code></li>
+<li>错误红点（线上自见）：见专升本方案 R3.9 / 竞墨红点提示词</li>
+<li>回退依据：项目根目录 <code>RELEASES.md</code> 发布台账</li>
+</ul></div></section>
+
+<section class="sec" id="sec-py">
+  <h2>11 · 通用巡检脚本（本体）</h2>
+  <p style="font-size:var(--fs-sub); color:var(--ink-2)">真浏览器巡检：console 采集 / 资源 4xx / 横向溢出 / 禁词 / 红点读取 / 对比度 / 深色模拟。新站照抄配置改 URL 即可。</p>
+  <div class="scriptbox">
+    <button class="copybtn" data-copytarget="pyCode">复制全文</button>
+    <pre id="pyCode"><code>#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+网页巡检 · 通用模板（证据制）
+--------------------------------------------------
+一条命令跑完一个站的发布后验收，产物落目录：截图 PNG + results.json + index.md。
+**结论只在文件里，不在对话里转述**——看证据不看汇报。
+
+用法：
+    python3 网页巡检.py --config 巡检配置_专升本.json
+    python3 网页巡检.py --config 巡检配置_专升本.json --quick   # 跳过浏览器，只做 HTTP 层
+    python3 网页巡检.py --config xxx.json --out ./巡检结果       # 指定输出目录
+
+配置文件（每站一份 JSON，字段见下方 CONFIG 说明）：
+    name            站名（用于产物目录命名）
+    url             线上正式地址（必填）
+    title_contains  页面标题应包含的字样（列表，任一命中即过）
+    viewport        手机视口，默认 375x812
+    key_selectors   关键元素清单 [{name, selector}]，逐个验存在+可见
+    actions         动作回放 [{name, do: click|goto|wait, target}]，每步截图
+    noise           console 已知噪声（列表，模糊匹配后不算错）
+    forbid_texts    禁词清单（如裸 LaTeX 命令串、&quot;请稍后重试&quot;零信息文案）
+    errlog_keys     错误红点 localStorage 键（如 zx_errlog_v1），巡检顺带读出
+
+固定检查项（不需要配置，所有站自动跑）：
+  HTTP    状态码、重定向链、最终 URL、HTML 体积、入口底色（body 有无背景，防白屏）
+  浏览器  console 报错（滤噪声）、资源 4xx/5xx、首屏截图（手机视口）
+  布局    横向溢出检测（scrollWidth &gt; clientWidth 即 FAIL）
+  红点    读 localStorage 错误日志键，有记录则列进 results.json
+
+依赖：requests、playwright（缺 playwright 自动降级为 --quick 模式）
+退出码：0 = 全 PASS；1 = 有 FAIL。产物目录路径打印在最后一行。
+&quot;&quot;&quot;
+
+import argparse
+import json
+import os
+import sys
+import time
+from datetime import datetime
+
+import requests
+
+UA = (&quot;Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) &quot;
+      &quot;AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari/604.1&quot;)
+DEFAULT_ERRLOG_KEYS = [&quot;zx_errlog_v1&quot;, &quot;jm_errlog_v1&quot;]
+
+
+def load_config(path):
+    with open(path, encoding=&quot;utf-8&quot;) as f:
+        cfg = json.load(f)
+    if not cfg.get(&quot;url&quot;):
+        sys.exit(&quot;配置缺 url&quot;)
+    cfg.setdefault(&quot;name&quot;, &quot;site&quot;)
+    cfg.setdefault(&quot;viewport&quot;, {&quot;width&quot;: 375, &quot;height&quot;: 812})
+    cfg.setdefault(&quot;title_contains&quot;, [])
+    cfg.setdefault(&quot;key_selectors&quot;, [])
+    cfg.setdefault(&quot;actions&quot;, [])
+    cfg.setdefault(&quot;noise&quot;, [])
+    cfg.setdefault(&quot;forbid_texts&quot;, [])
+    cfg.setdefault(&quot;errlog_keys&quot;, DEFAULT_ERRLOG_KEYS)
+    return cfg
+
+
+class Report:
+    &quot;&quot;&quot;所有结论先进这里，最终落 results.json；对话里只打单行进度。&quot;&quot;&quot;
+
+    def __init__(self):
+        self.items = []
+        self.shots = []
+
+    def add(self, level, name, detail=&quot;&quot;, evidence=&quot;&quot;):
+        self.items.append({&quot;level&quot;: level, &quot;name&quot;: name,
+                           &quot;detail&quot;: str(detail)[:500],
+                           &quot;evidence&quot;: str(evidence)[:500]})
+        icon = {&quot;PASS&quot;: &quot;PASS&quot;, &quot;FAIL&quot;: &quot;FAIL&quot;, &quot;WARN&quot;: &quot;WARN&quot;}.get(level, &quot;?&quot;)
+        print(f&quot;  [{icon}] {name}&quot; + (f&quot; — {detail}&quot; if detail else &quot;&quot;))
+
+    def count(self, level):
+        return sum(1 for i in self.items if i[&quot;level&quot;] == level)
+
+    def dump(self, outdir):
+        path = os.path.join(outdir, &quot;results.json&quot;)
+        with open(path, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+            json.dump({&quot;items&quot;: self.items, &quot;shots&quot;: self.shots,
+                       &quot;summary&quot;: {&quot;pass&quot;: self.count(&quot;PASS&quot;),
+                                   &quot;fail&quot;: self.count(&quot;FAIL&quot;),
+                                   &quot;warn&quot;: self.count(&quot;WARN&quot;)}},
+                      f, ensure_ascii=False, indent=2)
+        return path
+
+
+def http_layer(cfg, rep, outdir):
+    s = requests.Session()
+    s.headers[&quot;User-Agent&quot;] = UA
+    r = s.get(cfg[&quot;url&quot;], timeout=30, allow_redirects=True)
+    chain = &quot; -&gt; &quot;.join([h.status_code.__str__() + &quot; &quot; + h.url
+                         for h in r.history] + [str(r.status_code) + &quot; &quot; + r.url])
+    rep.add(&quot;PASS&quot; if r.status_code == 200 else &quot;FAIL&quot;,
+            &quot;HTTP 状态&quot;, f&quot;最终 {r.status_code}&quot;, chain)
+    # 按字节再显式 utf-8 解码，避免服务器未带 charset 时 requests 猜错编码（中文标题乱码）
+    html = r.content.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;)
+    title = &quot;&quot;
+    import re
+    m = re.search(r&quot;&lt;title[^&gt;]*&gt;(.*?)&lt;/title&gt;&quot;, html, re.S | re.I)
+    if m:
+        title = m.group(1).strip()[:80]
+    if cfg[&quot;title_contains&quot;]:
+        ok = any(t in title for t in cfg[&quot;title_contains&quot;])
+        rep.add(&quot;PASS&quot; if ok else &quot;FAIL&quot;, &quot;页面标题&quot;, title,
+                f&quot;应包含: {cfg[&#x27;title_contains&#x27;]}&quot;)
+    else:
+        rep.add(&quot;WARN&quot;, &quot;页面标题（未配置断言）&quot;, title)
+    kb = len(html.encode(&quot;utf-8&quot;)) / 1024
+    # 入口体积只防&quot;空壳 HTML&quot;：过小给 WARN 不给 FAIL（小站入口本来就可能小）
+    if kb &lt; 0.5:
+        rep.add(&quot;FAIL&quot;, &quot;HTML 体积&quot;, f&quot;{kb:.2f} KB，疑似空壳&quot;)
+    elif kb &lt; 1:
+        rep.add(&quot;WARN&quot;, &quot;HTML 体积&quot;, f&quot;{kb:.1f} KB，偏小（可能是空壳，配合首屏截图判断）&quot;)
+    else:
+        rep.add(&quot;PASS&quot;, &quot;HTML 体积&quot;, f&quot;{kb:.1f} KB&quot;)
+    # 入口底色：body/background 任一有颜色定义（防冷启动白屏）
+    has_bg = bool(re.search(r&quot;background[^;{}]*#|background[^;{}]*rgb|&lt;body[^&gt;]*bgcolor&quot;,
+                            html, re.I))
+    rep.add(&quot;PASS&quot; if has_bg else &quot;WARN&quot;, &quot;入口底色（防白屏）&quot;,
+            &quot;找到背景定义&quot; if has_bg else &quot;HTML 里没找到背景色，冷启动可能白屏，建议入口 HTML 带 body 底色&quot;)
+    with open(os.path.join(outdir, &quot;入口.html.txt&quot;), &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+        f.write(html[:200000])
+    return html
+
+
+def browser_layer(cfg, rep, outdir):
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        rep.add(&quot;WARN&quot;, &quot;浏览器层&quot;, &quot;playwright 未安装，自动降级（只有 HTTP 层证据）&quot;)
+        return
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page_kwargs = dict(viewport=cfg[&quot;viewport&quot;], user_agent=UA, device_scale_factor=2)
+        if cfg.get(&quot;color_scheme&quot;):
+            page_kwargs[&quot;color_scheme&quot;] = cfg[&quot;color_scheme&quot;]
+        if cfg.get(&quot;reduced_motion&quot;):
+            page_kwargs[&quot;reduced_motion&quot;] = &quot;reduce&quot;
+        page = browser.new_page(**page_kwargs)
+        console_errs, bad_reqs = [], []
+
+        page.on(&quot;console&quot;, lambda m: console_errs.append(m.text) if m.type == &quot;error&quot; else None)
+        page.on(&quot;response&quot;, lambda r: bad_reqs.append(f&quot;{r.status} {r.url}&quot;)
+                if r.status &gt;= 400 else None)
+
+        try:
+            page.goto(cfg[&quot;url&quot;], timeout=30000, wait_until=&quot;networkidle&quot;)
+        except Exception as e:
+            rep.add(&quot;FAIL&quot;, &quot;页面加载&quot;, str(e)[:200])
+            browser.close()
+            return
+        page.wait_for_timeout(800)
+        shot = os.path.join(outdir, &quot;01_首屏.png&quot;)
+        page.screenshot(path=shot)
+        rep.shots.append(shot)
+        rep.add(&quot;PASS&quot;, &quot;首屏截图&quot;, shot)
+
+        # console 报错（滤噪声）
+        noise = cfg[&quot;noise&quot;]
+        real = [e for e in console_errs if not any(n in e for n in noise)]
+        rep.add(&quot;PASS&quot; if not real else &quot;FAIL&quot;, &quot;console 报错&quot;,
+                f&quot;{len(real)} 条&quot; if real else &quot;无&quot;,
+                &quot;; &quot;.join(real[:5]) if real else &quot;&quot;)
+
+        # 资源 4xx/5xx
+        rep.add(&quot;PASS&quot; if not bad_reqs else &quot;FAIL&quot;, &quot;资源可达性&quot;,
+                f&quot;{len(bad_reqs)} 个失败&quot; if bad_reqs else &quot;全部可达&quot;,
+                &quot;; &quot;.join(bad_reqs[:8]) if bad_reqs else &quot;&quot;)
+
+        # 关键元素
+        for ks in cfg[&quot;key_selectors&quot;]:
+            try:
+                el = page.query_selector(ks[&quot;selector&quot;])
+                visible = bool(el and el.is_visible()) if el else False
+                rep.add(&quot;PASS&quot; if visible else &quot;FAIL&quot;,
+                        f&quot;关键元素·{ks[&#x27;name&#x27;]}&quot;,
+                        &quot;存在且可见&quot; if visible else &quot;缺失或不可见&quot;, ks[&quot;selector&quot;])
+            except Exception as e:
+                rep.add(&quot;FAIL&quot;, f&quot;关键元素·{ks[&#x27;name&#x27;]}&quot;, str(e)[:120], ks[&quot;selector&quot;])
+
+        # 横向溢出
+        overflow = page.evaluate(
+            &quot;() =&gt; document.documentElement.scrollWidth - document.documentElement.clientWidth&quot;)
+        rep.add(&quot;PASS&quot; if overflow &lt;= 1 else &quot;FAIL&quot;, &quot;横向溢出&quot;,
+                f&quot;超出 {overflow}px&quot; if overflow &gt; 1 else &quot;无&quot;)
+
+        # 禁词
+        body_text = page.evaluate(&quot;() =&gt; document.body.innerText&quot;)
+        hits = [t for t in cfg[&quot;forbid_texts&quot;] if t in body_text]
+        rep.add(&quot;PASS&quot; if not hits else &quot;FAIL&quot;, &quot;禁词扫描&quot;,
+                &quot;未命中&quot; if not hits else f&quot;命中 {len(hits)} 个&quot;, &quot;; &quot;.join(hits[:5]))
+
+        # 正文对比度（浅/深色都要 ≥4.5，WCAG AA 正文级；由实际计算色算，不凭感觉）
+        if cfg.get(&quot;contrast_check&quot;):
+            ratio = page.evaluate(&quot;&quot;&quot;() =&gt; {
+                function lum(c){
+                  const m = c.match(/[\\d.]+/g); if(!m) return null;
+                  const [r,g,b] = m.slice(0,3).map(Number).map(v=&gt;{
+                    v/=255; return v&lt;=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4)});
+                  return .2126*r+.7152*g+.0722*b;
+                }
+                function bgOf(el){
+                  let e=el;
+                  while(e){ const b=getComputedStyle(e).backgroundColor;
+                    if(b &amp;&amp; b!==&#x27;rgba(0, 0, 0, 0)&#x27; &amp;&amp; b!==&#x27;transparent&#x27;) return b;
+                    e=e.parentElement; }
+                  return &#x27;rgb(255,255,255)&#x27;;
+                }
+                const cs=getComputedStyle(document.body);
+                const L1=lum(cs.color), L2=lum(bgOf(document.body));
+                if(L1==null||L2==null) return -1;
+                return (Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);
+            }&quot;&quot;&quot;)
+            try:
+                ratio = round(float(ratio), 2)
+                if ratio &gt;= 4.5:
+                    rep.add(&quot;PASS&quot;, &quot;正文对比度&quot;, f&quot;{ratio}:1（≥4.5 达 AA）&quot;,
+                            f&quot;色系: {cfg.get(&#x27;color_scheme&#x27;,&#x27;light&#x27;)}&quot;)
+                elif ratio &gt;= 4.0:
+                    rep.add(&quot;WARN&quot;, &quot;正文对比度&quot;, f&quot;{ratio}:1（4.0-4.5 边缘，大字号可接受）&quot;, &quot;&quot;)
+                else:
+                    rep.add(&quot;FAIL&quot;, &quot;正文对比度&quot;, f&quot;{ratio}:1（&lt;4.0 弱光看不清）&quot;, &quot;&quot;)
+            except Exception as e:
+                rep.add(&quot;WARN&quot;, &quot;正文对比度&quot;, &quot;计算失败: &quot;+str(e)[:80], &quot;&quot;)
+
+        # 错误红点 localStorage
+        for key in cfg[&quot;errlog_keys&quot;]:
+            try:
+                raw = page.evaluate(f&quot;() =&gt; localStorage.getItem({json.dumps(key)})&quot;)
+            except Exception:
+                raw = None
+            if raw:
+                rep.add(&quot;WARN&quot;, f&quot;错误红点·{key}&quot;, &quot;有历史错误记录（详见 results.json）&quot;, raw[:400])
+            else:
+                rep.add(&quot;PASS&quot;, f&quot;错误红点·{key}&quot;, &quot;无历史错误&quot;)
+
+        # 动作回放
+        for i, act in enumerate(cfg[&quot;actions&quot;], 1):
+            name, do, target = act.get(&quot;name&quot;), act.get(&quot;do&quot;), act.get(&quot;target&quot;, &quot;&quot;)
+            ok, detail = True, &quot;&quot;
+            try:
+                if do == &quot;click&quot;:
+                    page.click(target, timeout=8000)
+                    page.wait_for_timeout(600)
+                elif do == &quot;fill&quot;:
+                    page.fill(target, act.get(&quot;value&quot;, &quot;&quot;), timeout=8000)
+                    page.wait_for_timeout(200)
+                elif do == &quot;goto&quot;:
+                    page.goto(target, timeout=20000)
+                elif do == &quot;wait&quot;:
+                    page.wait_for_timeout(int(target))
+                elif do == &quot;run&quot;:
+                    page.evaluate(target)
+                    page.wait_for_timeout(200)
+                elif do == &quot;upload&quot;:
+                    page.set_input_files(target, act.get(&quot;value&quot;, &quot;&quot;), timeout=8000)
+                    page.wait_for_timeout(600)
+                elif do == &quot;check&quot;:
+                    truth = page.evaluate(target)
+                    if not truth:
+                        raise RuntimeError(&quot;断言未通过: &quot; + str(target)[:150])
+                    page.wait_for_timeout(200)
+                else:
+                    raise RuntimeError(f&quot;未知动作类型: {do}&quot;)
+                shot = os.path.join(outdir, f&quot;{i + 1:02d}_{name}.png&quot;)
+                page.screenshot(path=shot)
+                rep.shots.append(shot)
+                detail = shot
+            except Exception as e:
+                ok, detail = False, str(e)[:200]
+            rep.add(&quot;PASS&quot; if ok else &quot;FAIL&quot;, f&quot;动作·{name}&quot;,
+                    detail, f&quot;{do} {target}&quot;)
+
+        browser.close()
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(&quot;--config&quot;, required=True)
+    ap.add_argument(&quot;--quick&quot;, action=&quot;store_true&quot;, help=&quot;只跑 HTTP 层&quot;)
+    ap.add_argument(&quot;--out&quot;, default=None)
+    args = ap.parse_args()
+
+    cfg = load_config(args.config)
+    ts = datetime.now().strftime(&quot;%m%d_%H%M&quot;)
+    outdir = args.out or f&quot;巡检结果_{cfg[&#x27;name&#x27;]}_{ts}&quot;
+    os.makedirs(outdir, exist_ok=True)
+    rep = Report()
+
+    print(f&quot;== 网页巡检 · {cfg[&#x27;name&#x27;]} · {cfg[&#x27;url&#x27;]} ==&quot;)
+    http_layer(cfg, rep, outdir)
+    if not args.quick:
+        browser_layer(cfg, rep, outdir)
+
+    res = rep.dump(outdir)
+    md = os.path.join(outdir, &quot;index.md&quot;)
+    with open(md, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+        f.write(f&quot;# 巡检产物 · {cfg[&#x27;name&#x27;]} · {datetime.now():%Y-%m-%d %H:%M}\n\n&quot;)
+        f.write(f&quot;- PASS {rep.count(&#x27;PASS&#x27;)} / FAIL {rep.count(&#x27;FAIL&#x27;)} / WARN {rep.count(&#x27;WARN&#x27;)}\n&quot;)
+        f.write(f&quot;- **检查范围：HTTP 层=入口全量；浏览器层=首屏 + 配置 actions 覆盖到的页面（本站共 {len(cfg[&#x27;actions&#x27;])} 个动作）。PASS ≠ 整站干净，只代表已覆盖范围干净。**\n&quot;)
+        f.write(&quot;- FAIL/WARN 明细见 results.json，截图见 PNG\n\n| 结果 | 项 | 说明 |\n|---|---|---|\n&quot;)
+        for i in rep.items:
+            if i[&quot;level&quot;] != &quot;PASS&quot;:
+                f.write(f&quot;| {i[&#x27;level&#x27;]} | {i[&#x27;name&#x27;]} | {i[&#x27;detail&#x27;]} |\n&quot;)
+    print(f&quot;\n产物目录：{os.path.abspath(outdir)}&quot;)
+    print(f&quot;结论看文件，不看转述：{os.path.abspath(md)}&quot;)
+    sys.exit(0 if rep.count(&quot;FAIL&quot;) == 0 else 1)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+  </div>
+</section>
+
+<section class="sec guide" id="sec-guide">
+  <h2>用法 · 新对话开场白（可复制）</h2>
+  <p style="font-size:var(--fs-sub); color:var(--ink-2)">开新对话建站/演练时，把下面这段粘进去，省去重新交代背景：</p>
+  <textarea id="openingText" readonly>请先读资料库《网页通用模板方案-00_索引-先读我_新》和《-01_施工规格书_修正版_新》，按规格书的规矩，用模板B整包复制一个新站：&lt;站名/业务一句话&gt;。只改3色+换内容+加真实路由，跑巡检过阶段门，改完汇报改了哪几行、没动哪些。</textarea>
+  <div class="copyrow"><button id="copyOpening">复制开场白</button></div>
+  <h3 style="font-size:16px; margin:var(--sp-3) 0 var(--sp-1)">给豆包做检查的正确姿势</h3>
+  <ul class="tips" style="font-size:var(--fs-sub); color:var(--ink-2); padding-left:1.3em">
+    <li><b>发本页链接</b>即可——发布后的链接是真实页面，豆包能直接读到全文（资料库 html 链接会变成壳，别发那种）。</li>
+    <li>让它对照 <b>01 规格书</b>逐条审，指出"哪一条违反了第几章"。</li>
+    <li>豆包反馈回来的意见照旧走流程：<b>逐条实测再采纳</b>，不照单全收。</li>
+  </ul>
+  <h3 style="font-size:16px; margin:var(--sp-3) 0 var(--sp-1)">本页的维护方式</h3>
+  <ul class="tips" style="font-size:var(--fs-sub); color:var(--ink-2); padding-left:1.3em">
+    <li>资料库里的 md 是<b>正本</b>；改文档 → 改资料库 + 通知重发本页。</li>
+    <li>本页更新流程：改工作区源文件 → 重新构建 → 重新发布，<b>链接不变</b>。</li>
+  </ul>
+</section>
+
+<footer class="ft">
+  网页通用模板方案 · 用模板A骨架现场构建的第一个成品站<br>
+  底部红点 = 本页自带的错误诊断（照模板规矩内置）
+</footer>
+
+</div>
+
+<script>
+/* 页内搜索：text-node 高亮 + 计数 + 跳转 */
+(function(){
+  var box=document.getElementById('searchBox'), cnt=document.getElementById('sCount');
+  var hits=[], cur=0, timer=null;
+  function clear(){
+    document.querySelectorAll('mark.s-hi').forEach(function(m){
+      var p=m.parentNode; p.replaceChild(document.createTextNode(m.textContent), m); p.normalize();
+    });
+    hits=[]; cur=0;
+  }
+  function run(q){
+    clear(); cnt.textContent='';
+    if(!q || q.length<1) return;
+    var root=document.querySelectorAll('.sec');
+    var rx=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), n=0;
+    root.forEach(function(sec){
+      var w=document.createTreeWalker(sec, NodeFilter.SHOW_TEXT, {
+        acceptNode:function(nd){
+          if(!nd.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          var t=nd.parentNode.tagName;
+          if(t==='SCRIPT'||t==='STYLE'||t==='MARK') return NodeFilter.FILTER_REJECT;
+          return rx.test(nd.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
+      nodes.forEach(function(nd){
+        var frag=document.createDocumentFragment(), s=nd.nodeValue, m, last=0;
+        rx.lastIndex=0;
+        while((m=rx.exec(s))){
+          if(m.index>last) frag.appendChild(document.createTextNode(s.slice(last,m.index)));
+          var mk=document.createElement('mark'); mk.className='s-hi'; mk.textContent=m[0];
+          frag.appendChild(mk); hits.push(mk); last=m.index+m[0].length; n++;
+          if(m[0].length===0) rx.lastIndex++;
+        }
+        if(last<s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+        nd.parentNode.replaceChild(frag, nd);
+      });
+    });
+    cnt.textContent = n? (n+' 处') : '无';
+    if(hits.length) jump(0);
+  }
+  function jump(i){
+    if(!hits.length) return;
+    cur=(i+hits.length)%hits.length;
+    hits.forEach(function(h,j){h.style.background = j===cur? 'rgba(176,58,46,.6)' : ''});
+    hits[cur].scrollIntoView({behavior:'smooth', block:'center'});
+    cnt.textContent=(cur+1)+'/'+hits.length;
+  }
+  box.addEventListener('input', function(){
+    clearTimeout(timer); var v=box.value.trim(); timer=setTimeout(function(){run(v)},300);
+  });
+  box.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){e.preventDefault(); jump(cur+1)}
+  });
+})();
+
+/* 复制按钮 */
+(function(){
+  function cp(text, btn){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){flash(btn,'已复制✓')}).catch(function(){fallback(text,btn)});
+    } else fallback(text,btn);
+  }
+  function fallback(text,btn){
+    var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand('copy'); flash(btn,'已复制✓')}catch(e){flash(btn,'请手动选择复制')}
+    document.body.removeChild(ta);
+  }
+  function flash(btn,msg){
+    var old=btn.textContent; btn.textContent=msg;
+    setTimeout(function(){btn.textContent=old},1400);
+  }
+  document.querySelectorAll('.copybtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      cp(document.getElementById(b.getAttribute('data-copytarget')).textContent, b);
+    });
+  });
+  var co=document.getElementById('copyOpening');
+  co && co.addEventListener('click', function(){
+    cp(document.getElementById('openingText').value, co);
+  });
+})();
+</script>
+
+<script>
+/* 错误红点：仓库站专属键 ck_errlog_v1，逻辑同模板A（内置能力勿删） */
+(function(){
+  var KEY='ck_errlog_v1', MAX=50;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+  function fmt(ts){var d=new Date(ts);function p(x){return(x<10?'0':'')+x}
+    return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function add(msg){var a=load();a.push({t:Date.now(),m:String(msg).slice(0,300)});
+    try{localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX)))}catch(e){} render()}
+  window.__errLogAdd=add;
+  window.addEventListener('error',function(e){
+    add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''))},true);
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'))});
+  function render(){
+    var a=load(),n=a.length,dot=document.getElementById('errDot');
+    if(!n){if(dot){dot.style.display='none'}return}
+    if(!dot){
+      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      dot.onclick=function(){
+        var p=document.getElementById('errPanel');
+        if(p.style.display==='block'){p.style.display='none';return}
+        var b='';a.forEach(function(x){
+          b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
+        p.innerHTML='<h4>&#9888; 本页出过错（'+n+' 条）</h4>'
+          +'<div class="hint">捕获的脚本错误记录。截图发给制作方定位修复；看完了可清除。</div>'
+          +b+'<button class="clr">清除全部</button>';
+        p.style.display='block';
+        p.querySelector('.clr').onclick=function(){
+          localStorage.removeItem(KEY);p.style.display='none';render()};
+      };
+      document.body.appendChild(dot);
+      var pnl=document.createElement('div');pnl.id='errPanel';pnl.style.display='none';
+      document.body.appendChild(pnl);
+    }
+    dot.style.display='flex';
+    dot.querySelector('.n').textContent=(n>9?'9+':n);
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render)}else{render()}
+})();
+</script>
+</body>
+</html>

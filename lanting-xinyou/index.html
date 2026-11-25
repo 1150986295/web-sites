@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html data-page-node-id="vvfvFqIi0KUU3oahQaeXTi" lang="zh-CN">
+<head data-page-node-id="sS6tWp59HhwRzfUwcPrx0n">
+<script data-page-node-id="hqL734rj1KgVBNlcmcyKpR" src="page/page_comm/inject.js"></script>
+<meta data-page-node-id="G3D2dppDXpwWgGJKkyyb9h" charset="utf-8">
+<meta data-page-node-id="uHrpALN9tqUqgj8fHS2GZ3" content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
+<title data-page-node-id="BRSycs5sDvxgMNKhtsxoOZ" data-pnid-children="m6pXnQBhcapVQCLaNT1UnG">兰亭书画协会 · 秋季招新</title>
+<meta data-page-node-id="rT58ojSQWWk0MZb5MQWd1p" content="兰亭书画协会秋季招新页：协会介绍、招新时间地点、活动安排、在线报名（复制自模板B多页应用骨架）" name="description">
+<style data-page-node-id="rSJrqxf4ea3ndx7aBaWldH" data-pnid-children="TGAz61vOQYAvLJLV1YCJ9L">
+/* ================================================================
+   兰亭书画协会招新页 · 多页应用（复制自 模板B 多页应用骨架）
+   本次演练只做三件事：① 改 3 色令牌 ② 换招新内容 ③ 按路由表加"招新问答"真实页
+   骨架内置防坑能力清单（勿删）：
+   ① 路由表唯一来源 + 入口启动自检（两个入口跳同一页/入口对不上→启动即报红点）
+   ② 切场引擎：只动 opacity/transform，200ms 退场，ENTER_SEEN 幂等防重复播
+   ③ 布局壳：内容区高度扣掉底部 tab + 安全区，"保存点不到"免疫
+   ④ 设计令牌全变量化 / ⑤ 红点 / ⑥ 三态 / ⑦ 移动端四条
+   ================================================================ */
+/* ---------- 一、设计令牌（改 3 色换肤，全站生效） ---------- */
+:root{
+  --paper:#F5F1E6; --card:#FFFDF8;
+  --ink:#2E2A24; --ink-2:rgba(46,42,36,.75); --ink-3:rgba(46,42,36,.55);
+  --primary:#3B372E; --accent:#B23A21; --line:#D9D1BE;
+  /* 派生软色：主色=墨，强调色=朱砂；软色随令牌换肤 */
+  --primary-soft:rgba(59,55,46,.10); --accent-soft:rgba(178,58,33,.08);
+  --line-soft:rgba(217,209,190,.5); --tex-fiber:rgba(120,108,84,.03);
+  --sk-a:#DDD7C8; --sk-b:#F2EDE2; /* 骨架屏底纹两色 */
+  /* 字体：标题走楷体/衬线系统栈（不外链字体文件），正文保持无衬线可读性 */
+  --font-display:"Kaiti SC","STKaiti","KaiTi","FZKai-Z03S","Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --fs-hero:30px; --fs-h1:20px; --fs-body:16px; --fs-sub:14px; --fs-mini:13px;
+  --sp-1:8px; --sp-2:16px; --sp-3:26px; --sp-4:44px; /* 留白宁大勿挤 */
+  --r-s:10px; --r-l:16px;
+  /* 纸纹阴影：细一层贴地 + 远一层大而淡，不用重投影 */
+  --sh-out:0 1px 2px rgba(120,108,84,.12), 0 10px 26px rgba(120,108,84,.10);
+  --sh-in:inset 0 1px 2px rgba(120,108,84,.10);
+  --tab-h:56px; /* 底部 tab 高度：内容区/弹层高度计算必须引用它，不许手写死数 */
+}
+/* ---------- 二、基础 ---------- */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; background:var(--paper); color:var(--ink); font-size:var(--fs-body); line-height:1.75;
+  font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y; overflow:hidden}
+button{font-family:inherit; cursor:pointer; border:0}
+.en-word{display:inline-block; white-space:nowrap}
+/* ---------- 三、布局壳：顶栏 + 内容区(扣tab) + 底部tab ---------- */
+.app{display:flex; flex-direction:column; height:100dvh}
+.topbar{flex:0 0 auto; padding:calc(var(--sp-2) + env(safe-area-inset-top)) var(--sp-2) var(--sp-2);
+  display:flex; align-items:center; justify-content:space-between; background:var(--card);
+  box-shadow:0 1px 0 var(--line); z-index:100}
+.topbar .ttl{font-family:var(--font-display); font-size:var(--fs-h1); font-weight:600; letter-spacing:.08em}
+/* 内容区：高度由 flex 自动扣掉 topbar/tabbar，弹层高度同样用 flex 布局兜底 */
+.content{flex:1 1 auto; position:relative; overflow:hidden}
+/* 底部 tab：装饰层/红点的 z-index 基准（交互层 900，装饰层 <900，红点 9990 独立） */
+.tabbar{flex:0 0 auto; height:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom); display:flex; background:var(--card);
+  box-shadow:0 -1px 0 var(--line); z-index:900}
+.tabbar .tab{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; font-size:var(--fs-mini); color:var(--ink-3); background:none}
+.tabbar .tab.on{color:var(--primary); font-weight:600}
+.tabbar .tab .ico{width:22px; height:22px; line-height:0}
+.tabbar .tab .ico svg{display:block; width:100%; height:100%}
+.tabbar .tab.on .ico{transform:translateY(-1px)}
+/* 顶栏右肩的朱砂小印：品牌印记，全站唯一一处装饰用强调色 */
+.topbar .seal{flex:0 0 auto; width:34px; height:34px; margin-left:var(--sp-1);
+  display:flex; align-items:center; justify-content:center; border-radius:7px;
+  background:var(--accent); color:#FFF6EA; font-family:var(--font-display);
+  font-size:12px; line-height:1; letter-spacing:.08em; font-weight:700;
+  box-shadow:inset 0 0 0 1.5px rgba(255,246,234,.5), 0 1px 3px rgba(178,58,33,.35)}
+/* ---------- 四、视图与路由（路由表是唯一来源） ---------- */
+.view{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:var(--sp-3) var(--sp-2); display:none}
+.view.on{display:block}
+/* 切场引擎：退场 200ms 只动 opacity；入场级联只动 opacity/transform；禁止 display/height/width 动画 */
+.view.leaving{opacity:0; transition:opacity .2s ease}
+.view.entering .stg{opacity:0; transform:translateY(10px)}
+.view.entering .stg{transition:opacity .3s ease, transform .3s cubic-bezier(.34,1.4,.64,1)}
+.view.entering .stg:nth-child(1){transition-delay:.02s}
+.view.entering .stg:nth-child(2){transition-delay:.07s}
+.view.entering .stg:nth-child(3){transition-delay:.12s}
+.view.entering .stg:nth-child(4){transition-delay:.17s}
+.view.entering .stg:nth-child(5){transition-delay:.22s}
+.view.entering .stg:nth-child(6){transition-delay:.27s}
+.view.entering .stg:nth-child(7){transition-delay:.32s}
+.view.entering .stg:nth-child(8){transition-delay:.37s}
+/* 无障碍：用户系统开了"减弱动态效果"→ 一切过场动画归零（结构不变，只关动效） */
+@media (prefers-reduced-motion: reduce){
+  .view.leaving{transition:none}
+  .view.entering .stg{transition:none; transform:none; opacity:1}
+  .sk{animation:none}
+  #toast{transition:none}
+}
+/* 弱光模式：系统深色偏好 → 令牌整体换肤（只改 :root，全站组件自动跟随）
+   墨色底 + 宣纸字；主色/强调色用提亮变体保证深底可读 */
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#1A1712; --card:#252117;
+    --ink:#ECE5D3; --ink-2:rgba(236,229,211,.78); --ink-3:rgba(236,229,211,.55);
+    --primary:#D3BE8F; --accent:#E2694E; --line:#3E382B;
+    --primary-soft:rgba(211,190,143,.15); --accent-soft:rgba(226,105,78,.15);
+    --line-soft:rgba(236,229,211,.14); --tex-fiber:rgba(236,229,211,.03);
+    --sk-a:#2E2920; --sk-b:#3B3527;
+    --sh-out:0 1px 2px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.28);
+    --sh-in:inset 0 1px 2px rgba(0,0,0,.30);
+  }
+}
+/* ---------- 五、通用组件（三态/卡片） ---------- */
+/* 卡片：细描边 + 纸纹肌理 + 纸纹阴影（不用重投影） */
+.card{background:var(--card); background-image:repeating-linear-gradient(93deg,var(--tex-fiber) 0 1px,transparent 1px 4px);
+  border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-out); padding:var(--sp-3); margin-bottom:var(--sp-2)}
+.card h2{font-family:var(--font-display); font-size:var(--fs-h1); letter-spacing:.06em; margin:0 0 var(--sp-2)}
+.sk{height:14px; border-radius:7px; background:linear-gradient(90deg,var(--sk-a) 25%,var(--sk-b) 50%,var(--sk-a) 75%);
+  background-size:200% 100%; animation:sk 1.2s infinite}
+@keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+.sk+.sk{margin-top:10px; width:72%}
+.empty{display:flex; flex-direction:column; align-items:center; gap:var(--sp-1); padding:var(--sp-2); text-align:center}
+.empty .go{margin-top:var(--sp-1); padding:9px 22px; border-radius:999px; color:var(--primary);
+  background:var(--primary-soft); font-size:var(--fs-sub); font-weight:600}
+.err{padding:var(--sp-2); border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:var(--r-s)}
+.err b{color:var(--accent); font-size:var(--fs-sub)}
+.err p{font-size:var(--fs-sub); color:var(--ink-2); margin:var(--sp-1) 0}
+.err .retry{padding:8px 20px; border-radius:999px; background:var(--accent); color:#fff; font-size:var(--fs-sub)}
+/* 主操作按钮：唯一强调色 */
+.btn-main{padding:12px 26px; border-radius:14px; background:var(--accent); color:#fff;
+  font-size:var(--fs-body); font-weight:600; letter-spacing:.04em; box-shadow:0 3px 12px rgba(176,58,46,.3)}
+.btn-soft{padding:9px 20px; border-radius:999px; background:var(--paper); color:var(--ink-2);
+  border:1px solid var(--line); box-shadow:var(--sh-out); font-size:var(--fs-sub)}
+/* 隐藏入口（管理后台）：身份就绪前不可见；显示逻辑必须读唯一身份源 WHO，不许另设 isAdmin */
+.gate{display:none}
+.gate.ok{display:inline-flex}
+/* ---------- 六、弹层与表单（身份系统） ---------- */
+/* 遮罩+底部弹层：高度用 flex 扣掉底部 tab，主按钮永远在可视区内（免疫"保存点不到"） */
+.mask{position:fixed; inset:0; background:rgba(46,42,36,.45); z-index:950; display:none}
+.mask.on{display:block}
+.sheet{position:fixed; left:0; right:0; bottom:0; z-index:960; display:none; flex-direction:column;
+  background:var(--card); border-radius:var(--r-l) var(--r-l) 0 0; padding:var(--sp-3) var(--sp-2);
+  padding-bottom:calc(var(--sp-2) + env(safe-area-inset-bottom)); max-height:calc(100dvh - var(--tab-h) - 20px)}
+.sheet.on{display:flex}
+.sheet h3{font-family:var(--font-display); letter-spacing:.06em; margin:0 0 var(--sp-2); font-size:var(--fs-h1); text-align:center}
+.field{margin-bottom:var(--sp-2)}
+.field label{display:block; font-size:var(--fs-sub); color:var(--ink-2); margin-bottom:4px}
+.field input{width:100%; padding:11px 14px; border:1.5px solid var(--line); border-radius:var(--r-s);
+  font-size:var(--fs-body); font-family:inherit; background:var(--paper); color:var(--ink); outline:none}
+.field input:focus{border-color:var(--primary); background:var(--card)}
+.sheet .btn-main{width:100%}
+.sheet .swap{text-align:center; font-size:var(--fs-sub); color:var(--ink-2); margin-top:var(--sp-2)}
+.sheet .swap b{color:var(--primary); cursor:pointer}
+.formMsg{font-size:var(--fs-sub); margin:0 0 var(--sp-2); padding:8px 12px; border-radius:var(--r-s); display:none}
+.formMsg.on{display:block}
+.formMsg.bad{background:var(--accent-soft); color:var(--accent); border-left:3px solid var(--accent)}
+.formMsg.ok{background:var(--primary-soft); color:var(--primary); border-left:3px solid var(--primary)}
+/* 未登录引导态（进需登录页不白屏，引导登录而不是 alert） */
+.authGate{text-align:center; padding:var(--sp-4) var(--sp-2)}
+.authGate .big{font-size:34px; margin-bottom:var(--sp-1)}
+.authGate p{font-size:var(--fs-sub); color:var(--ink-2); margin:0 0 var(--sp-2)}
+/* 我的页身份卡 */
+.kv{display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:var(--fs-sub)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--ink-2)}
+.kv .v{font-weight:600}
+/* toast：401/403 等轻提示，不打断操作 */
+#toast{position:fixed; left:50%; bottom:calc(var(--tab-h) + 70px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(8px); z-index:9800; background:rgba(46,42,36,.92); color:#fff;
+  padding:9px 18px; border-radius:999px; font-size:var(--fs-sub); opacity:0; transition:.25s; pointer-events:none; white-space:nowrap}
+#toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+/* ---------- 六·2、数据层组件（列表项/分页/表单） ---------- */
+.item{background:var(--card); background-image:repeating-linear-gradient(93deg,var(--tex-fiber) 0 1px,transparent 1px 4px);
+  border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-out);
+  padding:var(--sp-2) var(--sp-3); margin-bottom:var(--sp-2)}
+.item h4{font-family:var(--font-display); margin:0 0 4px; font-size:var(--fs-sub); font-weight:700; letter-spacing:.04em}
+.item .meta{font-size:var(--fs-mini); color:var(--ink-3)}
+.item .body{font-size:var(--fs-sub); color:var(--ink-2); margin-top:6px; overflow-wrap:break-word}
+/* 分页：加载更多（不跳页码，移动端单手友好） */
+.more{width:100%; padding:11px; border-radius:var(--r-s); background:var(--paper);
+  border:1px solid var(--line); box-shadow:var(--sh-out); color:var(--ink-2); font-size:var(--fs-sub); margin-top:2px}
+.more:disabled{opacity:.5}
+.nomore{text-align:center; font-size:var(--fs-mini); color:var(--ink-3); padding:var(--sp-2) 0}
+/* 表单文本域：跟随 .field 体系 */
+.field textarea{width:100%; min-height:88px; padding:11px 14px; border:1.5px solid var(--line);
+  border-radius:var(--r-s); font-size:var(--fs-body); font-family:inherit; background:var(--paper);
+  color:var(--ink); outline:none; resize:vertical}
+.field textarea:focus{border-color:var(--primary); background:var(--card)}
+/* 提交中状态：唯一强调色按钮的禁用态 */
+.btn-main:disabled{opacity:.55; box-shadow:none; cursor:default}
+/* ---------- 头图区（首页）：竖排淡墨大字水印 + 题签 kicker，纯装饰不参与交互 ---------- */
+.hero{position:relative; overflow:hidden; padding-top:var(--sp-4)}
+.hero-mark{position:absolute; top:-10px; right:-4px; writing-mode:vertical-rl; z-index:0;
+  font-family:var(--font-display); font-weight:700; font-size:88px; line-height:1;
+  letter-spacing:.14em; color:var(--accent); opacity:.09; pointer-events:none; user-select:none}
+.hero > *{position:relative; z-index:1}
+.hero-kicker{margin:0 0 var(--sp-1); font-size:var(--fs-mini); letter-spacing:.32em; color:var(--accent)}
+.hero h2{font-size:var(--fs-hero); line-height:1.4; margin-bottom:var(--sp-2)}
+/* 深色模式：主按钮文字改用底色令牌——深色下按 Google 用底色令牌做深字浅底
+   （必须放在 .btn-main 定义之后，同权重规则按源码顺序覆盖） */
+@media (prefers-color-scheme: dark){
+  .btn-main{color:var(--paper)}
+}
+/* ---------- 六·3、上传后台组件（阶段4） ---------- */
+/* 附图区：选图/缩略图/压缩信息 */
+.attach{border:1.5px dashed var(--line); border-radius:var(--r-s); padding:var(--sp-2);
+  text-align:center; color:var(--ink-2); font-size:var(--fs-sub)}
+.attach:active{background:var(--primary-soft)}
+.attach img{max-width:100%; border-radius:var(--r-s); display:block}
+.attach .info{font-size:var(--fs-mini); color:var(--ink-3); margin-top:6px}
+.attach .rm{color:var(--accent); font-size:var(--fs-mini); margin-top:4px; display:inline-block}
+/* 进度条：只动 width（写进"禁止动画 height/width"豁免清单——进度是状态指示不是布局动画） */
+.upbar{height:6px; border-radius:3px; background:var(--paper); box-shadow:var(--sh-in);
+  overflow:hidden; margin-top:8px; display:none}
+.upbar.on{display:block}
+.upbar .in{height:100%; width:0%; background:var(--primary); border-radius:3px;
+  transition:width .3s ease}
+.upbar.fail .in{background:var(--accent)}
+/* 管理后台：内容管理列表（复选） */
+.mrow{display:flex; align-items:center; gap:10px; padding:10px 0;
+  border-bottom:1px solid var(--line-soft); font-size:var(--fs-sub)}
+.mrow:last-child{border-bottom:0}
+.mrow .ttl2{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mrow input[type=checkbox]{width:18px; height:18px; accent-color:var(--accent); flex:0 0 auto}
+.mrow .cnt{font-size:var(--fs-mini); color:var(--ink-3)}
+/* 确认弹层：输入确认词才算确认（批量删除/高危操作专用） */
+#confirmSheet .warn{font-size:var(--fs-sub); color:var(--accent); text-align:center; margin:0 0 var(--sp-2)}
+#confirmSheet .btn-main{margin-top:var(--sp-2)}
+#confirmSheet .cancel{width:100%; margin-top:var(--sp-1); padding:10px; border:0;
+  border-radius:var(--r-s); background:var(--paper); color:var(--ink-2); font-size:var(--fs-sub)}
+/* 操作留痕列表 */
+.oplog .row{padding:8px 0; border-bottom:1px solid var(--line-soft);
+  font-size:var(--fs-mini); color:var(--ink-2)}
+.oplog .row b{color:var(--ink); font-size:var(--fs-sub)}
+.oplog .row .t{color:var(--ink-3); margin-right:8px}
+/* ---------- 七、红点（勿删） ---------- */
+#errDot{position:fixed;right:16px;bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom));
+  z-index:9990;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;
+  display:none;align-items:center;justify-content:center;font-size:18px;cursor:pointer;
+  box-shadow:0 2px 10px rgba(46,42,36,.35);border:2px solid rgba(255,255,255,.7)}
+#errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
+  background:var(--accent);border:1.5px solid var(--paper);color:#fff;font-size:11px;line-height:16px;
+  text-align:center;padding:0 3px;box-sizing:border-box}
+#errPanel{position:fixed;left:12px;right:12px;bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom));
+  z-index:9991;max-height:55vh;overflow:auto;display:none;background:var(--card);border-radius:14px;
+  padding:14px 16px;box-shadow:0 2px 12px rgba(201,194,176,.5);font-size:var(--fs-sub);color:var(--ink);line-height:1.7}
+#errPanel h4{margin:0 0 6px;font-size:15px;font-weight:600}
+#errPanel .hint{font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+#errPanel .row{padding:6px 0;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word}
+#errPanel .row .t{font-size:11.5px;color:var(--ink-3)}
+#errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;
+  background:var(--accent);color:#fff;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body data-page-node-id="1vre0BRuwihSAee7k8bMmg">
+<div data-page-node-id="CYG4vuVneJmMX61WcyGrAN" class="app">
+
+  <!--pnid:vEpgAAoRpckE8lVzzKjTwi--><!-- 顶部栏：标题由路由表驱动，不许各视图自写 -->
+  <header data-page-node-id="BnxDuCjZR1aYKM9Uuf9p45" class="topbar">
+    <div data-page-node-id="tELhH80NmxRTraJtfj4H82" class="ttl" id="topTitle"><!--pnid:7FDszkd2ZcUriDVQQ3jMV9-->招新首页</div>
+    <span class="seal" aria-hidden="true">蘭亭</span>
+    <!--pnid:F2IfhGrpeFh57GSLniatHy--><!-- 隐藏入口示例（管理后台）：按身份显隐，阶段2接入真实 WHO -->
+    <button data-page-node-id="Yef5wMOKfraXpsef3owvjn" class="btn-soft gate ok" data-goto="admin" id="gateAdmin"><!--pnid:SwA378YcU1NJDmQTEFq9Ly-->管理后台</button>
+  </header>
+
+  <!--pnid:dpRYm60iDdOLcj9dDujQnR--><!-- 内容区：所有视图都挂在这里 -->
+  <main data-page-node-id="ILFnvkRVfcAHXCNi1h49Dk" class="content" id="content">
+
+    <section data-page-node-id="n2zEdapfKJTN3FyiWvLsNc" class="view on" id="v-home">
+      <div data-page-node-id="z9f4VGrodRTBNroXexONI8" class="card stg hero">
+        <div data-page-node-id="P8wjYZFIlPVneXEynF9hcv" aria-hidden="true" class="hero-mark"><!--pnid:yh366rDazEETjfbKJG4VUP-->蘭亭</div>
+        <p data-page-node-id="j5vwWGkwaJkTviwHyChKiS" class="hero-kicker"><!--pnid:SlryK9IlvHzHPheogXzDQP-->翰墨传情 · 以字会友</p>
+        <h2 data-page-node-id="jAx66Pk4AxwkS73Q2KLGk5"><!--pnid:tzjFRPKF6K1sDS61no8xut-->兰亭书画协会 · 秋季招新</h2>
+        <p data-page-node-id="a3rhJHIusX1Kt9Hw8PnoVW"><!--pnid:DQyLh4LjAKm6GXy3TYi0pA-->写好字，交到朋友。兰亭书画协会面向全校招新，<b data-page-node-id="GB8Zv32HuX2SgneoS9H5hF"><!--pnid:TWg7RPxJD2d8sakjWGnlJb-->毛笔 / 硬笔</b><!--pnid:gOwgsIeOFAnfKa91OADGoU-->两组任选，零基础有专门的入门笔会。</p>
+        <div data-page-node-id="7O9NWupeehZKrt00O44I4e" class="kv"><span data-page-node-id="5u1jpQJvVEnFu6E4cfP18D" class="k"><!--pnid:8pHHNnivxnRDzABlJiXD2h-->招新时间</span><span data-page-node-id="9M3de2AhImprIK85YOf2db" class="v"><!--pnid:dOi1k1zOBVB8jDwIYxR7qV-->9月1日 – 9月15日</span></div>
+        <div data-page-node-id="GYlOdAHKlrBbwqxih5aZHx" class="kv"><span data-page-node-id="kRNj5oXFbX7XVtyEVDGltG" class="k"><!--pnid:A7De5d7bjuRKuyADf5MO5Q-->招新地点</span><span data-page-node-id="MGnEXkklfeJHvJhatIfo4r" class="v"><!--pnid:0KY1HYZYzRdONoYs6WaghC-->大学生活动中心 210</span></div>
+        <div data-page-node-id="2QFJzx7J3dfMRqtsabVdi9" class="kv"><span data-page-node-id="3Z3FwDbpuEiJtUwfUrP4rw" class="k"><!--pnid:cI69kJ38oZsrb6opSTt7vd-->咨询微信</span><span data-page-node-id="1mVfN95T7KnwSTb56TewLF" class="v"><!--pnid:ORdh108ZYQl8Km2AOkZp4G-->lanting-shuhua</span></div>
+        <p data-page-node-id="4Y3kL84DLpnu1gAnzSeAlZ" style="margin-top:var(--sp-2)">
+          <button data-page-node-id="EnTllF1jpXzd6F3tM6tr7o" class="btn-main" data-goto="post"><!--pnid:Rj4EZtZEl4yP56flJhy0Hw-->立即报名</button>
+          <button data-page-node-id="Ttt02k1TCjYik71sKSfumw" class="btn-soft" data-goto="list" style="margin-left:var(--sp-1)"><!--pnid:DIpM9YPuKxVPMTSYts6QWk-->先看活动安排</button>
+        </p>
+      </div>
+      <div data-page-node-id="bA4z5kZXyF71WfqKZOeuxd" class="card stg"><h2 data-page-node-id="DId9zF9C6MjOd70aVVVHkO"><!--pnid:wxMbdGIZoA7isispF7eGDJ-->协会是什么</h2>
+        <p data-page-node-id="rmRbWw6TkupjVhqnz0ZWH8" style="font-size:var(--fs-sub); color:var(--ink-2)"><!--pnid:wdieknOmM30VmFw4jzzun9-->兰亭书画协会是校团委指导下的学生社团，每周固定笔会两次，学期末办社员作品展；加入后可借用水写布、字帖与毛笔 / 硬笔练习材料。</p>
+      </div>
+    </section>
+
+    <section data-page-node-id="SsQgzWc07zDR4pvmgay6Pm" class="view" id="v-list">
+      <!--pnid:uiTBhjr9Coyln1BrL0vSFW--><!-- 列表三态容器：由 renderList() 按接口状态切换，不许手写死数据 -->
+      <div data-page-node-id="JSB0WuRDid4oVkVqKqMPtP" id="listWrap">
+        <div data-page-node-id="xgkWgCBJw2IWnRGDlX3bnp" class="card" id="listLoading" style="display:none"><div data-page-node-id="JEOoFp10ya28ZFX9FxgX7L" class="sk"></div><div data-page-node-id="9dxKpMwUONtkDzypnjpkmp" class="sk"></div><div data-page-node-id="1FcQXhzr0HhQ4w9YYTOjhs" class="sk"></div></div>
+        <div data-page-node-id="3JC27M1zkS4kFB5k8IitIc" class="card empty" id="listEmpty" style="display:none">
+          <span data-page-node-id="NY8GzW0thp3Rqw0oMGRXrw"><!--pnid:LsdGPKVFlIGDjLTsYXxdnh-->活动安排还没发布：开学第一周会在这里公布笔会与培训安排</span>
+          <button data-page-node-id="JzaIZPcRqUKhxSaKb1H7lj" class="go" data-goto="post"><!--pnid:mOTDwkZ64YlqgIhBt2Cuwv-->先去报名</button></div>
+        <div data-page-node-id="T8Q3F1zG54ydjxhtcWsCiF" class="card err" id="listErr" style="display:none"><b data-page-node-id="Tk8Kc6MJ8CsPY4pCf7YxLS"><!--pnid:G66nEkKVMyY1YXKIqLSVK9-->列表加载失败</b>
+          <p data-page-node-id="Ypd1WI1EUuaVuIbTO3l8T2"><!--pnid:xxhQa85PKA6XGMr5pyq3re-->发生了什么：数据接口没有响应。<br data-page-node-id="rANLfxry9zzRSx7CHuqOjb"><!--pnid:G3pQWMNAmqaRH7JHYxkHag-->为什么：网络断开或接口故障。<br data-page-node-id="hwPkFctMTJ4o1NZANqUlvx"><!--pnid:FTjlmSAJiQPqRrg60869h5-->怎么办：点重试；仍失败把红点截图发给制作方。</p>
+          <button data-page-node-id="OCHIQqJBe9GAVduiOZjbGz" class="retry" id="listRetry"><!--pnid:U4FEou3WVImO6mdT3aL6oJ-->重试</button></div>
+        <div data-page-node-id="erXvke2W40vBeNZ57KsyWt" id="listBody"></div>
+        <button data-page-node-id="ZDOAuqpsZVo93Laf1TYzi0" class="more" id="listMore" style="display:none"><!--pnid:DnCWf1ldXzXK0mUphMCGmP-->加载更多</button>
+        <div data-page-node-id="E2NWBmRRoagSJks90m2dby" class="nomore" id="listDone" style="display:none"><!--pnid:bFW476dSmRkEai1Sf3ApfL-->— 没有更多了 —</div>
+      </div>
+    </section>
+
+    <section data-page-node-id="oUary06b7QaOJisWq2AtlS" class="view" id="v-post">
+      <!--pnid:FCmtlrdr4l1nt72Z0i7B1R--><!-- 未登录引导态：authGate 显示 / 内容隐藏，由 renderView() 按 WHO 切换 -->
+      <div data-page-node-id="q9pIPyYDVLY1GM9AaJPFJp" class="authGate" id="postGate">
+        <div data-page-node-id="PLv40stRXkmd7Ul5Jl7oO6" class="big"><!--pnid:EQVcUJBPiXqhTyoJkoV8Uf-->🔐</div>
+        <p data-page-node-id="s3VmhPo2cBKpg2GwEFh65Z"><!--pnid:doxY0ia0Mq9ws6vV6WYqeF-->提交报名需要先登录。<br data-page-node-id="KTOIB67eGiKTmXoFD1fQnh"><!--pnid:yzypAuGDJMN55Pxe1e10eh-->还没有账号？注册只要一个姓名、学号和一个密码。</p>
+        <button data-page-node-id="nLfM20vjpqfprSq6KOMnRP" class="btn-main" data-auth="login"><!--pnid:rOvzG7vrT3wyKw0T8IjXRq-->去登录</button>
+      </div>
+      <div data-page-node-id="5D3VxVzucVUNvqs2DJhdt0" class="card stg" id="postBody" style="display:none">
+        <h2 data-page-node-id="guGW3by9a6O9vR7sfLgM0g"><!--pnid:Sh5wm7kcGfC8z5h589K7Mw-->提交报名</h2>
+        <div data-page-node-id="ASoLKns1jF9o48oWkITRxm" class="formMsg" id="postMsg"></div>
+        <div data-page-node-id="6oDUG5HQoXn29qMeLUQQNY" class="field"><label data-page-node-id="HNeQa3stiJyBljZm4WKMhT"><!--pnid:6MOzCI32xA639QHcRhrJuQ-->报名组别（必填）</label><input data-page-node-id="NVSCmNLICmmiSUDvIGLJMd" id="postTitle" maxlength="30" placeholder="例：毛笔组（零基础）"></div>
+        <div data-page-node-id="z5nmuUgvUXBeIEtRyzJVWN" class="field"><label data-page-node-id="628yOnkToKFU9h2KyD9lbb"><!--pnid:rTJgITKQxQYiCH4xHbyKfA-->自我介绍（必填）</label><textarea data-page-node-id="XuSprdSWMKNiZDMujoJ1SW" id="postBodyText" maxlength="200" placeholder="姓名、年级专业、有没有基础、想练毛笔还是硬笔…"></textarea></div>
+        <div data-page-node-id="0sjLYRwgV80zpQd0h1m7lg" class="field"><label data-page-node-id="3AjQIqx5XnXwxRvD6tVofe"><!--pnid:aa7Yy35AxrJHQTihXApjIi-->作品照片（可选，自动压缩）</label>
+          <div data-page-node-id="O6iC3fLxZnLZlra3t925LD" class="attach" id="attachBox">
+            <input data-page-node-id="YNt5oOaWJhQ3NMCNBaaF1m" accept="image/*" id="attachFile" type="file" style="display:none">
+            <span data-page-node-id="2hjIHK19irdR8NbuBrqV7m" id="attachHint"><!--pnid:yx0fIg1U5I6y8wXSlNlfaz-->📷 点这里选图<br data-page-node-id="q2ULd1NcLW1lNXJ9F6foF4"><span data-page-node-id="g2mbS3VjlksdrhlAirieSK" style="font-size:var(--fs-mini); color:var(--ink-3)"><!--pnid:DZt4Aj9SbZnYNxZEOeDQDh-->长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>
+          </div>
+          <div data-page-node-id="EezQ2M0lUm7hEpAAqsNOQE" class="upbar" id="upbar"><div data-page-node-id="J8ZDy4KAwsRjqCa9q18tPG" class="in" id="upbarIn"></div></div>
+        </div>
+        <button data-page-node-id="GQFuUpbd4pSZikEoc2oNBo" class="btn-main" id="postSubmit" style="width:100%"><!--pnid:anXImDwTPCFY1xKfBtg57l-->提交报名</button>
+      </div>
+    </section>
+
+    <section data-page-node-id="b6xe8mKnojImr1ITgtscNz" class="view" id="v-faq">
+      <div data-page-node-id="nlALcvqyVwnHpxILFTCmxQ" class="card stg"><h2 data-page-node-id="uYQ20GkMiBzrgLAdbeVX0h"><!--pnid:PhjPQ7r25KcQf6tKsb2jGZ-->招新问答</h2>
+        <div data-page-node-id="J8WkcXt5MfNvp985mvSJEt" class="item"><h4 data-page-node-id="khR6MBvujqh3G2Wo1eESyz"><!--pnid:BZJE4OngIOXBG9ezE5y1Q9-->零基础可以加入吗？</h4>
+          <div data-page-node-id="Vz8ISzeDFvofYYklbba65P" class="body"><!--pnid:h3d8u3DnNsbQDboFhRyQ5j-->可以。毛笔 / 硬笔两组都设零基础入门笔会，学长学姐一对一带。</div></div>
+        <div data-page-node-id="RSKrT0WcZfdpIyhMg2prbU" class="item"><h4 data-page-node-id="b5qZKeZ1v9voBLzHX8UJBo"><!--pnid:PxlZrd7f9tBMJSdk1SDmxS-->要交会费吗？</h4>
+          <div data-page-node-id="p0DZaY8oOdQdG7tWluwWac" class="body"><!--pnid:GHOfaNGu0Pz52OeOqNXwxG-->每学年 20 元，用于字帖、墨汁与作品展材料；家庭经济困难可申请减免。</div></div>
+        <div data-page-node-id="Fjs3VnJqSoPFpT7n5T3q67" class="item"><h4 data-page-node-id="Xh03Dy3BKNXC02AKyyhntP"><!--pnid:njP4KswiuUsgULslrnAMJ4-->平时活动多不多？</h4>
+          <div data-page-node-id="6ZwNthYRtYHxqYtpwbnH9N" class="body"><!--pnid:XGvAcaprlqZkyPor7Gd9ts-->每周两次晚笔会（活动中心 210），不定期外出观展与写生，具体以"活动安排"页公布为准。</div></div>
+        <button data-page-node-id="yfK009CzfK78fD8ZJ4gAD7" class="btn-main" data-goto="post" style="width:100%"><!--pnid:BvCjIY3TBlMuZCOBUGMVhT-->看懂了，去报名</button>
+      </div>
+    </section>
+
+    <section data-page-node-id="k3Op4gYezvX7KHfJHwUzh2" class="view" id="v-me">
+      <div data-page-node-id="n5ooTmk36hWsaSbbOzcSvE" class="authGate" id="meGate">
+        <div data-page-node-id="c5Fl7YONCtLJQciCfdHOpK" class="big"><!--pnid:I8zF9vqrjXaciGpKKqGua0-->👤</div>
+        <p data-page-node-id="KDukY2Bw6Q3AK2RxtUFDEb"><!--pnid:xIUcgR0RlmLDOlsTTHs80k-->登录后这里显示你的身份、<br data-page-node-id="U48ZHNPXl7BINDzlw13fyM"><!--pnid:454ofhKp4AjTLIPe2eY1Dl-->提供改密和退出入口。</p>
+        <button data-page-node-id="Vh5wfw83sbdChjAR314wvm" class="btn-main" data-auth="login"><!--pnid:goajZKTNOzGZguv9TZz0AS-->去登录</button>
+      </div>
+      <div data-page-node-id="UuhXKVLQhwiRmfUEaG2uOv" id="meBody" style="display:none">
+        <div data-page-node-id="seEqhm51FaPDz5XkMtN75S" class="card stg">
+          <h2 data-page-node-id="BMDuMOJ1fRhOQZ9IkaKfZb"><!--pnid:bUub9LUwvEKSPNlwUV4nHR-->我的身份</h2>
+          <div data-page-node-id="zv4ArgY9XiNZ6kYmELYRMU" class="kv"><span data-page-node-id="0wisGQo1uoCipIvELGyVPo" class="k"><!--pnid:VhL4Zl1KWFIvkEhJDqK6FD-->姓名</span><span data-page-node-id="E4bllQ0sLbZI7sMyUgH4io" class="v" id="meName"><!--pnid:QN3BAMayFUMDG7KZWOK80d-->—</span></div>
+          <div data-page-node-id="CimwjzbDd3Ytsc9tsjkNaN" class="kv"><span data-page-node-id="L7E1d0yz0VPj7H4un3f03V" class="k"><!--pnid:Ot5B8JJAmaKGodDzfZ8TqO-->学号</span><span data-page-node-id="4RONfxE5VdibPRhTjFXwSQ" class="v" id="meId"><!--pnid:QY5p6CLgUmHwE7iY61HSX5-->—</span></div>
+          <div data-page-node-id="iEptRW2mVHa4SIqcOtaiFk" class="kv"><span data-page-node-id="v4wc4bhKPTgAmkWAFV24J7" class="k"><!--pnid:asuySDGEKCnOIBcUcWVqiA-->角色</span><span data-page-node-id="HnsZpfpReR6JlFSkQ8Gclf" class="v" id="meRole"><!--pnid:74nzgY1BQiyfHgytEtdVUc-->—</span></div>
+        </div>
+        <div data-page-node-id="L5U1aWnrLZjbRur9Zgn32P" class="card stg">
+          <button data-page-node-id="plGwGtyy1ZxtttuN70MMiA" class="btn-soft" data-auth="change" style="width:100%; margin-bottom:var(--sp-1)"><!--pnid:ONRCSEoc8Z0fUklHWO3jXJ-->修改密码</button>
+          <button data-page-node-id="oyNTvANMHzZfwWHJkyRTrm" class="btn-soft" id="btnLogout" style="width:100%; color:var(--accent)"><!--pnid:JYPdZUiADxNSYa2FBN8CqQ-->退出登录</button>
+        </div>
+      </div>
+    </section>
+
+    <section data-page-node-id="4RHHPb9ZgWJHQR1Xo1aiOi" class="view" id="v-admin">
+      <div data-page-node-id="ReQ6uW410Uv2xFZ9uFyZT7" class="authGate" id="adminGate">
+        <div data-page-node-id="FqZcyaYnwYGOIuijfaTA2p" class="big"><!--pnid:k5L1YwAzcI1rAr33NRvcdi-->⛔</div>
+        <p data-page-node-id="nDKGshxARJvwwSEG1XwCP7"><!--pnid:pqh5XXwMmzzSvlZUM4BDeh-->这里是管理员页面，你的账号没有权限。<br data-page-node-id="hQjC9HnL1e5CAsvcbZrRZt"><!--pnid:q6lD1vCQwY4SCvPFVT9c5c-->这不是登录问题——退出登录也帮不了你。</p>
+        <button data-page-node-id="eguHUbepVbXdChenQv8ELO" class="btn-soft" data-goto="home"><!--pnid:v8vAZeyCiZNHkOTSFIucbr-->回首页</button>
+      </div>
+      <div data-page-node-id="WEYZvkCA5LOsUQuFrEufgr" id="adminBody" style="display:none">
+        <div data-page-node-id="ja8nv9q7ZIhOIlhULUTY3v" class="card stg"><h2 data-page-node-id="WTfEuOpHU03zp8NcuCi32X"><!--pnid:BoQjiwHRBdLfSkVlgWaEl1-->招新管理（管理员）</h2>
+          <p data-page-node-id="w1BIqI9B4xsgwf1XEppC5b" style="font-size:var(--fs-sub); color:var(--ink-2)"><!--pnid:SUuySfWwjr8Iy8sVt1vqES-->双层守卫：前端藏入口（.gate 由 WHO 驱动）+ 本页再验一次角色。报名数据、批量删除与操作留痕都在这里管理。</p>
+          <button data-page-node-id="sB29jG6nZFXm4Z3MRynO7G" class="btn-main" id="btnAdminCall"><!--pnid:7gPVZkRFL3J5uoZs0iAR4O-->调一个管理员专用接口（演示403/成功）</button>
+          <button data-page-node-id="7KQOI5RaRAwuB1pgleDv2W" class="btn-soft" id="btnRevoke" style="width:100%; margin-top:var(--sp-1)"><!--pnid:7dVyJoSZwZy1UbbEvFKYlt-->模拟服务端吊销当前 token（演示401清登录态）</button>
+        </div>
+        <div data-page-node-id="wxkMn0C5M8olpvTy5jh4EJ" class="card stg"><h2 data-page-node-id="lWocJyvDBVjrC5eduNlOsG"><!--pnid:RvN24pVZQhBFP9Y4Cbttu9-->数据备份</h2>
+          <p data-page-node-id="O1h6bwc4wuzFwhm5DRcVy7" style="font-size:var(--fs-sub); color:var(--ink-2)"><!--pnid:4pEEkHUrq6GgXirunUklhc-->导出=下载 JSON 文件（账号不带密码，脱敏）；导入=校验结构+按 id 去重，损坏的文件会被拒绝而不是污染全库。</p>
+          <div data-page-node-id="P7VOreOtrDEEjoFtmTwm48" class="formMsg" id="bakMsg"></div>
+          <button data-page-node-id="fLsJmletu508aXYIiQ3Ck0" class="btn-main" id="btnExport" style="width:100%"><!--pnid:gH7eUCrPodZ91LOmCVD6Rv-->导出全部数据</button>
+          <button data-page-node-id="Mt35uIK3evz9AOGamRQbNL" class="btn-soft" id="btnImport" style="width:100%; margin-top:var(--sp-1)"><!--pnid:jxgZxlBNpGhBv2eVfeMotw-->导入备份文件</button>
+          <input data-page-node-id="23mHKYE7aYjlcYjKi339T8" accept=".json,application/json" id="importFile" type="file" style="display:none">
+        </div>
+        <div data-page-node-id="BuEWNJdTeihY8ytXFWqt1n" class="card stg"><h2 data-page-node-id="ElWreVn1tLyXdeAAG1mTPh"><!--pnid:yAIDqlXiSJifeOdGoFfQUm-->内容管理（批量删除需二次确认）</h2>
+          <div data-page-node-id="FdeXjAx0pjKBQZx65l1LFH" id="adminList"></div>
+          <button data-page-node-id="oapjIzQmixGdcXQKdcgmxn" class="btn-main" disabled id="btnBatchDel" style="width:100%; margin-top:var(--sp-2)"><!--pnid:pUQC33SNhXuOrca9ux4KmL-->删除所选（0 条）</button>
+        </div>
+        <div data-page-node-id="AHW3Z22E4by499r98L8RgY" class="card stg"><h2 data-page-node-id="AWGsq8huRzPRi0GzbyU3pX"><!--pnid:CCfgwkhZrf9Y3U4c9eAmlA-->操作留痕（最近 20 条写操作）</h2>
+          <div data-page-node-id="uEK102T9jDIVWMIYrHYBai" class="oplog" id="oplogBox"><div data-page-node-id="8rR46XoiyL6IEOoyu0Eeqc" class="row"><!--pnid:OHImfvL9DAJds0AFWsobFe-->暂无操作记录</div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!--pnid:xZEkM1kKuUQKVcXCAHxtqe--><!-- 底部 tab：每个 tab 必须是路由表里登记的入口 -->
+  <nav data-page-node-id="YXLtZN6tmQR1zoG0qZF9k3" class="tabbar" id="tabbar">
+    <button data-page-node-id="xr0YKFfkS3JedUIbrz4Rxw" class="tab on" data-goto="home"><span data-page-node-id="VW4ljo95BbcRt4fTq3fyBE" class="ico"><!--pnid:FPXAXhaf6rCwcwrpw2LDau--><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5.5h4V20"/></svg></span><!--pnid:0Ilf7KFwaFEyoS6Ja6sQor-->首页</button>
+    <button data-page-node-id="seBEfMuwuXvQ2UB9dcsK3a" class="tab" data-goto="list"><span data-page-node-id="I9LbooxqrzfGgOtOFA2yvd" class="ico"><!--pnid:nmrqIagc4uKXXQk8GaIcer--><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M4 10.5h16"/><path d="M8.5 3.5v4M15.5 3.5v4"/><path d="M8 14.5h5"/></svg></span><!--pnid:x386sRA6fkONrJqC9TFezz-->活动</button>
+    <button data-page-node-id="o52pk8ldmu0rLL50CVUDrP" class="tab" data-goto="post"><span data-page-node-id="7jwjOndvJW08Hxbx1HNkcW" class="ico"><!--pnid:SER1Cor8CH5NVrIYc5hvCo--><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.7 3.6a2.1 2.1 0 0 1 3 3L7.5 18.8l-4 1.1 1.1-4Z"/></svg></span><!--pnid:Uj1KeM96DhwSfypP7AkRSE-->报名</button>
+    <button data-page-node-id="TZQLK7Fk9rfh279mVINoSs" class="tab" data-goto="faq"><span data-page-node-id="FvYaDxtLy0UKoy25jX3Pve" class="ico"><!--pnid:VD3McfdXHtZ7scTswLXxQm--><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.6a7.6 7.6 0 0 1-7.7 7.5c-1.2 0-2.4-.25-3.4-.7L4 19.6l1.2-3.9a7.3 7.3 0 0 1-1.2-4.1A7.6 7.6 0 0 1 11.7 4a7.6 7.6 0 0 1 8.3 7.6Z"/><path d="M8.6 11.5h.01M12.1 11.5h.01M15.6 11.5h.01"/></svg></span><!--pnid:8jseSzL5bOHpv9NpqyeDCL-->问答</button>
+    <button data-page-node-id="3xvKEXcaaX0JmLQQ8yiYKz" class="tab" data-goto="me"><span data-page-node-id="NCjPET5FEOpLkWT2YWkNFv" class="ico"><!--pnid:DhSo9s5bjNYoZkLKhOnTjn--><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.7 3.7-5.6 7-5.6s6.2 1.9 7 5.6"/></svg></span><!--pnid:u8w21Vmd49QMtLSOYfvgkV-->我的</button>
+  </nav>
+</div>
+
+<!--pnid:B4kKMz7mpEmjRMrpjttSvd--><!-- 身份弹层：登录 / 注册 / 改密 三模式，一个容器 -->
+<div data-page-node-id="75ifpKEY2sADWxMXf7qPZk" class="mask" id="authMask"></div>
+<div data-page-node-id="81dF6lYOrFPV39otDDCvp8" class="sheet" id="authSheet">
+  <h3 data-page-node-id="tV7gYPNMIdFOzMt2ssKgTQ" id="authTitle"><!--pnid:DbJQSWerL0I1dsoXJ2baQa-->登录</h3>
+  <div data-page-node-id="99PHG59DcprOlcBBOsAJa3" class="formMsg" id="authMsg"></div>
+  <div data-page-node-id="NiWfd2jq9pMSI8IbxKlgOr" class="field" id="fName"><label data-page-node-id="xIXFZrmyPlqAYLWIDgT15B"><!--pnid:FIhrNl9ii44YNr7bhyn6uW-->姓名</label><input data-page-node-id="dCfHFulNJKTU4evQ4ycYGb" autocomplete="name" id="inName" placeholder="真实姓名"></div>
+  <div data-page-node-id="tZiA5prqDzCzeQuTnQOlQ3" class="field" id="fId"><label data-page-node-id="oAZJYn7MF9iiGgKXvKpllN"><!--pnid:qTw1LCmBlwH6JTU18UAU6n-->学号</label><input data-page-node-id="aVRvx1qbRPCB50nrkFcWyA" autocomplete="username" id="inId" inputmode="numeric" placeholder="仅数字"></div>
+  <div data-page-node-id="sbPXtQMGKMd9I8dDZvXRGb" class="field"><label data-page-node-id="G5GD2YlU3bdtwsOggJc75j"><!--pnid:ezWnr43vG0ifSjVQMUy8gk-->密码</label><input data-page-node-id="XP8CFFI4VxDcI2MCTvEGHW" autocomplete="current-password" id="inPwd" placeholder="至少 6 位" type="password"></div>
+  <div data-page-node-id="baW8I0zRIVjalCPniOP8l0" class="field" id="fPwd2" style="display:none"><label data-page-node-id="fVelmbOWNbiLqhNpqBQl37"><!--pnid:syiOOQKiUJN1Pt4kErVKYK-->新密码</label><input data-page-node-id="fl2F4pHM5cUvgn0XaUmyOA" autocomplete="new-password" id="inPwd2" placeholder="再输一遍新密码" type="password"></div>
+  <button data-page-node-id="94cGrkWEEIuo4qJ0DIaAKi" class="btn-main" id="authSubmit"><!--pnid:gVp1Kqa6iJDBZpXzghvQCh-->登录</button>
+  <div data-page-node-id="XSEIyZlGzakAZ58IwZOXu3" class="swap" id="authSwap"></div>
+</div>
+<div data-page-node-id="nlCjuXOAAUS4JY1fXDkY0B" id="toast"></div>
+
+<!--pnid:I1IjUReZizvmu6qWejbjbC--><!-- 高危操作确认弹层：必须输入确认词，绝不裸 confirm() -->
+<div data-page-node-id="kVnusXmn1M99oSbjoLmN3v" class="sheet" id="confirmSheet">
+  <h3 data-page-node-id="MWmfFrzKg9J8MnbH4nFSjP"><!--pnid:Xb19rEE0RXyjNItdEUBNh0-->确认执行</h3>
+  <p data-page-node-id="q5xzlpVMrt0Su0Sev2SONK" class="warn" id="confirmText"><!--pnid:zFy2R8FPnxIxIENF6Vccix-->—</p>
+  <div data-page-node-id="rfcxPHJARUjiJhqRdal52z" class="field"><label data-page-node-id="dsW9qDwwSq1IA0KWXlIuu3"><!--pnid:0GdahttDAtUcjrlgfjFUeP-->输入"<b data-page-node-id="GWkdySoKnbFQaWGmrplNvV"><!--pnid:2jTTDaLnrwmQZR2gO4AeKY-->删除</b><!--pnid:oeCekhYlqlnQsZo2VUvX13-->"两个字确认</label>
+    <input data-page-node-id="f8rhkwIbAgZPRUeGG9QANV" autocomplete="off" id="confirmInput" placeholder="删除"></div>
+  <div data-page-node-id="vOB2I5oEJeZXwuYvu1Uai1" class="formMsg" id="confirmMsg"></div>
+  <button data-page-node-id="KhFoKYrIXr7rFjQg44vDyq" class="btn-main" id="confirmGo" style="width:100%"><!--pnid:J1mheaRPnQXclfOWwfsSnM-->执行</button>
+  <button data-page-node-id="rgFgH2IDK2r1oDkhGgRUV6" class="cancel" id="confirmCancel"><!--pnid:6EDlDOdSBJXPOYZVsIEd7f-->取消</button>
+</div>
+
+<script data-page-node-id="tpph6Bc53bG5WyTE0CEouf" data-pnid-children="PBhApoRcW8gFiVCMtNV0Rd">
+/* ================================================================
+   一、路由表（唯一来源！加页面先来这里登记，再写 HTML）
+   ================================================================ */
+const ROUTES = {
+  home:  {title:"招新首页", tab:true},
+  list:  {title:"活动安排", tab:true},
+  post:  {title:"报名",     tab:true, needAuth:true},
+  faq:   {title:"招新问答", tab:true},
+  me:    {title:"我的",     tab:true, needAuth:true},
+  admin: {title:"管理后台", tab:false, needAuth:true, needAdmin:true},
+};
+/* 唯一身份源：登录接口写入 {token, who} 双键成对；任何代码不许另设 isAdmin2 之类的影子变量 */
+const WHO = {token:null, who:null, isAdmin:false};
+
+/* ================================================================
+   二、身份系统（阶段2）
+   规矩：
+   · 登录成功 → saveWHO 双键成对写（内存+localStorage 同步）
+   · 401 = 登录失效 → 清整套回登录页（绝不清一半）
+   · 403 = 登录有效但没权限 → 只提示，绝不清登录态
+   · 隐藏入口 .gate 只由 WHO.isAdmin 驱动
+   · 模拟接口层与真实后端同形状：{code,message,traceId,data}
+     阶段3换真实后端时只替换 mock() 内部实现，调用方零改动
+   ================================================================ */
+const AUTH_KEY="lt_auth_v1", USERS_KEY="lt_users_v1", TOKENS_KEY="lt_tokens_v1";
+const DATA_KEY="lt_data_v1", IDEM_KEY="lt_idem_v1";
+const OPLOG_KEY="lt_oplog_v1";
+function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function fail(code,message){const e=new Error(message);e.code=code;e.traceId="t"+Date.now().toString(36);throw e}
+/* 操作留痕：后端写操作必留痕（谁/何时/干了什么），管理员可查 */
+function logOp(uid,action,detail){
+  const logs=loadJSON(OPLOG_KEY,[]);
+  logs.push({t:Date.now(), who:uid, action, detail:String(detail||"").slice(0,120)});
+  saveJSON(OPLOG_KEY,logs.slice(-100)); /* 最多留 100 条 */
+}
+
+/* ---------- 模拟接口层（阶段3替换此函数内部，调用方零改动） ---------- */
+function api(name, body){
+  return new Promise((res,rej)=>setTimeout(()=>{
+    try{ res(mock(name,body||{})) }catch(e){ rej(e) }
+  }, 250));
+}
+function env(code,message,data){return {code,message,traceId:"t"+Date.now().toString(36),data}}
+function mock(name,b){
+  const users=loadJSON(USERS_KEY,null), first=loadJSON(TOKENS_KEY,null);
+  if(users===null && first===null){         /* 全新站点：内置一个演示管理员 admin/123456 */
+    saveJSON(USERS_KEY,[{id:"admin",name:"演示管理员",pwd:"123456",isAdmin:true,pwdInit:true}]);
+    saveJSON(TOKENS_KEY,{});
+  }
+  const users2=loadJSON(USERS_KEY,[]), tokens=loadJSON(TOKENS_KEY,{});
+  if(name==="register"){
+    const id=String(b.id||"").trim();
+    if(!b.name||!b.name.trim()) fail(400,"请填写姓名");
+    if(!/^\d{4,12}$/.test(id)) fail(400,"学号需为 4-12 位数字");
+    if(!b.pwd||b.pwd.length<6) fail(400,"密码至少 6 位");
+    if(users2.some(u=>u.id===id)) fail(409,"这个学号已注册过，请直接登录");
+    const u={id,name:b.name.trim(),pwd:b.pwd,isAdmin:false,pwdInit:false};
+    users2.push(u); saveJSON(USERS_KEY,users2);
+    return loginCore(users2,u);
+  }
+  if(name==="login"){
+    const u=users2.find(x=>x.id===String(b.id||"").trim());
+    if(!u||u.pwd!==b.pwd) fail(401,"学号或密码不对");
+    return loginCore(users2,u);
+  }
+  if(name==="changePwd"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u) fail(401,"登录已失效，请重新登录");
+    if(u.pwd!==b.old) fail(400,"旧密码不对");
+    if(!b.next||b.next.length<6) fail(400,"新密码至少 6 位");
+    if(b.next===b.old) fail(400,"新密码不能和旧密码相同");
+    u.pwd=b.next; u.pwdInit=true; saveJSON(USERS_KEY,users2);
+    return env(0,"密码已修改",{who:{name:u.name,id:u.id,isAdmin:u.isAdmin,pwdInit:true}});
+  }
+  if(name==="adminStat"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"你的账号没有管理员权限");
+    return env(0,"ok",{userCount:users2.length, adminCount:users2.filter(x=>x.isAdmin).length});
+  }
+  /* ---------- 阶段3：数据接口（分页/新增幂等/导出/导入） ---------- */
+  if(name==="listItems"){
+    const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    const page=Math.max(1,parseInt(b.page)||1), ps=Math.min(20,Math.max(1,parseInt(b.pageSize)||5));
+    const items=d.items.slice().reverse(); /* 新的在前 */
+    return env(0,"ok",{list:items.slice((page-1)*ps,page*ps), total:items.length, page, pageSize:ps});
+  }
+  if(name==="addItem"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u) fail(401,"登录已失效，请重新登录");
+    if(!b.title||!String(b.title).trim()) fail(400,"标题必填");
+    if(!b.body||!String(b.body).trim()) fail(400,"正文必填");
+    if(String(b.title).trim().length>30) fail(400,"标题超 30 字");
+    if(String(b.body).trim().length>200) fail(400,"正文超 200 字");
+    if(b.image && String(b.image).length>400000) fail(400,"附图过大（压缩后仍超 300KB），请换小一点的图");
+    const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    const idem=loadJSON(IDEM_KEY,{});
+    /* 幂等：同一个 idemKey 只写一条，重复提交返回已写入那条 */
+    if(b.idemKey && idem[b.idemKey]!==undefined){
+      const hit=d.items.find(x=>x.id===idem[b.idemKey]);
+      if(hit) return env(0,"已收录（幂等去重）",{item:hit, idem:true});
+    }
+    const item={id:d.seq++, title:String(b.title).trim(), body:String(b.body).trim(),
+      authorId:u.id, authorName:u.name, createdAt:Date.now(),
+      image:b.image?String(b.image):null};
+    d.items.push(item); saveJSON(DATA_KEY,d);
+    if(b.idemKey){ idem[b.idemKey]=item.id; saveJSON(IDEM_KEY,idem); }
+    logOp(uid,"发布","id="+item.id+"《"+item.title+"》"+(item.image?"[带图]":""));
+    return env(0,"发布成功",{item});
+  }
+  if(name==="deleteItems"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能删除内容");
+    if(!Array.isArray(b.ids)||!b.ids.length) fail(400,"没有选中任何条目");
+    const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    const before=d.items.length;
+    d.items=d.items.filter(x=>!b.ids.includes(x.id));
+    const deleted=before-d.items.length;
+    if(deleted>0){ saveJSON(DATA_KEY,d); logOp(uid,"批量删除","删除 "+deleted+" 条："+b.ids.join(",")); }
+    return env(0,"已删除",{deleted});
+  }
+  if(name==="getLogs"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能看操作留痕");
+    const logs=loadJSON(OPLOG_KEY,[]);
+    return env(0,"ok",{list:logs.slice(-20).reverse(), total:logs.length});
+  }
+  if(name==="exportAll"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能导出全库备份");
+    logOp(uid,"导出备份","共"+loadJSON(DATA_KEY,{items:[]}).items.length+"条");
+    const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    return env(0,"ok",{version:1, exportedAt:Date.now(),
+      items:d.items, nextSeq:d.seq,
+      /* 账号表脱敏：导出绝不含密码字段 */
+      accounts:users2.map(x=>({id:x.id,name:x.name,isAdmin:!!x.isAdmin}))});
+  }
+  if(name==="importAll"){
+    const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
+    const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能导入备份");
+    const p=b.payload;
+    if(!p||typeof p!=="object") fail(400,"备份内容不是合法对象");
+    if(!Array.isArray(p.items)) fail(400,"备份缺少 items 列表，可能是文件选错或已损坏");
+    if(p.items.some(x=>!x||typeof x!=="object"||!x.id||!x.title)) fail(400,"items 里有结构不完整的条目，为防污染已整包拒绝");
+    const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    let imported=0, skipped=0;
+    const seen={}; d.items.forEach(x=>seen[x.id]=true);
+    p.items.forEach(x=>{ if(seen[x.id]){skipped++} else {seen[x.id]=true; d.items.push(x); imported++} });
+    d.seq=Math.max(d.seq, p.nextSeq||1, ...p.items.map(x=>x.id+1), 1);
+    saveJSON(DATA_KEY,d);
+    logOp(uid,"导入备份","新增"+imported+"条，跳过"+skipped+"条");
+    return env(0,"导入完成",{imported, skipped});
+  }
+  fail(404,"未知接口: "+name);
+}
+function loginCore(users,u){
+  const tokens=loadJSON(TOKENS_KEY,{});
+  const token="tk_"+Math.random().toString(36).slice(2,10);
+  tokens[token]=u.id; saveJSON(TOKENS_KEY,tokens);
+  return env(0,"ok",{token, who:{name:u.name,id:u.id,isAdmin:u.isAdmin,pwdInit:u.pwdInit}});
+}
+
+/* ---------- WHO 唯一源：成对读写，绝不出现"有token没who" ---------- */
+function saveWHO(token,who){
+  WHO.token=token; WHO.who=who; WHO.isAdmin=!!(who&&who.isAdmin);
+  saveJSON(AUTH_KEY,{token,who});
+  applyIdentity();
+}
+function clearWHO(msg){
+  localStorage.removeItem(AUTH_KEY);
+  WHO.token=null; WHO.who=null; WHO.isAdmin=false;
+  applyIdentity();
+  if(msg) toast(msg);
+}
+/* 401/403 分流器：全站唯一的身份错误入口 */
+function handleAuthError(err){
+  if(err.code===401){ clearWHO("登录已过期，请重新登录"); openAuth("login"); }
+  else if(err.code===403){ toast("没有权限执行此操作"); } /* 绝不清登录态 */
+}
+
+/* ---------- 视图按身份渲染（每次切页/身份变化都会调用） ---------- */
+function renderView(id){
+  if(id==="list"){ renderList(); }
+  if(id==="post"){
+    const on=!!WHO.token;
+    document.getElementById("postGate").style.display=on?"none":"";
+    document.getElementById("postBody").style.display=on?"":"none";
+  }
+  if(id==="me"){
+    const on=!!WHO.token;
+    document.getElementById("meGate").style.display=on?"none":"";
+    document.getElementById("meBody").style.display=on?"":"none";
+    if(on){
+      document.getElementById("meName").textContent=WHO.who.name;
+      document.getElementById("meId").textContent=WHO.who.id;
+      document.getElementById("meRole").textContent=WHO.isAdmin?"管理员":"普通用户";
+    }
+  }
+  if(id==="admin"){
+    const ok=WHO.token&&WHO.isAdmin;
+    document.getElementById("adminGate").style.display=ok?"none":"";
+    document.getElementById("adminBody").style.display=ok?"":"none";
+    if(ok){ renderAdminList(); renderOplog(); }
+  }
+}
+function applyIdentity(){
+  document.getElementById("gateAdmin").classList.toggle("ok", WHO.isAdmin);
+  renderView(current);
+}
+
+/* ---------- 身份弹层：登录/注册/改密三模式 ---------- */
+const AUTH_MODES={
+  login:  {title:"登录",   name:false, id:true,  pwd2:false, btn:"登录",      swap:'还没有账号？<b data-mode="register">注册一个</b>'},
+  register:{title:"注册",  name:true,  id:true,  pwd2:false, btn:"注册并登录", swap:'已有账号？<b data-mode="login">去登录</b>'},
+  change: {title:"修改密码",name:false, id:false, pwd2:true,  btn:"确认修改",   swap:""},
+};
+let authMode="login", authNext=null;
+function openAuth(mode, next){
+  if(mode==="change" && !WHO.token){ openAuth("login"); return; }
+  authMode=mode; authNext=next||authNext;
+  const m=AUTH_MODES[mode];
+  document.getElementById("authTitle").textContent=m.title;
+  document.getElementById("authSubmit").textContent=m.btn;
+  document.getElementById("fName").style.display=m.name?"":"none";
+  document.getElementById("fId").style.display=m.id?"":"none";
+  document.getElementById("fPwd2").style.display=m.pwd2?"":"none";
+  document.getElementById("authSwap").innerHTML=m.swap;
+  showMsg("","");
+  document.getElementById("authMask").classList.add("on");
+  document.getElementById("authSheet").classList.add("on");
+}
+function closeAuth(){
+  document.getElementById("authMask").classList.remove("on");
+  document.getElementById("authSheet").classList.remove("on");
+}
+function showMsg(cls,txt){
+  const el=document.getElementById("authMsg");
+  el.className="formMsg"+(cls?" "+cls+" on":" on"); /* 空串=隐藏 */
+  el.textContent=txt;
+  if(!cls){el.className="formMsg"}
+}
+function toast(txt){
+  const t=document.getElementById("toast");
+  t.textContent=txt; t.classList.add("on");
+  clearTimeout(toast._h); toast._h=setTimeout(()=>t.classList.remove("on"), 2200);
+}
+/* 弹层提交 */
+document.getElementById("authSubmit").onclick=async ()=>{
+  const v=x=>x.value.trim();
+  try{
+    if(authMode==="login"){
+      const r=await api("login",{id:v(inId),pwd:inPwd.value});
+      saveWHO(r.data.token, r.data.who); closeAuth();
+      toast("欢迎，"+r.data.who.name);
+      if(!r.data.who.pwdInit){ setTimeout(()=>openAuth("change"), 300); }
+      else if(authNext){ const n=authNext; authNext=null; goto(n); }
+    }else if(authMode==="register"){
+      const r=await api("register",{name:v(inName),id:v(inId),pwd:inPwd.value});
+      saveWHO(r.data.token, r.data.who); closeAuth();
+      toast("注册成功，请先设置正式密码");
+      setTimeout(()=>openAuth("change"), 300);   /* 首登改密流程 */
+    }else{ /* change */
+      const r=await api("changePwd",{token:WHO.token,old:inPwd.value,next:inPwd2.value});
+      WHO.who=r.data.who; saveJSON(AUTH_KEY,{token:WHO.token,who:WHO.who});
+      closeAuth(); toast("密码已修改"); applyIdentity();
+      if(authNext){ const n=authNext; authNext=null; goto(n); }
+    }
+  }catch(err){
+    if(err.code===401 && authMode!=="login"){ handleAuthError(err); return; }
+    showMsg("bad", err.message);
+  }
+};
+document.getElementById("authMask").onclick=closeAuth;
+/* data-auth / data-mode 入口统一委托 */
+document.addEventListener("click", e=>{
+  const a=e.target.closest("[data-auth]");
+  if(a){ openAuth(a.getAttribute("data-auth")); return; }
+  const m=e.target.closest("[data-mode]");
+  if(m){ openAuth(m.getAttribute("data-mode")); }
+});
+/* 退出登录 */
+document.getElementById("btnLogout").onclick=()=>clearWHO("已退出登录");
+/* 管理后台演示：调管理员接口 + 模拟 token 吊销看 401 */
+document.getElementById("btnAdminCall").onclick=async ()=>{
+  try{
+    const r=await api("adminStat",{token:WHO.token});
+    toast("管理员接口成功：全站 "+r.data.userCount+" 人（含管理员 "+r.data.adminCount+" 人）");
+  }catch(err){ handleAuthError(err); }
+};
+document.getElementById("btnRevoke").onclick=()=>{
+  const tokens=loadJSON(TOKENS_KEY,{});
+  delete tokens[WHO.token]; saveJSON(TOKENS_KEY,tokens);
+  toast("已模拟服务端吊销当前 token——现在点上面的接口按钮，看 401 清登录态");
+};
+
+/* ================================================================
+   阶段3：数据层 UI（列表三态+分页 / 幂等提交 / 备份导出导入）
+   规矩：
+   · 列表不手写死数据，每次进页问接口要；三态由接口状态驱动
+   · 分页用"加载更多"（移动端单手），每页条数写一处 PAGE_SIZE
+   · 提交带 idemKey：同一意图的重复请求服务端只落一条
+   · 导出脱敏（无密码）、导入校验+去重，坏文件整包拒绝
+   ================================================================ */
+const PAGE_SIZE=5;
+const LIST={page:0, total:0, dirty:true};  /* dirty：发布/导入后置真，下次进列表重拉 */
+
+async function loadListPage(page){
+  return api("listItems",{page, pageSize:PAGE_SIZE});
+}
+async function renderList(){
+  const show=(id,on)=>document.getElementById(id).style.display=on?"":"none";
+  const body=document.getElementById("listBody");
+  if(LIST.dirty && LIST.page===0){
+    show("listLoading",true); show("listEmpty",false); show("listErr",false);
+    body.innerHTML=""; show("listMore",false); show("listDone",false);
+  }
+  try{
+    const r=await loadListPage(LIST.dirty?1:LIST.page+1);
+    LIST.dirty=false;
+    show("listLoading",false); show("listErr",false);
+    LIST.page=r.data.page; LIST.total=r.data.total;
+    if(LIST.total===0){
+      show("listEmpty",true); show("listMore",false); show("listDone",false); return;
+    }
+    r.data.list.forEach(it=>{
+      const d=new Date(it.createdAt);
+      const el=document.createElement("div"); el.className="item";
+      el.innerHTML='<h4></h4><div class="meta"></div><div class="body"></div>'
+        +(it.image?'<img src="'+it.image+'" style="max-width:100%;border-radius:var(--r-s);margin-top:8px" loading="lazy">':'');
+      el.querySelector("h4").textContent=it.title;
+      el.querySelector(".meta").textContent=it.authorName+" · "+(d.getMonth()+1)+"-"+d.getDate();
+      el.querySelector(".body").textContent=it.body;
+      body.appendChild(el);
+    });
+    const shown=Math.min(LIST.page*PAGE_SIZE, LIST.total);
+    const hasMore=LIST.page*PAGE_SIZE<LIST.total;
+    const moreBtn=document.getElementById("listMore");
+    if(hasMore){ moreBtn.textContent="加载更多（已看 "+shown+" / 共 "+LIST.total+"）"; }
+    else{ document.getElementById("listDone").textContent="— 共 "+LIST.total+" 条，已全部加载 —"; }
+    show("listMore",hasMore); show("listDone",!hasMore);
+  }catch(err){
+    show("listLoading",false); show("listErr",true);
+    show("listMore",false); show("listDone",false);
+    if(err.code===401){ handleAuthError(err); }
+  }
+}
+document.getElementById("listRetry").onclick=()=>{ LIST.page=0; LIST.dirty=true; renderList(); };
+document.getElementById("listMore").onclick=()=>renderList();
+
+/* 发布表单：必填校验 + 幂等提交（请求中禁用，双击/重复请求只落一条） */
+let POSTING=false;
+document.getElementById("postSubmit").onclick=async ()=>{
+  if(POSTING) return;                      /* 第一道闸：请求中不受理 */
+  const title=document.getElementById("postTitle").value.trim();
+  const body=document.getElementById("postBodyText").value.trim();
+  const msg=document.getElementById("postMsg");
+  const setMsg=(cls,txt)=>{msg.className="formMsg"+(cls?" "+cls+" on":""); msg.textContent=txt;};
+  if(!title){ setMsg("bad","标题必填"); return; }
+  if(!body){ setMsg("bad","正文必填"); return; }
+  POSTING=true;
+  const btn=document.getElementById("postSubmit");
+  btn.disabled=true; btn.textContent="提交中…";
+  /* 幂等键：本次提交意图的身份证。双击/网络重试带同一个键，服务端只落一条 */
+  const idemKey="idem_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+  try{
+    const r=await api("addItem",{token:WHO.token, title, body, idemKey, image:ATTACH.data||null});
+    setMsg("ok", r.message);
+    document.getElementById("postTitle").value="";
+    document.getElementById("postBodyText").value="";
+    attachReset();                         /* 成功才清附图；失败现场全保留可重试 */
+    LIST.dirty=true; LIST.page=0;          /* 列表已变，下次进页重拉 */
+    toast("已发布（id="+r.data.item.id+"）");
+    setTimeout(()=>goto("list"), 500);
+  }catch(err){
+    if(err.code===401){ handleAuthError(err); }
+    else{ setMsg("bad", err.message); }
+  }finally{
+    POSTING=false; btn.disabled=false; btn.textContent="提交";
+  }
+};
+
+/* 备份导出：管理员专用，下载脱敏 JSON */
+document.getElementById("btnExport").onclick=async ()=>{
+  const bakMsg=document.getElementById("bakMsg");
+  const setMsg=(cls,txt)=>{bakMsg.className="formMsg"+(cls?" "+cls+" on":""); bakMsg.textContent=txt;};
+  try{
+    const r=await api("exportAll",{token:WHO.token});
+    const blob=new Blob([JSON.stringify(r.data,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    const d=new Date();
+    a.download="兰亭招新_备份_"+(d.getMonth()+1)+d.getDate()+"_"+d.getHours()+d.getMinutes()+".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+    setMsg("ok","已导出 "+r.data.items.length+" 条内容、"+r.data.accounts.length+" 个账号（脱敏）");
+  }catch(err){ handleAuthError(err); setMsg("bad", err.message); }
+};
+/* 备份导入：本地先校验能不能解析，再交接口校验结构+去重 */
+document.getElementById("btnImport").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=(e)=>{
+  const f=e.target.files[0]; e.target.value="";
+  if(!f) return;
+  const bakMsg=document.getElementById("bakMsg");
+  const setMsg=(cls,txt)=>{bakMsg.className="formMsg"+(cls?" "+cls+" on":""); bakMsg.textContent=txt;};
+  const rd=new FileReader();
+  rd.onload=async ()=>{
+    let payload;
+    try{ payload=JSON.parse(rd.result); }
+    catch(ex){ setMsg("bad","这不是合法的 JSON 文件——已拒绝，什么都没动"); return; }
+    try{
+      const r=await api("importAll",{token:WHO.token, payload});
+      LIST.dirty=true; LIST.page=0;
+      setMsg("ok","导入完成：新增 "+r.data.imported+" 条，重复跳过 "+r.data.skipped+" 条");
+      toast("备份已导入");
+    }catch(err){ handleAuthError(err); setMsg("bad", err.message); }
+  };
+  rd.readAsText(f);
+};
+
+/* ---------- 内容管理列表（复选+全选+批量删除） ---------- */
+let ADMIN_ITEMS=[];
+async function renderAdminList(){
+  const box=document.getElementById("adminList");
+  try{
+    const r=await api("listItems",{page:1, pageSize:20});
+    ADMIN_ITEMS=r.data.list;   /* 管理列表按 id 升序展示，与用户列表顺序区分 */
+    ADMIN_ITEMS.sort((a,b)=>a.id-b.id);
+    if(!ADMIN_ITEMS.length){
+      box.innerHTML='<div class="row" style="font-size:var(--fs-sub);color:var(--ink-3);padding:10px 0">库里没有内容</div>';
+      syncBatchBtn(); return;
+    }
+    box.innerHTML="";
+    /* 全选行 */
+    const all=document.createElement("div"); all.className="mrow";
+    all.innerHTML='<input type="checkbox" id="chkAll"><span class="ttl2" style="font-weight:600">全选（本页 '+ADMIN_ITEMS.length+' 条 / 共 '+r.data.total+' 条）</span>';
+    box.appendChild(all);
+    ADMIN_ITEMS.forEach(it=>{
+      const row=document.createElement("div"); row.className="mrow";
+      const d=new Date(it.createdAt);
+      row.innerHTML='<input type="checkbox" class="chk" data-id="'+it.id+'">'
+        +'<span class="ttl2"></span><span class="cnt"></span>';
+      row.querySelector(".ttl2").textContent="#"+it.id+"《"+it.title+"》"+(it.image?"[图]":"");
+      row.querySelector(".cnt").textContent=(d.getMonth()+1)+"-"+d.getDate()+" "+it.authorName;
+      box.appendChild(row);
+    });
+    document.getElementById("chkAll").onchange=(e)=>{
+      document.querySelectorAll("#adminList .chk").forEach(c=>c.checked=e.target.checked);
+      syncBatchBtn();
+    };
+    box.querySelectorAll(".chk").forEach(c=>c.onchange=syncBatchBtn);
+    syncBatchBtn();
+  }catch(err){ handleAuthError(err); }
+}
+function pickedIds(){
+  return Array.from(document.querySelectorAll("#adminList .chk"))
+    .filter(c=>c.checked).map(c=>c.getAttribute("data-id")).map(Number);
+}
+function syncBatchBtn(){
+  const btn=document.getElementById("btnBatchDel"), n=pickedIds().length;
+  btn.disabled=n===0;
+  btn.textContent="删除所选（"+n+" 条）";
+}
+/* 批量删除：确认词弹层（高危操作绝不裸 confirm） */
+document.getElementById("btnBatchDel").onclick=()=>{
+  const n=pickedIds().length;
+  if(!n) return;
+  document.getElementById("confirmText").textContent="即将永久删除选中的 "+n+" 条内容（含附图），不可恢复。";
+  document.getElementById("confirmInput").value="";
+  const m=document.getElementById("confirmMsg"); m.className="formMsg"; m.textContent="";
+  document.getElementById("confirmSheet").classList.add("on");
+};
+document.getElementById("confirmCancel").onclick=()=>{
+  document.getElementById("confirmSheet").classList.remove("on");
+};
+document.getElementById("confirmGo").onclick=async ()=>{
+  if(document.getElementById("confirmInput").value.trim()!=="删除"){
+    const m=document.getElementById("confirmMsg");
+    m.className="formMsg bad on"; m.textContent="确认词不对——高危操作必须输入“删除”两个字";
+    return;
+  }
+  const ids=pickedIds();
+  const btn=document.getElementById("confirmGo");
+  btn.disabled=true; btn.textContent="删除中…";
+  try{
+    const r=await api("deleteItems",{token:WHO.token, ids});
+    document.getElementById("confirmSheet").classList.remove("on");
+    toast("已删除 "+r.data.deleted+" 条（已留痕）");
+    LIST.dirty=true; LIST.page=0;
+    renderAdminList(); renderOplog();
+  }catch(err){
+    handleAuthError(err);
+    const m=document.getElementById("confirmMsg");
+    m.className="formMsg bad on"; m.textContent=err.message;
+  }finally{
+    btn.disabled=false; btn.textContent="执行";
+  }
+};
+/* ---------- 操作留痕展示 ---------- */
+async function renderOplog(){
+  const box=document.getElementById("oplogBox");
+  try{
+    const r=await api("getLogs",{token:WHO.token});
+    if(!r.data.list.length){
+      box.innerHTML='<div class="row">暂无操作记录</div>'; return;
+    }
+    box.innerHTML="";
+    r.data.list.forEach(x=>{
+      const d=new Date(x.t);
+      const row=document.createElement("div"); row.className="row";
+      const p=n=>(n<10?"0":"")+n;
+      row.innerHTML='<span class="t"></span><b></b> <span></span>';
+      row.querySelector(".t").textContent=(d.getMonth()+1)+"-"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());
+      row.querySelector("b").textContent=x.who+" "+x.action;
+      row.querySelector("span:last-child").textContent=x.detail;
+      box.appendChild(row);
+    });
+  }catch(err){ handleAuthError(err); }
+}
+
+/* ================================================================
+   阶段4：上传后台（图片压缩+进度 / 批量删除二次确认 / 操作留痕）
+   规矩：
+   · 压缩在前端做（canvas 长边1080/JPEG80%），原图不动只压副本
+   · 进度条只动 width（唯一豁免"禁 width 动画"：状态指示非布局动画）
+   · 压缩/提交失败保留现场，重试不丢已填内容
+   · 批量删除必须输入确认词"删除"，绝不裸 confirm()
+   · 写操作全部后端留痕，管理员可查
+   ================================================================ */
+const ATTACH={data:null, origW:0, origH:0, origKB:0, doneKB:0};
+
+/* 进度条：setPct(0-100, fail?) */
+function setPct(p, isFail){
+  const bar=document.getElementById("upbar"), inner=document.getElementById("upbarIn");
+  bar.classList.add("on"); bar.classList.toggle("fail", !!isFail);
+  inner.style.width=p+"%";
+}
+function attachReset(){
+  ATTACH.data=null;
+  const box=document.getElementById("attachBox");
+  box.innerHTML='<input type="file" id="attachFile" accept="image/*" style="display:none">'
+    +'<span id="attachHint">📷 点这里选图<br><span style="font-size:var(--fs-mini);color:var(--ink-3)">长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>';
+  document.getElementById("upbar").classList.remove("on","fail");
+  document.getElementById("upbarIn").style.width="0%";
+  bindAttachFile();
+}
+function bindAttachFile(){
+  document.getElementById("attachFile").onchange=(e)=>{
+    const f=e.target.files[0]; e.target.value="";
+    if(!f) return;
+    if(!/^image\//.test(f.type)){ toast("选的不是图片文件"); return; }
+    ATTACH.origKB=Math.round(f.size/1024);
+    setPct(12);
+    const rd=new FileReader();
+    rd.onerror=()=>{ setPct(0,true); toast("读文件失败，换个图再试"); };
+    rd.onload=()=>{
+      setPct(32);
+      const img=new Image();
+      img.onerror=()=>{ setPct(0,true); toast("这张图解码失败——文件可能损坏，现场已保留可换图"); };
+      img.onload=()=>{
+        setPct(60);
+        ATTACH.origW=img.naturalWidth; ATTACH.origH=img.naturalHeight;
+        try{
+          const MAX=1080;                          /* 长边上限 */
+          const scale=Math.min(1, MAX/Math.max(img.naturalWidth, img.naturalHeight));
+          const w=Math.round(img.naturalWidth*scale), h=Math.round(img.naturalHeight*scale);
+          const cv=document.createElement("canvas");
+          cv.width=w; cv.height=h;
+          cv.getContext("2d").drawImage(img, 0, 0, w, h);
+          const data=cv.toDataURL("image/jpeg", 0.8);
+          ATTACH.data=data;
+          ATTACH.doneKB=Math.round(data.length*3/4/1024); /* base64 还原字节数 */
+          setPct(100);
+          /* 展示压缩结果（证据式：原图多大→压成多大） */
+          const box=document.getElementById("attachBox");
+          box.innerHTML='<img src="'+data+'"><div class="info">'
+            +ATTACH.origW+'×'+ATTACH.origH+' ('+ATTACH.origKB+'KB) → '
+            +w+'×'+h+' ('+ATTACH.doneKB+'KB)</div>'
+            +'<span class="rm" id="attachRm">✕ 移除附图</span>';
+          document.getElementById("attachRm").onclick=attachReset;
+          if(ATTACH.doneKB>300){ toast("压完仍超 300KB，提交会被拒——建议换图"); }
+        }catch(ex){
+          setPct(0,true); toast("压缩过程出错——现场已保留可换图");
+          window.__errLogAdd && window.__errLogAdd("图片压缩失败: "+(ex.message||ex));
+        }
+      };
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(f);
+  };
+}
+document.getElementById("attachBox").onclick=(e)=>{
+  if(e.target.id==="attachRm") return;
+  document.getElementById("attachFile").click();
+};
+bindAttachFile();
+
+/* ---------- 启动恢复：localStorage 有 WHO 且 token 仍有效才恢复 ---------- */
+(function restoreWHO(){
+  const a=loadJSON(AUTH_KEY,null);
+  if(a && a.token && a.who && loadJSON(TOKENS_KEY,{}).hasOwnProperty(a.token)){
+    WHO.token=a.token; WHO.who=a.who; WHO.isAdmin=!!a.who.isAdmin;
+  }else if(a){ localStorage.removeItem(AUTH_KEY); }
+})();
+
+/* ================================================================
+   二、启动自检：所有 data-goto 入口必须在路由表登记（固化"入口对不上"坑）
+   ================================================================ */
+(function routeAudit(){
+  const bad = [];
+  document.querySelectorAll("[data-goto]").forEach(el=>{
+    const id = el.getAttribute("data-goto");
+    if(!ROUTES[id]) bad.push(id);
+  });
+  Object.keys(ROUTES).filter(k=>ROUTES[k].tab).forEach(k=>{
+    if(!document.querySelector(`[data-goto="${k}"]`)) bad.push("tab缺失:"+k);
+  });
+  if(bad.length){
+    window.__errLogAdd && window.__errLogAdd("路由自检失败: " + bad.join(", "));
+    console.error("[路由表自检] 未登记入口:", bad);
+  }
+})();
+
+/* ================================================================
+   三、切场引擎：200ms 退场 → 切换 → 入场级联；ENTER_SEEN 幂等防重复播
+   ================================================================ */
+const ENTER_SEEN = {}; /* 每个视图只播一次入场动画，回到已看过的页面不重复播 */
+let current = "home";
+function goto(id){
+  if(!ROUTES[id]){ window.__errLogAdd && window.__errLogAdd("goto未登记页面: "+id); return; }
+  if(id === current) return;
+  const cur = document.getElementById("v-"+current);
+  const nxt = document.getElementById("v-"+id);
+  if(!cur || !nxt) return;
+  /* 权限门：needAuth 未登录 → 弹登录层并记住要去的页（不白屏不 alert）；
+     needAdmin 但非管理员 → 照常进入视图，视图内显示 403 引导态（403 不清登录态） */
+  if(ROUTES[id].needAuth && !WHO.token){
+    openAuth("login", id); return;
+  }
+  cur.classList.add("leaving");
+  setTimeout(()=>{
+    cur.classList.remove("on","leaving");
+    nxt.classList.add("on");
+    current = id;
+    document.getElementById("topTitle").textContent = ROUTES[id].title;
+    document.querySelectorAll(".tabbar .tab").forEach(t=>
+      t.classList.toggle("on", t.getAttribute("data-goto")===id));
+    renderView(id);
+    if(!ENTER_SEEN[id]){            /* 幂等：只播一次 */
+      ENTER_SEEN[id] = true;
+      nxt.classList.add("entering");
+      setTimeout(()=>nxt.classList.remove("entering"), 650);
+    }
+  }, 200);                          /* 退场 200ms，与 CSS transition 对齐 */
+}
+/* 所有 data-goto 入口统一走引擎（不许再有第二套跳转写法） */
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-goto]");
+  if(el) goto(el.getAttribute("data-goto"));
+});
+/* 启动收尾：按恢复出的身份渲染入口与各视图（放在这里是因为依赖 current 等初始化） */
+applyIdentity();
+</script>
+
+<script data-page-node-id="SUmsXQ9vSugGbHjVkf7K2j" data-pnid-children="tswKKl135ecnrb9aKPLARH">
+/* ================================================================
+   红点：捕获 JS 错误 → localStorage 持久 → 角落徽标（勿删，保持最后一个 script）
+   ================================================================ */
+(function(){
+  var KEY='lt_errlog_v1', MAX=50;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+  function fmt(ts){var d=new Date(ts);function p(x){return(x<10?'0':'')+x}
+    return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function add(msg){var a=load();a.push({t:Date.now(),m:String(msg).slice(0,300)});
+    try{localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX)))}catch(e){} render()}
+  window.__errLogAdd=add;
+  window.addEventListener('error',function(e){
+    add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''))},true);
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'))});
+  function render(){
+    var a=load(),n=a.length,dot=document.getElementById('errDot');
+    if(!n){if(dot){dot.style.display='none'}return}
+    if(!dot){
+      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      dot.onclick=function(){
+        var p=document.getElementById('errPanel');
+        if(p.style.display==='block'){p.style.display='none';return}
+        var b='';a.forEach(function(x){
+          b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
+        p.innerHTML='<h4>&#9888; 页面出过错（'+n+' 条）</h4>'
+          +'<div class="hint">打开以来捕获的脚本错误记录。把带时间的几行截图发给制作方定位修复；看完了可清除。</div>'
+          +b+'<button class="clr">清除全部</button>';
+        p.style.display='block';
+        p.querySelector('.clr').onclick=function(){
+          localStorage.removeItem(KEY);p.style.display='none';render()};
+      };
+      document.body.appendChild(dot);
+      var pnl=document.createElement('div');pnl.id='errPanel';pnl.style.display='none';
+      document.body.appendChild(pnl);
+    }
+    dot.style.display='flex';
+    dot.querySelector('.n').textContent=(n>9?'9+':n);
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render)}else{render()}
+})();
+</script>
+</body>
+</html>

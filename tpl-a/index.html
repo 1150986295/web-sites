@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>模板A·单页站骨架</title>
+<meta name="description" content="改这里：一句话介绍，微信转发时会显示">
+<!-- 分享卡片：换 assets/share.png（300x300）+ 上面 title/description 即可 -->
+<style>
+/* ========== 一、设计令牌（改这里换肤，全站生效） ========== */
+:root{
+  /* 颜色：主色/强调色/底色 三处是复制新站必改的 */
+  --paper:#EAE6DC;          /* 底色·宣纸 */
+  --card:#FFFFFF;           /* 卡片底 */
+  --ink:#2E2A24;            /* 文字一级 */
+  --ink-2:rgba(46,42,36,.75); /* 文字二级 */
+  --ink-3:rgba(46,42,36,.55); /* 文字三级（时间、来源） */
+  --primary:#4A6B57;        /* 主色·青墨绿 */
+  --accent:#B03A2E;         /* 强调色·朱砂（全站唯一，只给主操作） */
+  --line:#C9C2B0;           /* 分隔线 */
+  /* 字号五档：正文不许低于 16px */
+  --fs-hero:26px; --fs-h1:20px; --fs-body:16px; --fs-sub:14px; --fs-mini:13px;
+  /* 间距四档 / 圆角两档 / 阴影两档（新拟态：双向对打） */
+  --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
+  --r-s:10px; --r-l:16px;
+  --sh-out:2px 2px 6px rgba(201,194,176,.55), -2px -2px 6px rgba(255,255,255,.85);
+  --sh-in:inset 1px 1px 3px rgba(201,194,176,.5), inset -1px -1px 3px rgba(255,255,255,.75);
+}
+/* 弱光模式：系统深色偏好 → 令牌整体换肤（与模板B同一套深色令牌，保持两模板同标准） */
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#26241F; --card:#32302A;
+    --ink:#EAE6DC; --ink-2:rgba(234,230,220,.78); --ink-3:rgba(234,230,220,.55);
+    --primary:#8FB49C; --accent:#D98878; --line:#54513F;
+    --sh-out:2px 2px 6px rgba(0,0,0,.45), -2px -2px 6px rgba(255,255,255,.04);
+    --sh-in:inset 1px 1px 3px rgba(0,0,0,.4), inset -1px -1px 3px rgba(255,255,255,.05);
+  }
+}
+/* 无障碍：用户开了"减弱动态效果"→过场动画归零（与模板B同规矩） */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important}
+}
+/* ========== 二、基础（移动端四条硬规矩在此落地） ========== */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-size:var(--fs-body); line-height:1.75;
+  font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+  touch-action:pan-y; /* 硬规矩④：不许 none，否则列表滑不动 */
+  padding-bottom:84px} /* 给底部固定行动按钮留位 */
+img{max-width:100%; display:block}
+h1,h2,h3{margin:0}
+p{margin:0 0 var(--sp-2)}
+button{font-family:inherit; cursor:pointer; border:0}
+/* 英文整词换行（禁止单词被劈成两半） */
+.en-word{display:inline-block; white-space:nowrap}
+/* ========== 三、五区块布局 ========== */
+.wrap{max-width:640px; margin:0 auto; padding:0 var(--sp-2)}
+/* 头部 */
+.hd{padding:calc(var(--sp-4) + env(safe-area-inset-top)) var(--sp-2) var(--sp-3); text-align:center}
+.hd .ttl{font-size:var(--fs-hero); font-weight:700; letter-spacing:.04em}
+.hd .sub{font-size:var(--fs-sub); color:var(--ink-2); margin-top:var(--sp-1)}
+.hd .qr-slot{margin:var(--sp-3) auto 0; width:120px; height:120px; border-radius:var(--r-s);
+  background:var(--card); box-shadow:var(--sh-in); display:flex; align-items:center; justify-content:center;
+  font-size:var(--fs-mini); color:var(--ink-3)}
+/* 主视觉：先底色渐变，图加载失败有占位 */
+.hero{margin:0 var(--sp-2); border-radius:var(--r-l); overflow:hidden;
+  background:linear-gradient(135deg,#E4DFD2,#D8D2C0); min-height:200px; position:relative}
+.hero img{width:100%; height:auto; opacity:0; transition:opacity .4s}
+.hero img.on{opacity:1}
+.hero .ph{position:absolute; inset:0; display:flex; flex-direction:column; gap:var(--sp-1);
+  align-items:center; justify-content:center; color:var(--ink-3); font-size:var(--fs-sub);
+  background:var(--paper)}
+/* 信息区 */
+.sec{margin:var(--sp-4) var(--sp-2) 0; background:var(--card); border-radius:var(--r-l);
+  box-shadow:var(--sh-out); padding:var(--sp-3)}
+.sec h2{font-size:var(--fs-h1); margin-bottom:var(--sp-2)}
+.meta{display:flex; flex-wrap:wrap; gap:var(--sp-1) var(--sp-3); font-size:var(--fs-sub); color:var(--ink-2)}
+/* 三态演示区（复制新站时整块替换为真实内容） */
+.demo{margin:var(--sp-4) var(--sp-2) 0}
+.demo .cap{font-size:var(--fs-mini); color:var(--ink-3); margin-bottom:var(--sp-1)}
+.st{background:var(--card); border-radius:var(--r-s); box-shadow:var(--sh-out); padding:var(--sp-2); margin-bottom:var(--sp-2)}
+/* 加载态：骨架屏 */
+.sk{height:14px; border-radius:7px; background:linear-gradient(90deg,#DDD7C8 25%,#EFEAE0 50%,#DDD7C8 75%);
+  background-size:200% 100%; animation:sk 1.2s infinite}
+@keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+.sk+.sk{margin-top:10px; width:72%}
+/* 空态 */
+.empty{display:flex; flex-direction:column; align-items:center; gap:var(--sp-1); padding:var(--sp-2)}
+.empty .go{margin-top:var(--sp-1); padding:9px 22px; border-radius:999px; color:var(--primary);
+  background:rgba(74,107,87,.12); font-size:var(--fs-sub); font-weight:600}
+/* 错误态：三段式 */
+.err{padding:var(--sp-2); border-left:3px solid var(--accent); background:rgba(176,58,46,.08); border-radius:var(--r-s)}
+.err b{color:var(--accent); font-size:var(--fs-sub)}
+.err p{font-size:var(--fs-sub); color:var(--ink-2); margin:var(--sp-1) 0}
+.err .retry{padding:8px 20px; border-radius:999px; background:var(--accent); color:#fff; font-size:var(--fs-sub)}
+/* 页脚 */
+.ft{margin:var(--sp-4) var(--sp-2) 0; padding:var(--sp-2) 0 var(--sp-3); text-align:center;
+  font-size:var(--fs-mini); color:var(--ink-3); border-top:1px solid var(--line)}
+/* 底部固定行动按钮：全站唯一强调色、唯一主操作 */
+.act-bar{position:fixed; left:0; right:0; bottom:0; z-index:900;
+  padding:calc(var(--sp-2)) var(--sp-2) calc(var(--sp-2) + env(safe-area-inset-bottom));
+  background:linear-gradient(to top, var(--paper) 78%, rgba(234,230,220,0))}
+#actMain{display:block; width:100%; max-width:608px; margin:0 auto; padding:14px;
+  border-radius:14px; background:var(--accent); color:#fff; font-size:var(--fs-body); font-weight:600;
+  box-shadow:0 3px 12px rgba(176,58,46,.35); letter-spacing:.06em}
+/* 演示用按钮（复制新站时删除） */
+.demo .trigger{padding:8px 18px; border-radius:999px; background:var(--paper); color:var(--ink-2);
+  box-shadow:var(--sh-out); font-size:var(--fs-mini)}
+/* ========== 四、红点（内置能力，勿删） ========== */
+#errDot{position:fixed;right:16px;bottom:96px;z-index:9990;width:44px;height:44px;border-radius:50%;
+  background:var(--accent);color:#FFFFFF;display:none;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(46,42,36,.35);
+  border:2px solid rgba(255,255,255,.7)}
+#errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
+  background:var(--accent);border:1.5px solid var(--paper);color:#FFFFFF;font-size:11px;line-height:16px;
+  text-align:center;padding:0 3px;box-sizing:border-box}
+#errPanel{position:fixed;left:12px;right:12px;bottom:154px;z-index:9991;max-height:60vh;overflow:auto;
+  display:none;background:var(--card);border-radius:14px;padding:14px 16px;
+  box-shadow:0 2px 12px rgba(201,194,176,.5); font-size:var(--fs-sub);color:var(--ink);line-height:1.7}
+#errPanel h4{margin:0 0 6px;font-size:15px;font-weight:600}
+#errPanel .hint{font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+#errPanel .row{padding:6px 0;border-bottom:1px solid rgba(201,194,176,.4);overflow-wrap:break-word}
+#errPanel .row .t{font-size:11.5px;color:var(--ink-3)}
+#errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;
+  background:var(--accent);color:#FFFFFF;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- ① 头部 -->
+<header class="hd">
+  <h1 class="ttl">改成你的活动标题</h1>
+  <p class="sub">一句话副标题 · 一句话副标题</p>
+  <div class="qr-slot">放二维码<br>120×120</div>
+</header>
+
+<!-- ② 主视觉 -->
+<div class="hero">
+  <div class="ph" id="heroPh">主图位：assets/hero.jpg<br>（加载失败时显示这个占位）</div>
+  <img id="heroImg" src="assets/hero.jpg" alt="主视觉图" decoding="async">
+</div>
+
+<!-- ③ 信息区 -->
+<section class="sec">
+  <h2>活动信息</h2>
+  <div class="meta">
+    <span>📅 改：日期时间</span>
+    <span>📍 改：地点</span>
+    <span>👤 改：主办方</span>
+  </div>
+  <p style="margin-top:var(--sp-2)">改：活动介绍正文。正文 16px、行高 1.75，不许再调小。长英文单词用
+    <span class="en-word">announcement</span> 这样包起来，整词换行不被劈开。</p>
+</section>
+
+<!-- 三态演示区（能力内置演示；复制新站时整块删掉换成真内容） -->
+<div class="demo">
+  <div class="cap">↓ 内置三态演示 · 复制新站时删除本区块</div>
+  <div class="st" aria-label="加载态演示">
+    <div class="sk"></div><div class="sk"></div>
+  </div>
+  <div class="st empty" aria-label="空态演示">
+    <span>这里该有报名名单，还没人报名</span>
+    <button class="go" onclick="alert('空态的下一步按钮')">去邀请第一位</button>
+  </div>
+  <div class="st err" aria-label="错误态演示">
+    <b>图片加载失败</b>
+    <p>发生了什么：主视觉图没加载出来。<br>为什么：当前无图或网络断开。<br>怎么办：点下方重试，或检查 assets/hero.jpg 是否存在。</p>
+    <button class="retry" onclick="document.getElementById('heroImg').src='assets/hero.jpg?'+Date.now()">重试</button>
+  </div>
+  <div class="st" style="text-align:center">
+    <button class="trigger" id="demoErr">点我演示：触发一次红点记录</button>
+  </div>
+</div>
+
+<!-- ⑤ 页脚 -->
+<footer class="ft">
+  改：主办方 · 联系方式<br>骨架模板A · 换文案换图即可上线
+</footer>
+
+<!-- ④ 行动区：底部固定，唯一主操作 -->
+<div class="act-bar">
+  <button id="actMain">改：报名 / 加微信 / 导航（唯一主操作）</button>
+</div>
+
+<script>
+/* 主视觉图：加载成功淡入、失败显示占位 */
+(function(){
+  var img=document.getElementById('heroImg'), ph=document.getElementById('heroPh');
+  img.onload=function(){img.classList.add('on'); ph.style.display='none'};
+  img.onerror=function(){img.style.display='none'; ph.style.display='flex'};
+  if(img.complete && img.naturalWidth>0){img.onload()}
+  /* 演示按钮：故意抛一个错误给红点记录 */
+  document.getElementById('demoErr').onclick=function(){
+    window.__errLogAdd && window.__errLogAdd('演示错误：这是模板A内置的记录测试');
+  };
+  /* 主操作按钮：复制新站时换成真实跳转 */
+  document.getElementById('actMain').onclick=function(){
+    alert('主操作按钮：改成跳转（报名链接 / 微信号 / 地图）');
+  };
+})();
+</script>
+
+<script>
+/* 前端错误红点：内置能力，勿删。捕获脚本错误 → localStorage 持久 → 角落红点，自己打开就看得见 */
+(function(){
+  var KEY='tplA_errlog_v1', MAX=50;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+  function fmt(ts){var d=new Date(ts);function p(x){return(x<10?'0':'')+x}
+    return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function add(msg){var a=load();a.push({t:Date.now(),m:String(msg).slice(0,300)});
+    try{localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX)))}catch(e){} render()}
+  window.__errLogAdd=add; /* 供演示/测试用 */
+  window.addEventListener('error',function(e){
+    add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''))},true);
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'))});
+  function render(){
+    var a=load(),n=a.length,dot=document.getElementById('errDot');
+    if(!n){if(dot){dot.style.display='none'}return}
+    if(!dot){
+      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      dot.onclick=function(){
+        var p=document.getElementById('errPanel');
+        if(p.style.display==='block'){p.style.display='none';return}
+        var b='';a.forEach(function(x){
+          b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
+        p.innerHTML='<h4>&#9888; 页面出过错（'+n+' 条）</h4>'
+          +'<div class="hint">打开以来捕获的脚本错误记录。出现红点说明某次运行中有代码出错。'
+          +'把带时间的几行截图发给制作方定位修复；看完了可清除。</div>'
+          +b+'<button class="clr">清除全部</button>';
+        p.style.display='block';
+        p.querySelector('.clr').onclick=function(){
+          localStorage.removeItem(KEY);p.style.display='none';render()};
+      };
+      document.body.appendChild(dot);
+      var pnl=document.createElement('div');pnl.id='errPanel';pnl.style.display='none';
+      document.body.appendChild(pnl);
+    }
+    dot.style.display='flex';
+    dot.querySelector('.n').textContent=(n>9?'9+':n);
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render)}else{render()}
+})();
+</script>
+</body>
+</html>

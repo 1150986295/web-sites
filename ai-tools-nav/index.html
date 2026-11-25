@@ -143,7 +143,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 }
 .grid.switching{opacity:0; transform:translateY(6px)}
 .card{position:relative; display:flex; flex-direction:column; gap:var(--sp-2);
-  padding:clamp(18px,2.4vw,24px); overflow:hidden;
+  padding:clamp(18px,2.4vw,24px); overflow:hidden; color:inherit; text-decoration:none;
   border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--sh-1);
   background:linear-gradient(155deg, rgba(255,255,255,.10), rgba(255,255,255,.032) 62%, rgba(255,255,255,.058));
   -webkit-backdrop-filter:blur(18px) saturate(130%); backdrop-filter:blur(18px) saturate(130%);
@@ -165,6 +165,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   letter-spacing:.04em; color:var(--cat); background:var(--cat-soft); border:1px solid var(--cat-line)}
 .card h3{font-size:var(--fs-h1); line-height:1.3; font-weight:650; letter-spacing:.01em}
 .card p{font-size:var(--fs-body); line-height:1.72; color:var(--ink-2)}
+.visit{display:inline-flex; align-items:center; gap:6px; margin-top:auto; padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.08); color:var(--cat);
+  font-size:var(--fs-mini); font-weight:600; letter-spacing:.03em}
+.visit svg{width:14px; height:14px; transition:transform .24s cubic-bezier(.2,.7,.2,1)}
+.card:hover .visit svg, .card:focus-visible .visit svg{transform:translate(2px,-2px)}
 .cat-writing{--cat:var(--c-writing); --cat-soft:var(--c-writing-soft); --cat-line:var(--c-writing-line)}
 .cat-image{--cat:var(--c-image); --cat-soft:var(--c-image-soft); --cat-line:var(--c-image-line)}
 .cat-code{--cat:var(--c-code); --cat-soft:var(--c-code-soft); --cat-line:var(--c-code-line)}
@@ -254,11 +259,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   <header class="hd">
     <p class="kicker"><i></i>TOOL ATLAS · OFFLINE READY</p>
     <h1>AI <span>工具导航</span></h1>
-    <p class="lede">写作、绘图、编程、办公——把真正用得上的工具，收进一页。搜名字，或按分类看。</p>
+    <p class="lede">写作、绘图、编程、办公——好用的工具收进一页。搜名字、点卡片，直达官网。</p>
     <div class="stats">
       <span><b>9</b> 个工具</span>
       <span><b>4</b> 个分类</span>
-      <span><b>0</b> 外部依赖</span>
+      <span><b>9</b> 个直达入口</span>
     </div>
   </header>
 
@@ -331,8 +336,8 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   </section>
 
   <footer class="ft">
-    本站为纯前端单文件索引，不含登录、推广与任何外部请求，断网也能打开。<br>
-    工具简介为人工整理，仅供检索参考；具体功能、收费与隐私条款以各产品官网为准。
+    本站为纯前端单文件索引，不含登录与推广；页面本身无外部请求，断网也能浏览。<br>
+    点击卡片会在新窗口打开对应工具官网，具体功能、收费与隐私条款以官网为准。
   </footer>
 </main>
 
@@ -345,23 +350,23 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   var ROUTES = {all:'全部', writing:'写作', image:'绘图', code:'编程', office:'办公'};
 
   var TOOLS = [
-    {name:'Notion AI', cat:'writing', keys:'notion ai 笔记 文档 写作', icon:'doc',
+    {name:'Notion AI', cat:'writing', keys:'notion ai 笔记 文档 写作', icon:'doc', url:'https://www.notion.so/product/ai',
      desc:'在笔记里改写、总结、起稿，资料和思路放在一处。'},
-    {name:'秘塔写作猫', cat:'writing', keys:'秘塔 写作猫 中文 校对 润色', icon:'pen',
+    {name:'秘塔写作猫', cat:'writing', keys:'秘塔 写作猫 中文 校对 润色', icon:'pen', url:'https://xiezuocat.com/',
      desc:'中文错别字、语病和措辞检查，改稿快一步。'},
-    {name:'DeepL Write', cat:'writing', keys:'deepl write 英文 改写 翻译', icon:'globe',
+    {name:'DeepL Write', cat:'writing', keys:'deepl write 英文 改写 翻译', icon:'globe', url:'https://www.deepl.com/write',
      desc:'英文句子改写与语气调整，邮件和论文都能用。'},
-    {name:'Midjourney', cat:'image', keys:'midjourney mj 绘图 出图 插画', icon:'image',
+    {name:'Midjourney', cat:'image', keys:'midjourney mj 绘图 出图 插画', icon:'image', url:'https://www.midjourney.com/',
      desc:'一句提示词出图，风格化视觉与概念图首选。'},
-    {name:'Stable Diffusion', cat:'image', keys:'stable diffusion sd 开源 绘图 本地', icon:'layers',
+    {name:'Stable Diffusion', cat:'image', keys:'stable diffusion sd 开源 绘图 本地', icon:'layers', url:'https://stability.ai/',
      desc:'开源绘图模型，本地部署，参数与风格全在手。'},
-    {name:'Cursor', cat:'code', keys:'cursor 编辑器 编程 补全 重构', icon:'cursor',
+    {name:'Cursor', cat:'code', keys:'cursor 编辑器 编程 补全 重构', icon:'cursor', url:'https://cursor.com/',
      desc:'把 AI 放进编辑器，整段改写、补全与解释代码。'},
-    {name:'GitHub Copilot', cat:'code', keys:'copilot github 编程 ide 补全', icon:'code',
+    {name:'GitHub Copilot', cat:'code', keys:'copilot github 编程 ide 补全', icon:'code', url:'https://github.com/features/copilot',
      desc:'在 IDE 里边写边补全，测试和注释也能生成。'},
-    {name:'WPS AI', cat:'office', keys:'wps ai 办公 文档 表格 演示', icon:'grid',
+    {name:'WPS AI', cat:'office', keys:'wps ai 办公 文档 表格 演示', icon:'grid', url:'https://ai.wps.cn/',
      desc:'文档、表格、演示里的中文助手，起草与整理。'},
-    {name:'讯飞听见', cat:'office', keys:'讯飞 听见 iflytek 录音 转写 纪要', icon:'wave',
+    {name:'讯飞听见', cat:'office', keys:'讯飞 听见 iflytek 录音 转写 纪要', icon:'wave', url:'https://www.iflyrec.com/',
      desc:'录音转文字，会议结束就有可改的纪要底稿。'}
   ];
 
@@ -422,12 +427,17 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     });
   }
   function cardHTML(t,i){
-    return '<article class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '" style="--i:' + i + '">'
+    return '<a class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '"'
+      + ' href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"'
+      + ' aria-label="打开 ' + esc(t.name) + ' 官网（新窗口）" style="--i:' + i + '">'
       + '<div class="card-top"><span class="icon" aria-hidden="true">' + svg(ICONS[t.icon]) + '</span>'
       + '<span class="tag">' + ROUTES[t.cat] + '</span></div>'
       + '<h3>' + esc(t.name) + '</h3>'
       + '<p>' + esc(t.desc) + '</p>'
-      + '</article>';
+      + '<span class="visit">访问官网 '
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + '<path d="M7 17 17 7"></path><path d="M9.5 7H17v7.5"></path></svg>'
+      + '</span></a>';
   }
 
   function render(animate){

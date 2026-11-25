@@ -19,65 +19,83 @@
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
   line-height:1.75;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.wrap{max-width:520px;width:100%;padding:36px 22px}
+.wrap{max-width:560px;width:100%;padding:36px 22px}
 h1{font-size:22px;margin:0 0 4px;letter-spacing:1px}
 .sub{font-size:13px;color:var(--sub);margin-bottom:26px}
 .card{display:block;text-decoration:none;color:inherit;background:var(--card);
-  border-radius:18px;padding:18px 20px;margin-bottom:16px;
+  border-radius:18px;padding:14px 14px 16px;margin-bottom:16px;
   box-shadow:6px 6px 14px var(--shadow-dk),-6px -6px 14px var(--shadow-lt);
   transition:transform .15s}
 .card:active{transform:scale(.98)}
-.card-hd{display:flex;align-items:center;gap:10px}
+.cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top center;
+  border-radius:12px;margin-bottom:12px;background:rgba(138,130,116,.12)}
+.card-hd{display:flex;align-items:center;gap:10px;padding:0 6px}
 .seal{width:34px;height:34px;border-radius:8px;background:var(--zhu);color:#fff;
   display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex:none}
 .t{font-size:16px;font-weight:800}
 .go{margin-left:auto;color:var(--zhu);font-weight:800;font-size:13px;white-space:nowrap}
-.d{font-size:12.5px;color:var(--sub);margin-top:6px}
-.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.d{font-size:12.5px;color:var(--sub);margin-top:6px;padding:0 6px}
+.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;padding:0 6px}
 .tag{font-size:10.5px;color:var(--sub);background:rgba(138,130,116,.1);padding:2px 9px;border-radius:999px}
 footer{margin-top:24px;font-size:11px;color:var(--sub);text-align:center}
+/* 桌面端：双列网格截图墙 */
+@media (min-width: 768px){
+  body{align-items:flex-start;padding-top:48px}
+  .wrap{max-width:1040px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{margin-bottom:0}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>作品集</h1>
-  <div class="sub">纯静态小站 · 全部源码开源在 GitHub</div>
+  <div class="sub">纯静态小站 · 全部源码开源在 GitHub · 点击卡片直达</div>
 
+  <div class="grid">
   <a class="card" href="https://1150986295.github.io/zsb-study/">
+    <img class="cover" src="./screenshots/zsb-study.jpg" alt="专升本每日修炼截图" loading="lazy">
     <div class="card-hd"><span class="seal">修</span><span class="t">专升本每日修炼</span><span class="go">进入 ›</span></div>
     <div class="d">830题刷题站 · 记忆曲线 · 番茄钟 · 深色纸墨模式 · 备份导出导入</div>
     <div class="tags"><span class="tag">多页应用</span><span class="tag">localStorage</span><span class="tag">KaTeX公式</span></div>
   </a>
 
   <a class="card" href="./lanting-xinyou/">
+    <img class="cover" src="./screenshots/lanting-xinyou.jpg" alt="兰亭招新截图" loading="lazy">
     <div class="card-hd"><span class="seal">蘭</span><span class="t">兰亭招新 · 演练站</span><span class="go">进入 ›</span></div>
     <div class="d">书画协会招新页 · SVG线性图标 · 暖墨深色 · 报名表单</div>
     <div class="tags"><span class="tag">单页站</span><span class="tag">视觉施工v2</span></div>
   </a>
 
   <a class="card" href="./jingmo/">
+    <img class="cover" src="./screenshots/jingmo.jpg" alt="竞墨赛事平台截图" loading="lazy">
     <div class="card-hd"><span class="seal">竞</span><span class="t">兰亭·竞墨 赛事平台</span><span class="go">进入 ›</span></div>
     <div class="d">书画协会赛事投稿与作品展示 · 投稿通道 · 作品画廊 · 报名系统</div>
     <div class="tags"><span class="tag">单页站</span><span class="tag">协会真实在用</span></div>
   </a>
 
   <a class="card" href="./ziliao-tpl/">
+    <img class="cover" src="./screenshots/ziliao-tpl.jpg" alt="资料仓库截图" loading="lazy">
     <div class="card-hd"><span class="seal">库</span><span class="t">网页模板资料仓库</span><span class="go">进入 ›</span></div>
     <div class="d">全部模板方案与规格书的移动导航 · 页内搜索 · 文档全文嵌入</div>
     <div class="tags"><span class="tag">文档站</span><span class="tag">资料导航</span></div>
   </a>
 
   <a class="card" href="./tpl-a/">
+    <img class="cover" src="./screenshots/tpl-a.jpg" alt="模板A截图" loading="lazy">
     <div class="card-hd"><span class="seal">A</span><span class="t">模板A · 单页站</span><span class="go">进入 ›</span></div>
     <div class="d">活动页通用模板 · 单文件+图片资源</div>
     <div class="tags"><span class="tag">模板</span><span class="tag">脱平台</span></div>
   </a>
 
   <a class="card" href="./tpl-b/">
+    <img class="cover" src="./screenshots/tpl-b.jpg" alt="模板B截图" loading="lazy">
     <div class="card-hd"><span class="seal">B</span><span class="t">模板B · 多页应用</span><span class="go">进入 ›</span></div>
     <div class="d">带登录系统的通用模板 · 模拟接口层 · 幂等提交 · 兜底测试</div>
     <div class="tags"><span class="tag">模板</span><span class="tag">身份系统</span></div>
   </a>
+
+  </div>
 
   <footer>2026-11-25 · GitHub Pages 托管 · 换平台随时可搬</footer>
 </div>

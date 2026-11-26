@@ -2574,8 +2574,10 @@ window.mountDemo = mountDemo;
       dot.onclick=function(){
         var p=document.getElementById('errPanel');
         if(p.style.display==='block'){ p.style.display='none'; return; }
-        var b=''; a.forEach(function(x){ b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'; });
-        p.innerHTML='<h4>⚠ 页面出过错（'+n+' 条）</h4><div class="hint">打开以来捕获的脚本错误。把带时间的几行截图发给制作方定位；看完可清除。</div>'+b+'<button class="clr">清除全部</button>';
+        /* 每次打开都重新读：闭包里那份是创建时的旧数组，会出现"徽标 2 条、面板 1 条" */
+        var cur=load(), cn=cur.length, b='';
+        cur.forEach(function(x){ b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'; });
+        p.innerHTML='<h4>⚠ 页面出过错（'+cn+' 条）</h4><div class="hint">打开以来捕获的脚本错误。把带时间的几行截图发给制作方定位；看完可清除。</div>'+b+'<button class="clr">清除全部</button>';
         p.style.display='block';
         p.querySelector('.clr').onclick=function(){ localStorage.removeItem(KEY); p.style.display='none'; render(); };
       };

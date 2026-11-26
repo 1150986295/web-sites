@@ -554,12 +554,17 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   var switches = document.getElementById('switches');
 
   function esc(s){
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
-  /* URL 协议白名单：纵深防御——即使数据被改成 javascript: 也不会执行 */
+  /* URL 协议白名单 + 规范化：纵深防御——即使数据被改成 javascript: 或塞引号也逃不出属性 */
   function safeUrl(u){
     var s = String(u || '').trim();
-    return /^https?:\/\/\S+$/i.test(s) ? s : '#';
+    if(!/^https?:\/\//i.test(s)) return '#';
+    try{
+      var url = new URL(s);
+      if(url.protocol !== 'http:' && url.protocol !== 'https:') return '#';
+      return url.href;          /* URL 规范化会把引号、尖括号等编码掉 */
+    }catch(e){ return '#'; }
   }
   function svg(inner){
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
@@ -631,7 +636,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     return '<div class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '" style="--i:' + i + '">'
       + '<button class="star" type="button" data-fav="' + esc(t.name) + '" aria-pressed="' + (fav ? 'true' : 'false') + '"'
       + ' aria-label="' + (fav ? '取消收藏 ' : '收藏 ') + esc(t.name) + '">' + STAR + '</button>'
-      + '<a class="card-hit" href="' + safeUrl(t.url) + '" target="_blank" rel="noopener noreferrer" data-rec="' + esc(t.name) + '">'
+      + '<a class="card-hit" href="' + esc(safeUrl(t.url)) + '" target="_blank" rel="noopener noreferrer" data-rec="' + esc(t.name) + '">'
       + '<div class="card-top"><span class="icon" aria-hidden="true">' + svg(ICONS[t.icon]) + '</span>'
       + '<span class="tag">' + ROUTES[t.cat] + '</span></div>'
       + '<h3>' + mark(t.name) + '</h3>'

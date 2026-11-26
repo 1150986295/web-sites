@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>模板B·多页应用骨架</title>
 <meta name="description" content="带后台系统的空骨架：路由表唯一来源+切场引擎+身份双键占位，复制后按阶段2/3提示词接身份与数据">
+<script>
+/* 站点命名空间（复制新站第一件事：改这里，所有 localStorage 键自动隔离）
+   同域名下放多个模板站时，不改它 = 共用一套账号/数据，互相污染 */
+window.__SITE__ = "tplB";
+</script>
 <style>
 /* ================================================================
    模板B · 多页应用骨架（阶段1：只做骨架，无业务）
@@ -17,11 +22,20 @@
 /* ---------- 一、设计令牌（改 3 色换肤，全站生效） ---------- */
 :root{
   --paper:#EAE6DC; --card:#FFFFFF;
-  --ink:#2E2A24; --ink-2:rgba(46,42,36,.75); --ink-3:rgba(46,42,36,.55);
+  --ink:#2E2A24; --ink-2:rgba(46,42,36,.75); --ink-3:rgba(46,42,36,.68); /* ink-3 实测 4.58:1，13px 也达标 */
   --primary:#4A6B57; --accent:#B03A2E; --line:#C9C2B0;
+  --primary-soft:rgba(74,107,87,.12); --primary-softer:rgba(74,107,87,.06);
+  --accent-soft:rgba(176,58,46,.08);
+  --line-soft:rgba(201,194,176,.4); --line-softer:rgba(201,194,176,.35);
+  --on-accent:#FFFFFF; --scrim:rgba(46,42,36,.45); --scrim-strong:rgba(46,42,36,.92);
+  --ring-light:rgba(255,255,255,.7);
+  --sh-accent:0 3px 12px rgba(176,58,46,.3);
+  --sh-float:0 2px 10px rgba(46,42,36,.35);
+  --sh-panel:0 2px 12px rgba(201,194,176,.5);
   --fs-hero:26px; --fs-h1:20px; --fs-body:16px; --fs-sub:14px; --fs-mini:13px;
   --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
   --r-s:10px; --r-l:16px;
+  /* 纸感拟物柔光：光固定从左上来，投影右下 + 高光左上成对出现（例外规则见 docs/06） */
   --sh-out:2px 2px 6px rgba(201,194,176,.55), -2px -2px 6px rgba(255,255,255,.85);
   --sh-in:inset 1px 1px 3px rgba(201,194,176,.5), inset -1px -1px 3px rgba(255,255,255,.75);
   --tab-h:56px; /* 底部 tab 高度：内容区/弹层高度计算必须引用它，不许手写死数 */
@@ -49,7 +63,11 @@ button{font-family:inherit; cursor:pointer; border:0}
 .tabbar .tab{min-height:44px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;  /* 无障碍：触控目标≥44px */
   gap:2px; font-size:var(--fs-mini); color:var(--ink-3); background:none}
 .tabbar .tab.on{color:var(--primary); font-weight:600}
-.tabbar .tab .ico{font-size:18px; line-height:1}
+.tabbar .tab .ico{font-size:18px; line-height:1; display:inline-flex}
+/* 图标统一：内联 SVG 描边，跟随文字色；emoji 在不同系统字形不一，禁用 */
+.ico svg,.mag svg,.big svg,.attach .cam svg{width:1em; height:1em; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:block}
+.big svg{width:34px; height:34px; stroke-width:1.5}
 /* ---------- 四、视图与路由（路由表是唯一来源） ---------- */
 .view{position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding:var(--sp-2); display:none}
@@ -77,10 +95,19 @@ button{font-family:inherit; cursor:pointer; border:0}
 @media (prefers-color-scheme: dark){
   :root{
     --paper:#26241F; --card:#32302A;
-    --ink:#EAE6DC; --ink-2:rgba(234,230,220,.78); --ink-3:rgba(234,230,220,.55);
+    --ink:#EAE6DC; --ink-2:rgba(234,230,220,.78); --ink-3:rgba(234,230,220,.62); /* 实测 5.67:1 */
     --primary:#8FB49C; --accent:#D98878; --line:#54513F;
-    --sh-out:2px 2px 6px rgba(0,0,0,.45), -2px -2px 6px rgba(255,255,255,.04);
-    --sh-in:inset 1px 1px 3px rgba(0,0,0,.4), inset -1px -1px 3px rgba(255,255,255,.05);
+    --primary-soft:rgba(143,180,156,.16); --primary-softer:rgba(143,180,156,.09);
+    --accent-soft:rgba(217,136,120,.14);
+    --line-soft:rgba(84,81,63,.55); --line-softer:rgba(84,81,63,.45);
+    --on-accent:#26241F; --scrim:rgba(10,9,6,.6); --scrim-strong:rgba(10,9,6,.94);
+    --ring-light:rgba(234,230,220,.25);
+    --sh-accent:0 3px 12px rgba(10,9,6,.4);
+    --sh-float:0 2px 10px rgba(10,9,6,.5);
+    --sh-panel:0 2px 12px rgba(10,9,6,.45);
+    /* 深色阴影用带暖色相的暗色，不用纯黑（避免"死黑糊边"） */
+    --sh-out:2px 2px 6px rgba(12,10,6,.5), -2px -2px 6px rgba(255,255,255,.04);
+    --sh-in:inset 1px 1px 3px rgba(12,10,6,.45), inset -1px -1px 3px rgba(255,255,255,.05);
   }
 }
 /* ---------- 五、通用组件（三态/卡片） ---------- */
@@ -92,14 +119,14 @@ button{font-family:inherit; cursor:pointer; border:0}
 .sk+.sk{margin-top:10px; width:72%}
 .empty{display:flex; flex-direction:column; align-items:center; gap:var(--sp-1); padding:var(--sp-2); text-align:center}
 .empty .go{margin-top:var(--sp-1); padding:9px 22px; border-radius:999px; color:var(--primary);
-  background:rgba(74,107,87,.12); font-size:var(--fs-sub); font-weight:600}
-.err{padding:var(--sp-2); border-left:3px solid var(--accent); background:rgba(176,58,46,.08); border-radius:var(--r-s)}
+  background:var(--primary-soft); font-size:var(--fs-sub); font-weight:600}
+.err{padding:var(--sp-2); border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:var(--r-s)}
 .err b{color:var(--accent); font-size:var(--fs-sub)}
 .err p{font-size:var(--fs-sub); color:var(--ink-2); margin:var(--sp-1) 0}
-.err .retry{padding:8px 20px; border-radius:999px; background:var(--accent); color:#fff; font-size:var(--fs-sub)}
+.err .retry{padding:8px 20px; border-radius:999px; background:var(--accent); color:var(--on-accent); font-size:var(--fs-sub)}
 /* 主操作按钮：唯一强调色 */
-.btn-main{padding:12px 26px; border-radius:14px; background:var(--accent); color:#fff;
-  font-size:var(--fs-body); font-weight:600; letter-spacing:.04em; box-shadow:0 3px 12px rgba(176,58,46,.3)}
+.btn-main{padding:12px 26px; border-radius:14px; background:var(--accent); color:var(--on-accent);
+  font-size:var(--fs-body); font-weight:600; letter-spacing:.04em; box-shadow:var(--sh-accent)}
 .btn-soft{padding:9px 20px; border-radius:999px; background:var(--paper); color:var(--ink-2);
   box-shadow:var(--sh-out); font-size:var(--fs-sub)}
 /* 隐藏入口（管理后台）：身份就绪前不可见；显示逻辑必须读唯一身份源 WHO，不许另设 isAdmin */
@@ -107,7 +134,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 .gate.ok{display:inline-flex}
 /* ---------- 六、弹层与表单（身份系统） ---------- */
 /* 遮罩+底部弹层：高度用 flex 扣掉底部 tab，主按钮永远在可视区内（免疫"保存点不到"） */
-.mask{position:fixed; inset:0; background:rgba(46,42,36,.45); z-index:950; display:none}
+.mask{position:fixed; inset:0; background:var(--scrim); z-index:950; display:none}
 .mask.on{display:block}
 .sheet{position:fixed; left:0; right:0; bottom:0; z-index:960; display:none; flex-direction:column;
   background:var(--card); border-radius:var(--r-l) var(--r-l) 0 0; padding:var(--sp-3) var(--sp-2);
@@ -118,26 +145,26 @@ button{font-family:inherit; cursor:pointer; border:0}
 .field label{display:block; font-size:var(--fs-sub); color:var(--ink-2); margin-bottom:4px}
 .field input{width:100%; padding:11px 14px; border:1.5px solid var(--line); border-radius:var(--r-s);
   font-size:var(--fs-body); font-family:inherit; background:var(--paper); color:var(--ink); outline:none}
-.field input:focus{border-color:var(--primary); background:#fff}
+.field input:focus{border-color:var(--primary); background:var(--card)}
 .sheet .btn-main{width:100%}
 .sheet .swap{text-align:center; font-size:var(--fs-sub); color:var(--ink-2); margin-top:var(--sp-2)}
 .sheet .swap b{color:var(--primary); cursor:pointer}
 .formMsg{font-size:var(--fs-sub); margin:0 0 var(--sp-2); padding:8px 12px; border-radius:var(--r-s); display:none}
 .formMsg.on{display:block}
-.formMsg.bad{background:rgba(176,58,46,.08); color:var(--accent); border-left:3px solid var(--accent)}
-.formMsg.ok{background:rgba(74,107,87,.1); color:var(--primary); border-left:3px solid var(--primary)}
+.formMsg.bad{background:var(--accent-soft); color:var(--accent); border-left:3px solid var(--accent)}
+.formMsg.ok{background:var(--primary-soft); color:var(--primary); border-left:3px solid var(--primary)}
 /* 未登录引导态（进需登录页不白屏，引导登录而不是 alert） */
 .authGate{text-align:center; padding:var(--sp-4) var(--sp-2)}
 .authGate .big{font-size:34px; margin-bottom:var(--sp-1)}
 .authGate p{font-size:var(--fs-sub); color:var(--ink-2); margin:0 0 var(--sp-2)}
 /* 我的页身份卡 */
-.kv{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(201,194,176,.4); font-size:var(--fs-sub)}
+.kv{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line-soft); font-size:var(--fs-sub)}
 .kv:last-child{border-bottom:0}
 .kv .k{color:var(--ink-2)}
 .kv .v{font-weight:600}
 /* toast：401/403 等轻提示，不打断操作 */
 #toast{position:fixed; left:50%; bottom:calc(var(--tab-h) + 70px + env(safe-area-inset-bottom));
-  transform:translateX(-50%) translateY(8px); z-index:9800; background:rgba(46,42,36,.92); color:#fff;
+  transform:translateX(-50%) translateY(8px); z-index:9800; background:var(--scrim-strong); color:#fff;
   padding:9px 18px; border-radius:999px; font-size:var(--fs-sub); opacity:0; transition:.25s; pointer-events:none; white-space:nowrap}
 #toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
 /* ---------- 六·1.5、搜索+筛选组件（阶段6交互增强，可整段复制到任何列表站） ---------- */
@@ -153,7 +180,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 .filters::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto; min-height:44px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line);  /* 无障碍：触控目标≥44px */
   background:var(--card); color:var(--ink-2); font-size:var(--fs-mini); white-space:nowrap}
-.chip.on{background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600}
+.chip.on{background:var(--primary); border-color:var(--primary); color:var(--on-accent); font-weight:600}
 .hitline{font-size:var(--fs-mini); color:var(--ink-3); min-height:1em; padding:0 2px}
 /* ---------- 六·2、数据层组件（列表项/分页/表单） ---------- */
 .item{background:var(--card); border-radius:var(--r-l); box-shadow:var(--sh-out);
@@ -170,16 +197,17 @@ button{font-family:inherit; cursor:pointer; border:0}
 .field textarea{width:100%; min-height:88px; padding:11px 14px; border:1.5px solid var(--line);
   border-radius:var(--r-s); font-size:var(--fs-body); font-family:inherit; background:var(--paper);
   color:var(--ink); outline:none; resize:vertical}
-.field textarea:focus{border-color:var(--primary); background:#fff}
+.field textarea:focus{border-color:var(--primary); background:var(--card)}
 /* 提交中状态：唯一强调色按钮的禁用态 */
 .btn-main:disabled{opacity:.55; box-shadow:none; cursor:default}
 /* ---------- 六·3、上传后台组件（阶段4） ---------- */
 /* 附图区：选图/缩略图/压缩信息 */
 .attach{border:1.5px dashed var(--line); border-radius:var(--r-s); padding:var(--sp-2);
   text-align:center; color:var(--ink-2); font-size:var(--fs-sub)}
-.attach:active{background:rgba(74,107,87,.06)}
+.attach:active{background:var(--primary-softer)}
 .attach img{max-width:100%; border-radius:var(--r-s); display:block}
 .attach .info{font-size:var(--fs-mini); color:var(--ink-3); margin-top:6px}
+.attach .cam{display:inline-block; font-size:20px; margin-right:4px; vertical-align:-4px}
 .attach .rm{color:var(--accent); font-size:var(--fs-mini); margin-top:4px; display:inline-block}
 /* 进度条：只动 width（写进"禁止动画 height/width"豁免清单——进度是状态指示不是布局动画） */
 .upbar{height:6px; border-radius:3px; background:var(--paper); box-shadow:var(--sh-in);
@@ -190,38 +218,42 @@ button{font-family:inherit; cursor:pointer; border:0}
 .upbar.fail .in{background:var(--accent)}
 /* 管理后台：内容管理列表（复选） */
 .mrow{display:flex; align-items:center; gap:10px; padding:10px 0;
-  border-bottom:1px solid rgba(201,194,176,.4); font-size:var(--fs-sub)}
+  border-bottom:1px solid var(--line-soft); font-size:var(--fs-sub)}
 .mrow:last-child{border-bottom:0}
 .mrow .ttl2{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .mrow input[type=checkbox]{width:18px; height:18px; accent-color:var(--accent); flex:0 0 auto}
 .mrow .cnt{font-size:var(--fs-mini); color:var(--ink-3)}
 /* 确认弹层：输入确认词才算确认（批量删除/高危操作专用） */
+.pager{display:flex; align-items:center; justify-content:space-between; gap:var(--sp-1);
+  margin-top:var(--sp-2); font-size:var(--fs-mini); color:var(--ink-2)}
+.pager .btn-soft{min-height:44px}
+.pager span{text-align:center; flex:1}
 #confirmSheet .warn{font-size:var(--fs-sub); color:var(--accent); text-align:center; margin:0 0 var(--sp-2)}
 #confirmSheet .btn-main{margin-top:var(--sp-2)}
 #confirmSheet .cancel{width:100%; margin-top:var(--sp-1); padding:10px; border:0;
   border-radius:var(--r-s); background:var(--paper); color:var(--ink-2); font-size:var(--fs-sub)}
 /* 操作留痕列表 */
-.oplog .row{padding:8px 0; border-bottom:1px solid rgba(201,194,176,.35);
+.oplog .row{padding:8px 0; border-bottom:1px solid var(--line-softer);
   font-size:var(--fs-mini); color:var(--ink-2)}
 .oplog .row b{color:var(--ink); font-size:var(--fs-sub)}
 .oplog .row .t{color:var(--ink-3); margin-right:8px}
 /* ---------- 七、红点（勿删） ---------- */
 #errDot{position:fixed;right:16px;bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom));
-  z-index:9990;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;
+  z-index:9990;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);
   display:none;align-items:center;justify-content:center;font-size:18px;cursor:pointer;
-  box-shadow:0 2px 10px rgba(46,42,36,.35);border:2px solid rgba(255,255,255,.7)}
+  box-shadow:var(--sh-float);border:2px solid var(--ring-light)}
 #errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
-  background:var(--accent);border:1.5px solid var(--paper);color:#fff;font-size:11px;line-height:16px;
+  background:var(--accent);border:1.5px solid var(--paper);color:var(--on-accent);font-size:11px;line-height:16px;
   text-align:center;padding:0 3px;box-sizing:border-box}
 #errPanel{position:fixed;left:12px;right:12px;bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom));
   z-index:9991;max-height:55vh;overflow:auto;display:none;background:var(--card);border-radius:14px;
-  padding:14px 16px;box-shadow:0 2px 12px rgba(201,194,176,.5);font-size:var(--fs-sub);color:var(--ink);line-height:1.7}
+  padding:14px 16px;box-shadow:var(--sh-panel);font-size:var(--fs-sub);color:var(--ink);line-height:1.7}
 #errPanel h4{margin:0 0 6px;font-size:15px;font-weight:600}
 #errPanel .hint{font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
-#errPanel .row{padding:6px 0;border-bottom:1px solid rgba(201,194,176,.4);overflow-wrap:break-word}
+#errPanel .row{padding:6px 0;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word}
 #errPanel .row .t{font-size:11.5px;color:var(--ink-3)}
 #errPanel .clr{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;
-  background:var(--accent);color:#fff;font-size:14px;cursor:pointer}
+  background:var(--accent);color:var(--on-accent);font-size:14px;cursor:pointer}
 /* ---------- 八、桌面端布局（≥768px）：底tab → 左侧边栏，DOM零改动 ---------- */
 @media (min-width: 768px){
   /* 壳改 grid：左列侧边栏，右上顶栏，右下内容；移动端样式全部原样保留 */
@@ -232,7 +264,7 @@ button{font-family:inherit; cursor:pointer; border:0}
   .tabbar .tab{flex:0 0 auto; flex-direction:row; justify-content:flex-start; gap:10px;
     padding:11px 14px; border-radius:12px; font-size:var(--fs-sub); margin:0 2px}
   .tabbar .tab .ico{font-size:19px}
-  .tabbar .tab.on{background:rgba(74,107,87,.12)}
+  .tabbar .tab.on{background:var(--primary-soft)}
   /* 顶栏/内容都挪到右列 */
   .topbar{grid-column:2; grid-row:1; padding-left:var(--sp-3); padding-right:var(--sp-3)}
   .topbar .ttl{font-size:22px}
@@ -242,7 +274,7 @@ button{font-family:inherit; cursor:pointer; border:0}
   /* 弹层从"贴底"升级为"居中对话框" */
   .sheet{left:50%; right:auto; bottom:auto; top:50%; transform:translate(-50%,-50%);
     width:460px; max-height:min(80vh, 640px); border-radius:var(--r-l)}
-  .mask{background:rgba(46,42,36,.5)}
+  .mask{background:var(--scrim)}
   /* 红点/错误面板：贴底位置跟着布局改到右下 */
   #errDot{bottom:24px; right:24px}
   #errPanel{left:auto; right:24px; bottom:80px; width:520px; max-width:calc(100vw - 280px)}
@@ -251,6 +283,35 @@ button{font-family:inherit; cursor:pointer; border:0}
   .field input:focus,.field textarea:focus{background:var(--card)}
 }
 </style>
+<script>
+/* ================================================================
+   红点前置捕获（勿删 · 必须在所有业务脚本之前）
+   只负责"记录"：注册错误监听并把记录写进 localStorage。
+   红点 UI 仍在页面末尾渲染——这样连最早期的同步错误也不会漏。
+   ================================================================ */
+(function(){
+  var KEY=(window.__SITE__||'tplB')+'_errlog_v1', MAX=50;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+  function push(msg){
+    try{
+      var a=load(); a.push({t:Date.now(), m:String(msg).slice(0,300)});
+      try{ localStorage.setItem(KEY, JSON.stringify(a.slice(-MAX))) }catch(e){}
+    }catch(e){}
+  }
+  window.__errLogAdd=push;
+  window.addEventListener('error',function(e){
+    var t=e.target;
+    if(t && t!==window && t.tagName){          /* 资源加载失败（img/script/link） */
+      push('资源加载失败: '+t.tagName.toLowerCase()+' '+(t.src||t.href||'(无地址)'));
+      return;
+    }
+    push((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''));
+  },true);
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason; push('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'));
+  });
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -282,7 +343,7 @@ button{font-family:inherit; cursor:pointer; border:0}
         <!-- 搜索+筛选：走 listItems 接口的 keyword/filter 参数，前端只认返回结果 -->
         <div class="searchbar stg">
           <div class="searchrow">
-            <div class="searchbox"><span class="mag">🔍</span>
+            <div class="searchbox"><span class="mag" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="m16 16 4 4"/></svg></span>
               <input id="listSearch" type="search" placeholder="搜标题或正文…" autocomplete="off" aria-label="搜索内容"></div>
           </div>
           <div class="filters" id="listFilters">
@@ -308,7 +369,7 @@ button{font-family:inherit; cursor:pointer; border:0}
     <section class="view" id="v-post">
       <!-- 未登录引导态：authGate 显示 / 内容隐藏，由 renderView() 按 WHO 切换 -->
       <div class="authGate" id="postGate">
-        <div class="big">🔐</div>
+        <div class="big" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.2"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"/><path d="M12 14v2.5"/></svg></div>
         <p>发布内容需要先登录。<br>还没有账号？注册只要一个学号和一个密码。</p>
         <button class="btn-main" data-auth="login">去登录</button>
       </div>
@@ -320,7 +381,7 @@ button{font-family:inherit; cursor:pointer; border:0}
         <div class="field"><label>附图（可选，自动压缩）</label>
           <div class="attach" id="attachBox">
             <input type="file" id="attachFile" accept="image/*" style="display:none">
-            <span id="attachHint">📷 点这里选图<br><span style="font-size:var(--fs-mini);color:var(--ink-3)">长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>
+            <span id="attachHint"><span class="cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8.5h3l1.4-2h7.2l1.4 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></span>点这里选图<br><span style="font-size:var(--fs-mini);color:var(--ink-3)">长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>
           </div>
           <div class="upbar" id="upbar"><div class="in" id="upbarIn"></div></div>
         </div>
@@ -330,7 +391,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 
     <section class="view" id="v-me">
       <div class="authGate" id="meGate">
-        <div class="big">👤</div>
+        <div class="big" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20c.7-3.6 3.4-5.4 7.2-5.4s6.5 1.8 7.2 5.4"/></svg></div>
         <p>登录后这里显示你的身份、<br>提供改密和退出入口。</p>
         <button class="btn-main" data-auth="login">去登录</button>
       </div>
@@ -350,7 +411,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 
     <section class="view" id="v-admin">
       <div class="authGate" id="adminGate">
-        <div class="big">⛔</div>
+        <div class="big" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M6.2 6.2l11.6 11.6"/></svg></div>
         <p>这里是管理员页面，你的账号没有权限。<br>这不是登录问题——退出登录也帮不了你。</p>
         <button class="btn-soft" data-goto="home">回首页</button>
       </div>
@@ -361,7 +422,7 @@ button{font-family:inherit; cursor:pointer; border:0}
           <button class="btn-soft" id="btnRevoke" style="width:100%;margin-top:var(--sp-1)">模拟服务端吊销当前 token（演示401清登录态）</button>
         </div>
         <div class="card stg"><h2>数据备份</h2>
-          <p style="font-size:var(--fs-sub);color:var(--ink-2)">导出=下载 JSON 文件（账号不带密码，脱敏）；导入=校验结构+按 id 去重，损坏的文件会被拒绝而不是污染全库。</p>
+          <p style="font-size:var(--fs-sub);color:var(--ink-2)">导出=下载 JSON 文件（内容全量 + 账号名单脱敏，不含密码）；导入=校验结构+按 id 去重，坏文件整包拒绝。<b>账号表不随备份恢复</b>——备份只用来救内容，登录账号需重新注册或由管理员在存储里补。</p>
           <div class="formMsg" id="bakMsg"></div>
           <button class="btn-main" id="btnExport" style="width:100%">导出全部数据</button>
           <button class="btn-soft" id="btnImport" style="width:100%;margin-top:var(--sp-1)">导入备份文件</button>
@@ -369,7 +430,12 @@ button{font-family:inherit; cursor:pointer; border:0}
         </div>
         <div class="card stg"><h2>内容管理（批量删除需二次确认）</h2>
           <div id="adminList"></div>
-          <button class="btn-main" id="btnBatchDel" style="width:100%;margin-top:var(--sp-2)" disabled>删除所选（0 条）</button>
+          <div class="pager" id="adminPager" style="display:none">
+            <button class="btn-soft" id="adminPrev" type="button">上一页</button>
+            <span id="adminPageInfo">—</span>
+            <button class="btn-soft" id="adminNext" type="button">下一页</button>
+          </div>
+          <button class="btn-main" id="btnBatchDel" style="width:100%;margin-top:var(--sp-2)" disabled>选择要移入回收站的内容</button>
         </div>
         <div class="card stg"><h2>操作留痕（最近 20 条写操作）</h2>
           <div class="oplog" id="oplogBox"><div class="row">暂无操作记录</div></div>
@@ -381,10 +447,10 @@ button{font-family:inherit; cursor:pointer; border:0}
 
   <!-- 底部 tab：每个 tab 必须是路由表里登记的入口 -->
   <nav class="tabbar" id="tabbar">
-    <button class="tab on" data-goto="home"><span class="ico">🏠</span>首页</button>
-    <button class="tab" data-goto="list"><span class="ico">📋</span>列表</button>
-    <button class="tab" data-goto="post"><span class="ico">➕</span>发布</button>
-    <button class="tab" data-goto="me"><span class="ico">👤</span>我的</button>
+    <button class="tab on" data-goto="home"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></span>首页</button>
+    <button class="tab" data-goto="list"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></span>列表</button>
+    <button class="tab" data-goto="post"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>发布</button>
+    <button class="tab" data-goto="me"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20c.7-3.6 3.4-5.4 7.2-5.4s6.5 1.8 7.2 5.4"/></svg></span>我的</button>
   </nav>
 </div>
 
@@ -437,17 +503,55 @@ const WHO = {token:null, who:null, isAdmin:false};
    · 模拟接口层与真实后端同形状：{code,message,traceId,data}
      阶段3换真实后端时只替换 mock() 内部实现，调用方零改动
    ================================================================ */
-const AUTH_KEY="tplB_auth_v1", USERS_KEY="tplB_users_v1", TOKENS_KEY="tplB_tokens_v1";
-const DATA_KEY="tplB_data_v1", IDEM_KEY="tplB_idem_v1";
-const OPLOG_KEY="tplB_oplog_v1";
+/* 存储键统一派生：改 window.__SITE__ 一处，全站隔离（同域名多个模板站不串号） */
+const SITE=window.__SITE__||"tplb";
+const SK=n=>SITE+"_"+n+"_v1";
+const AUTH_KEY=SK("auth"), USERS_KEY=SK("users"), TOKENS_KEY=SK("tokens");
+const DATA_KEY=SK("data"), IDEM_KEY=SK("idem");
+const OPLOG_KEY=SK("oplog");
 function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
-function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function saveJSON(k,v){
+  localStorage.setItem(k,JSON.stringify(v));   /* 不吞异常：配额满/隐私模式必须让上层知道，否则就是"假成功" */
+}
 function fail(code,message){const e=new Error(message);e.code=code;e.traceId="t"+Date.now().toString(36);throw e}
+/* 属性值转义：拼进 href/src/data-* 这类属性时用，esc() 不够（它只处理文本节点场景的 & < > "） */
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+/* 备份条目清洗：外部 JSON 一律不可信。只保留已知字段，image 只接受合法 http(s)/data:image */
+function sanitizeItem(x){
+  if(!x||typeof x!=="object") return null;
+  const id=Number(x.id);
+  if(!Number.isFinite(id)||id<=0) return null;
+  const title=String(x.title||"").trim().slice(0,400);
+  if(!title) return null;
+  let image="";
+  if(x.image){
+    const s=String(x.image).trim().slice(0,400000*2);
+    if(/^data:image\/(png|jpe?g|gif|webp);base64,/i.test(s)) image=s;   /* 只认 base64 位图 */
+    else{
+      try{
+        const u=new URL(s,location.href);
+        if(u.protocol==="https:"||u.protocol==="http:") image=u.href;    /* URL 规范化会编码引号等危险字符 */
+      }catch(e){ image=""; }
+    }
+  }
+  return {id, title,
+    body:String(x.body||"").slice(0,400000),
+    image,
+    authorId:String(x.authorId||""),
+    authorName:String(x.authorName||"").slice(0,40),
+    createdAt:Number(x.createdAt)||Date.now()};
+}
 /* 操作留痕：后端写操作必留痕（谁/何时/干了什么），管理员可查 */
 function logOp(uid,action,detail){
-  const logs=loadJSON(OPLOG_KEY,[]);
-  logs.push({t:Date.now(), who:uid, action, detail:String(detail||"").slice(0,120)});
-  saveJSON(OPLOG_KEY,logs.slice(-100)); /* 最多留 100 条 */
+  /* 留痕是旁路能力：写不进去只记痕，绝不能把已成功的业务操作变成"失败" */
+  try{
+    const logs=loadJSON(OPLOG_KEY,[]);
+    logs.push({t:Date.now(), who:uid, action, detail:String(detail||"").slice(0,120)});
+    saveJSON(OPLOG_KEY,logs.slice(-100)); /* 最多留 100 条 */
+  }catch(e){
+    window.__errLogAdd && window.__errLogAdd("操作留痕写入失败（业务已生效）: "+action);
+  }
 }
 
 /* ---------- 模拟接口层（阶段3替换此函数内部，调用方零改动） ---------- */
@@ -498,7 +602,8 @@ function mock(name,b){
   if(name==="listItems"){
     const d=loadJSON(DATA_KEY,{items:[],seq:1});
     const page=Math.max(1,parseInt(b.page)||1), ps=Math.min(20,Math.max(1,parseInt(b.pageSize)||5));
-    let items=d.items.slice().reverse(); /* 新的在前 */
+    const alive=d.items.filter(x=>!x.deleted);        /* 软删除：列表只认未删的 */
+    let items=alive.slice().reverse(); /* 新的在前 */
     /* 搜索+筛选：接口层过滤，前端只认返回；换真后端照传 keyword/filter 即可 */
     const kw=String(b.keyword||"").trim().toLowerCase();
     if(kw) items=items.filter(x=>String(x.title||"").toLowerCase().includes(kw)
@@ -509,7 +614,8 @@ function mock(name,b){
       const since=Date.now()-7*24*3600*1000;
       items=items.filter(x=>new Date(x.createdAt).getTime()>=since);
     }
-    return env(0,"ok",{list:items.slice((page-1)*ps,page*ps), total:items.length, page, pageSize:ps});
+    return env(0,"ok",{list:items.slice((page-1)*ps,page*ps), total:items.length,
+      deletedTotal:d.items.filter(x=>x.deleted).length, page, pageSize:ps});
   }
   if(name==="addItem"){
     const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
@@ -529,8 +635,19 @@ function mock(name,b){
     const item={id:d.seq++, title:String(b.title).trim(), body:String(b.body).trim(),
       authorId:u.id, authorName:u.name, createdAt:Date.now(),
       image:b.image?String(b.image):null};
-    d.items.push(item); saveJSON(DATA_KEY,d);
-    if(b.idemKey){ idem[b.idemKey]=item.id; saveJSON(IDEM_KEY,idem); }
+    d.items.push(item);
+    try{
+      saveJSON(DATA_KEY,d);                 /* 落盘失败必须回滚内存，绝不返回"发布成功" */
+    }catch(e){
+      d.items.pop(); d.seq--;               /* 回滚：否则内存多一条、seq 还留空洞 */
+      fail(507,"存储空间不足，发布失败：请压缩图片或清理浏览器数据后重试");
+    }
+    if(b.idemKey){
+      try{ idem[b.idemKey]=item.id; saveJSON(IDEM_KEY,idem); }
+      catch(e){                             /* 内容已落库，只是幂等键没存上：下次重试可能重复一条，记痕不误报失败 */
+        window.__errLogAdd && window.__errLogAdd("幂等键写入失败（本条内容已保存）");
+      }
+    }
     logOp(uid,"发布","id="+item.id+"《"+item.title+"》"+(item.image?"[带图]":""));
     return env(0,"发布成功",{item});
   }
@@ -539,11 +656,13 @@ function mock(name,b){
     const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能删除内容");
     if(!Array.isArray(b.ids)||!b.ids.length) fail(400,"没有选中任何条目");
     const d=loadJSON(DATA_KEY,{items:[],seq:1});
-    const before=d.items.length;
-    d.items=d.items.filter(x=>!b.ids.includes(x.id));
-    const deleted=before-d.items.length;
-    if(deleted>0){ saveJSON(DATA_KEY,d); logOp(uid,"批量删除","删除 "+deleted+" 条："+b.ids.join(",")); }
-    return env(0,"已删除",{deleted});
+    let deleted=0; const at=Date.now();
+    /* 软删除：只打标记不移除，列表过滤掉；备份会带上 deletedItems，误删可找回 */
+    d.items.forEach(x=>{
+      if(b.ids.includes(x.id) && !x.deleted){ x.deleted=true; x.deletedAt=at; x.deletedBy=u.id; deleted++; }
+    });
+    if(deleted>0){ saveJSON(DATA_KEY,d); logOp(uid,"批量删除","移入回收站 "+deleted+" 条："+b.ids.join(",")); }
+    return env(0,"已移入回收站",{deleted});
   }
   if(name==="getLogs"){
     const uid=b.token&&tokens[b.token]; if(!uid) fail(401,"登录已失效，请重新登录");
@@ -556,8 +675,9 @@ function mock(name,b){
     const u=users2.find(x=>x.id===uid); if(!u||!u.isAdmin) fail(403,"只有管理员能导出全库备份");
     logOp(uid,"导出备份","共"+loadJSON(DATA_KEY,{items:[]}).items.length+"条");
     const d=loadJSON(DATA_KEY,{items:[],seq:1});
+    const alive=d.items.filter(x=>!x.deleted), gone=d.items.filter(x=>x.deleted);
     return env(0,"ok",{version:1, exportedAt:Date.now(),
-      items:d.items, nextSeq:d.seq,
+      items:alive, deletedItems:gone, nextSeq:d.seq,   /* 回收站也导出：误删可随备份恢复 */
       /* 账号表脱敏：导出绝不含密码字段 */
       accounts:users2.map(x=>({id:x.id,name:x.name,isAdmin:!!x.isAdmin}))});
   }
@@ -569,13 +689,28 @@ function mock(name,b){
     if(!Array.isArray(p.items)) fail(400,"备份缺少 items 列表，可能是文件选错或已损坏");
     if(p.items.some(x=>!x||typeof x!=="object"||!x.id||!x.title)) fail(400,"items 里有结构不完整的条目，为防污染已整包拒绝");
     const d=loadJSON(DATA_KEY,{items:[],seq:1});
-    let imported=0, skipped=0;
+    let imported=0, skipped=0, restored=0;
     const seen={}; d.items.forEach(x=>seen[x.id]=true);
-    p.items.forEach(x=>{ if(seen[x.id]){skipped++} else {seen[x.id]=true; d.items.push(x); imported++} });
-    d.seq=Math.max(d.seq, p.nextSeq||1, ...p.items.map(x=>x.id+1), 1);
+    p.items.forEach(function(raw){
+      const x=sanitizeItem(raw);                  /* 逐条清洗：未知字段丢弃，image 过白名单 */
+      if(!x){ skipped++; return; }
+      if(seen[x.id]){ skipped++; return; }
+      seen[x.id]=true; d.items.push(x); imported++;
+    });
+    /* 回收站条目：可选字段，逐条清洗后按已删除状态入库（不因它坏了就拒整包） */
+    const gone=Array.isArray(p.deletedItems)?p.deletedItems:[];
+    gone.forEach(function(raw){
+      const x=sanitizeItem(raw);
+      if(!x||seen[x.id]){ skipped++; return; }
+      x.deleted=true; x.deletedAt=Number(raw.deletedAt)||Date.now();
+      seen[x.id]=true; d.items.push(x); restored++;
+    });
+    const ids=p.items.map(x=>(Number(x&&x.id)||0)+1)
+      .concat(gone.map(x=>(Number(x&&x.id)||0)+1));
+    d.seq=Math.max(d.seq, Number(p.nextSeq)||1, ...ids, 1);
     saveJSON(DATA_KEY,d);
-    logOp(uid,"导入备份","新增"+imported+"条，跳过"+skipped+"条");
-    return env(0,"导入完成",{imported, skipped});
+    logOp(uid,"导入备份","新增"+imported+"条，回收站"+restored+"条，跳过"+skipped+"条");
+    return env(0,"导入完成",{imported, skipped, restored, ignoredAccounts:(p.accounts&&p.accounts.length)||0});
   }
   fail(404,"未知接口: "+name);
 }
@@ -729,11 +864,13 @@ document.getElementById("btnRevoke").onclick=()=>{
    ================================================================ */
 const PAGE_SIZE=5;
 const LIST={page:0, total:0, dirty:true, keyword:"", filter:"all"};  /* dirty：发布/导入后置真，下次进列表重拉 */
+let LIST_SEQ=0;   /* 请求序号：慢响应回来时若已有更新的请求，整包丢弃，防重复追加 */
 
 async function loadListPage(page){
   return api("listItems",{page, pageSize:PAGE_SIZE, keyword:LIST.keyword, filter:LIST.filter});
 }
 async function renderList(){
+  const mySeq=++LIST_SEQ;                 /* 本次请求占位（搜索/筛选/加载更多共用） */
   const show=(id,on)=>document.getElementById(id).style.display=on?"":"none";
   const body=document.getElementById("listBody");
   if(LIST.dirty && LIST.page===0){
@@ -742,6 +879,7 @@ async function renderList(){
   }
   try{
     const r=await loadListPage(LIST.dirty?1:LIST.page+1);
+    if(mySeq!==LIST_SEQ) return;          /* 已有更新的请求：本次结果作废，不碰 DOM/状态 */
     LIST.dirty=false;
     show("listLoading",false); show("listErr",false);
     LIST.page=r.data.page; LIST.total=r.data.total;
@@ -757,11 +895,20 @@ async function renderList(){
     r.data.list.forEach(it=>{
       const d=new Date(it.createdAt);
       const el=document.createElement("div"); el.className="item";
-      el.innerHTML='<h4></h4><div class="meta"></div><div class="body"></div>'
-        +(it.image?'<img src="'+it.image+'" style="max-width:100%;border-radius:var(--r-s);margin-top:8px" loading="lazy">':'');
-      el.querySelector("h4").textContent=it.title;
-      el.querySelector(".meta").textContent=it.authorName+" · "+(d.getMonth()+1)+"-"+d.getDate();
-      el.querySelector(".body").textContent=it.body;
+      /* 全程 DOM 赋值，不拼 innerHTML：image 来自备份导入，裸拼可被引号逃逸注入 */
+      const h4=document.createElement("h4"); h4.textContent=it.title;
+      const meta=document.createElement("div"); meta.className="meta";
+      meta.textContent=it.authorName+" · "+(d.getMonth()+1)+"-"+d.getDate();
+      const bodyDiv=document.createElement("div"); bodyDiv.className="body"; bodyDiv.textContent=it.body;
+      el.appendChild(h4); el.appendChild(meta); el.appendChild(bodyDiv);
+      if(it.image){
+        const img=document.createElement("img");
+        img.src=it.image;                                   /* 入库前已过 URL 白名单 */
+        img.loading="lazy"; img.style.maxWidth="100%";
+        img.style.borderRadius="var(--r-s)"; img.style.marginTop="8px";
+        img.alt="附图";
+        el.appendChild(img);
+      }
       body.appendChild(el);
     });
     const shown=Math.min(LIST.page*PAGE_SIZE, LIST.total);
@@ -771,6 +918,7 @@ async function renderList(){
     else{ document.getElementById("listDone").textContent="— 共 "+LIST.total+" 条，已全部加载 —"; }
     show("listMore",hasMore); show("listDone",!hasMore);
   }catch(err){
+    if(mySeq!==LIST_SEQ) return;          /* 过期的失败也不许改当前界面 */
     show("listLoading",false); show("listErr",true);
     show("listMore",false); show("listDone",false);
     if(err.code===401){ handleAuthError(err); }
@@ -793,6 +941,10 @@ document.getElementById("listFilters").addEventListener("click",(e)=>{
 
 /* 发布表单：必填校验 + 幂等提交（请求中禁用，双击/重复请求只落一条） */
 let POSTING=false;
+/* 幂等键生命周期：首次提交时生成 → 失败重试沿用同一个 → 成功后才换新。
+   若每次点击都新生成，网络重试就成了"新意图"，去重等于没做。 */
+let POST_IDEM=null;
+function newIdemKey(){ return "idem_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
 document.getElementById("postSubmit").onclick=async ()=>{
   if(POSTING) return;                      /* 第一道闸：请求中不受理 */
   const title=document.getElementById("postTitle").value.trim();
@@ -804,10 +956,12 @@ document.getElementById("postSubmit").onclick=async ()=>{
   POSTING=true;
   const btn=document.getElementById("postSubmit");
   btn.disabled=true; btn.textContent="提交中…";
-  /* 幂等键：本次提交意图的身份证。双击/网络重试带同一个键，服务端只落一条 */
-  const idemKey="idem_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+  /* 幂等键：本次提交意图的身份证。失败重试复用同一个，服务端只落一条 */
+  if(!POST_IDEM) POST_IDEM=newIdemKey();
+  const idemKey=POST_IDEM;
   try{
     const r=await api("addItem",{token:WHO.token, title, body, idemKey, image:ATTACH.data||null});
+    POST_IDEM=newIdemKey();                /* 成功才算新意图结束，下次是全新一条 */
     setMsg("ok", r.message);
     document.getElementById("postTitle").value="";
     document.getElementById("postBodyText").value="";
@@ -854,29 +1008,39 @@ document.getElementById("importFile").onchange=(e)=>{
     try{
       const r=await api("importAll",{token:WHO.token, payload});
       LIST.dirty=true; LIST.page=0;
-      setMsg("ok","导入完成：新增 "+r.data.imported+" 条，重复跳过 "+r.data.skipped+" 条");
+      setMsg("ok","导入完成：新增 "+r.data.imported+" 条，重复跳过 "+r.data.skipped+" 条"
+        +(r.data.ignoredAccounts?("；账号名单 "+r.data.ignoredAccounts+" 个未导入（备份不含密码，无法恢复登录）"):""));
       toast("备份已导入");
     }catch(err){ handleAuthError(err); setMsg("bad", err.message); }
   };
   rd.readAsText(f);
 };
 
-/* ---------- 内容管理列表（复选+全选+批量删除） ---------- */
+/* ---------- 内容管理列表（复选+全选+批量删除+分页） ---------- */
 let ADMIN_ITEMS=[];
+const ADMIN_PAGE_SIZE=20;
+let ADMIN_PAGE=1, ADMIN_TOTAL=0, ADMIN_DELETED=0;
 async function renderAdminList(){
   const box=document.getElementById("adminList");
   try{
-    const r=await api("listItems",{page:1, pageSize:20});
+    const r=await api("listItems",{page:ADMIN_PAGE, pageSize:ADMIN_PAGE_SIZE});
+    ADMIN_TOTAL=r.data.total; ADMIN_DELETED=r.data.deletedTotal||0;
+    const pages=Math.max(1,Math.ceil(ADMIN_TOTAL/ADMIN_PAGE_SIZE));
+    if(ADMIN_PAGE>pages){ ADMIN_PAGE=pages; return renderAdminList(); }  /* 删空最后一页→自动回退 */
     ADMIN_ITEMS=r.data.list;   /* 管理列表按 id 升序展示，与用户列表顺序区分 */
     ADMIN_ITEMS.sort((a,b)=>a.id-b.id);
+    const pager=document.getElementById("adminPager");
     if(!ADMIN_ITEMS.length){
-      box.innerHTML='<div class="row" style="font-size:var(--fs-sub);color:var(--ink-3);padding:10px 0">库里没有内容</div>';
+      box.innerHTML='<div class="row" style="font-size:var(--fs-sub);color:var(--ink-3);padding:10px 0">'
+        +'库里没有内容'+(ADMIN_DELETED?('（回收站还有 '+ADMIN_DELETED+' 条）'):'')+'</div>';
+      pager.style.display="none";
       syncBatchBtn(); return;
     }
     box.innerHTML="";
     /* 全选行 */
     const all=document.createElement("div"); all.className="mrow";
-    all.innerHTML='<input type="checkbox" id="chkAll"><span class="ttl2" style="font-weight:600">全选（本页 '+ADMIN_ITEMS.length+' 条 / 共 '+r.data.total+' 条）</span>';
+    all.innerHTML='<input type="checkbox" id="chkAll"><span class="ttl2" style="font-weight:600"></span>';
+    all.querySelector(".ttl2").textContent="全选（本页 "+ADMIN_ITEMS.length+" 条 / 共 "+ADMIN_TOTAL+" 条）";
     box.appendChild(all);
     ADMIN_ITEMS.forEach(it=>{
       const row=document.createElement("div"); row.className="mrow";
@@ -892,9 +1056,20 @@ async function renderAdminList(){
       syncBatchBtn();
     };
     box.querySelectorAll(".chk").forEach(c=>c.onchange=syncBatchBtn);
+    /* 分页：每页 20 条，显示总数与回收站计数 */
+    pager.style.display="flex";
+    document.getElementById("adminPageInfo").textContent=
+      "第 "+ADMIN_PAGE+" / "+pages+" 页 · 共 "+ADMIN_TOTAL+" 条"
+      +(ADMIN_DELETED?("（回收站 "+ADMIN_DELETED+" 条）"):"");
+    document.getElementById("adminPrev").disabled = ADMIN_PAGE<=1;
+    document.getElementById("adminNext").disabled = ADMIN_PAGE>=pages;
     syncBatchBtn();
   }catch(err){ handleAuthError(err); }
 }
+document.getElementById("adminPrev").onclick=()=>{ if(ADMIN_PAGE>1){ ADMIN_PAGE--; renderAdminList(); } };
+document.getElementById("adminNext").onclick=()=>{
+  if(ADMIN_PAGE*ADMIN_PAGE_SIZE<ADMIN_TOTAL){ ADMIN_PAGE++; renderAdminList(); }
+};
 function pickedIds(){
   return Array.from(document.querySelectorAll("#adminList .chk"))
     .filter(c=>c.checked).map(c=>c.getAttribute("data-id")).map(Number);
@@ -902,13 +1077,13 @@ function pickedIds(){
 function syncBatchBtn(){
   const btn=document.getElementById("btnBatchDel"), n=pickedIds().length;
   btn.disabled=n===0;
-  btn.textContent="删除所选（"+n+" 条）";
+  btn.textContent="移入回收站（"+n+" 条）";
 }
 /* 批量删除：确认词弹层（高危操作绝不裸 confirm） */
 document.getElementById("btnBatchDel").onclick=()=>{
   const n=pickedIds().length;
   if(!n) return;
-  document.getElementById("confirmText").textContent="即将永久删除选中的 "+n+" 条内容（含附图），不可恢复。";
+  document.getElementById("confirmText").textContent="选中的 "+n+" 条内容将移入回收站（含附图），列表不再显示；导出备份可找回。";
   document.getElementById("confirmInput").value="";
   const m=document.getElementById("confirmMsg"); m.className="formMsg"; m.textContent="";
   document.getElementById("confirmSheet").classList.add("on");
@@ -928,7 +1103,7 @@ document.getElementById("confirmGo").onclick=async ()=>{
   try{
     const r=await api("deleteItems",{token:WHO.token, ids});
     document.getElementById("confirmSheet").classList.remove("on");
-    toast("已删除 "+r.data.deleted+" 条（已留痕）");
+    toast("已移入回收站 "+r.data.deleted+" 条（已留痕，备份可找回）");
     LIST.dirty=true; LIST.page=0;
     renderAdminList(); renderOplog();
   }catch(err){
@@ -982,7 +1157,7 @@ function attachReset(){
   ATTACH.data=null;
   const box=document.getElementById("attachBox");
   box.innerHTML='<input type="file" id="attachFile" accept="image/*" style="display:none">'
-    +'<span id="attachHint">📷 点这里选图<br><span style="font-size:var(--fs-mini);color:var(--ink-3)">长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>';
+    +'<span id="attachHint"><span class="cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8.5h3l1.4-2h7.2l1.4 2h3v11H4z"/><circle cx="12" cy="13.5" r="3.2"/></svg></span>点这里选图<br><span style="font-size:var(--fs-mini);color:var(--ink-3)">长边压到 1080px、JPEG 80%，原图不动只压副本</span></span>';
   document.getElementById("upbar").classList.remove("on","fail");
   document.getElementById("upbarIn").style.width="0%";
   bindAttachFile();
@@ -1072,7 +1247,11 @@ let current = "home";
 let switchSeq = 0;                    /* 切场序号：连点防竞态（照搬导航站通用做法，勿删） */
 function goto(id){
   if(!ROUTES[id]){ window.__errLogAdd && window.__errLogAdd("goto未登记页面: "+id); return; }
-  if(id === current) return;
+  const my = ++switchSeq;            /* 先占位：任何导航意图都立即作废在途切场 */
+  if(id === current){                /* 同页点击：撤销可能正在进行的退场，界面回到原位 */
+    document.querySelectorAll(".view.leaving").forEach(v=>v.classList.remove("leaving"));
+    return;
+  }
   const cur = document.getElementById("v-"+current);
   const nxt = document.getElementById("v-"+id);
   if(!cur || !nxt) return;
@@ -1081,7 +1260,6 @@ function goto(id){
   if(ROUTES[id].needAuth && !WHO.token){
     openAuth("login", id); return;
   }
-  const my = ++switchSeq;            /* 本次切场序号；旧序号的定时器到点后自动作废 */
   cur.classList.add("leaving");
   setTimeout(()=>{
     if(my !== switchSeq) return;     /* 已有更新的切场：丢弃本次，杜绝双视图叠加 */
@@ -1114,18 +1292,14 @@ applyIdentity();
    红点：捕获 JS 错误 → localStorage 持久 → 角落徽标（勿删，保持最后一个 script）
    ================================================================ */
 (function(){
-  var KEY='tplB_errlog_v1', MAX=50;
+  var KEY=(window.__SITE__||'tplB')+'_errlog_v1';
   function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
   function fmt(ts){var d=new Date(ts);function p(x){return(x<10?'0':'')+x}
     return (d.getMonth()+1)+'-'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-  function add(msg){var a=load();a.push({t:Date.now(),m:String(msg).slice(0,300)});
-    try{localStorage.setItem(KEY,JSON.stringify(a.slice(-MAX)))}catch(e){} render()}
-  window.__errLogAdd=add;
-  window.addEventListener('error',function(e){
-    add((e.message||'脚本错误')+(e.lineno?(' @行'+e.lineno):''))},true);
-  window.addEventListener('unhandledrejection',function(e){
-    var r=e.reason;add('Promise未处理: '+((r&&r.message)||(r&&String(r))||'无信息'))});
+  /* 监听与写盘已在 <head> 的前置脚本完成，这里只补 UI 刷新，避免同一条错误记两次 */
+  var early=window.__errLogAdd||function(){};
+  window.__errLogAdd=function(msg){ early(msg); try{render()}catch(e){} };
   function render(){
     var a=load(),n=a.length,dot=document.getElementById('errDot');
     if(!n){if(dot){dot.style.display='none'}return}

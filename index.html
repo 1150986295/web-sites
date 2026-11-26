@@ -9,6 +9,7 @@
   --paper:#EAE6DC; --ink:#2E2A24; --sub:#6B6455; --line:#C9C2B0;
   --zhu:#B03A2E; --card:#EAE6DC;
   --shadow-lt:#FFFFFF; --shadow-dk:#C9C2B0;
+  --tap:44px;
 }
 @media (prefers-color-scheme: dark){
   :root{ --paper:#1D1A16; --ink:#EAE4D8; --sub:#A69D8B; --line:#3B352C;
@@ -24,9 +25,12 @@ h1{font-size:22px;margin:0 0 4px;letter-spacing:1px}
 .sub{font-size:13px;color:var(--sub);margin-bottom:26px}
 .card{display:block;text-decoration:none;color:inherit;background:var(--card);
   border-radius:18px;padding:14px 14px 16px;margin-bottom:16px;
+  min-height:var(--tap);
   box-shadow:6px 6px 14px var(--shadow-dk),-6px -6px 14px var(--shadow-lt);
   transition:transform .15s}
 .card:active{transform:scale(.98)}
+/* 键盘可达：Tab 到卡片时必须看得见焦点，否则键盘用户完全失去位置感 */
+:focus-visible{outline:2px solid var(--zhu); outline-offset:3px; border-radius:6px}
 .cover{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top center;
   border-radius:12px;margin-bottom:12px;background:rgba(138,130,116,.12)}
 .card-hd{display:flex;align-items:center;gap:10px;padding:0 6px}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI 工具导航 · 一页收好</title>
-<meta name="description" content="写作、绘图、编程、办公四类 AI 工具的本地单页导航，纯前端实现，断网也能打开。">
+<meta name="description" content="40 个 AI 工具的本地单页导航，含任务场景、免费与网络条件筛选，纯前端断网可用。">
 <style>
 /* ========== 一、设计令牌 ========== */
 :root{
@@ -86,9 +86,14 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   background:rgba(255,255,255,.04); box-shadow:var(--sh-1)}
 .kicker i{width:6px; height:6px; border-radius:50%; background:linear-gradient(120deg,var(--primary),var(--accent))}
 .hd h1{margin-top:var(--sp-3); font-size:var(--fs-hero); line-height:1.1; font-weight:800; letter-spacing:.01em}
-.hd h1 span{background:linear-gradient(100deg,#7FA0FF 0%,#B58CFF 55%,#6FE6FF 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent}
-.lede{max-width:620px; margin:var(--sp-2) auto 0; font-size:var(--fs-body); color:var(--ink-2); line-height:1.75}
+.hd h1 span{
+  /* 首尾同色的 5 色标 + 放大背景，让光带循环流动时无缝衔接 */
+  background:linear-gradient(100deg,#7FA0FF 0%,#B58CFF 28%,#6FE6FF 50%,#B58CFF 72%,#7FA0FF 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:textFlow 6s linear infinite;
+}
+.lede{max-width:640px; margin:var(--sp-2) auto 0; font-size:var(--fs-body); color:var(--ink-2); line-height:1.75}
 .stats{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:var(--sp-3);
   font-size:var(--fs-mini); color:var(--ink-3)}
 .stats span{padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.03)}
@@ -133,6 +138,16 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 .chip[aria-pressed="true"]{color:#07090F; border-color:transparent; font-weight:650;
   background:linear-gradient(120deg,#7FA0FF,#B58CFF); box-shadow:var(--sh-1)}
 .chip[aria-pressed="true"] b{color:rgba(7,9,15,.56)}
+.switches{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.sw{display:inline-flex; align-items:center; gap:7px; min-height:34px; padding:6px 12px;
+  border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.035);
+  color:var(--ink-2); font-size:13px; transition:all .2s ease}
+.sw .dot{width:14px; height:14px; flex:none; display:grid; place-items:center;
+  border:1px solid var(--line-2); border-radius:4px; font-size:10px; line-height:1}
+.sw:hover{border-color:var(--line-2); color:var(--ink)}
+.sw[aria-pressed="true"]{color:#07090F; border-color:transparent; font-weight:600;
+  background:linear-gradient(120deg,#7FA0FF,#B58CFF)}
+.sw[aria-pressed="true"] .dot{border-color:rgba(7,9,15,.5)}
 .hitline{margin:var(--sp-2) 2px 0; min-height:22px; font-size:var(--fs-mini); color:var(--ink-3)}
 
 /* ========== 四、卡片列表 ========== */
@@ -149,6 +164,8 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   -webkit-backdrop-filter:blur(18px) saturate(130%); backdrop-filter:blur(18px) saturate(130%);
   transition:transform .24s cubic-bezier(.2,.7,.2,1), border-color .24s ease, box-shadow .24s ease;
 }
+.card-hit{position:absolute; inset:0; z-index:1; text-decoration:none; border-radius:var(--r-l); cursor:pointer}
+.card .card-top,.card h3,.card p,.card .meta,.card .visit{position:relative}
 .card::before{content:""; position:absolute; inset:0 0 auto; height:1px; opacity:.85;
   background:linear-gradient(90deg,var(--cat),rgba(255,255,255,.2) 38%,transparent 82%)}
 .card::after{content:""; position:absolute; right:-40px; top:-50px; width:180px; height:150px;
@@ -156,21 +173,36 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   background:radial-gradient(circle at 50% 50%, var(--cat-soft), transparent 70%)}
 .card:hover{transform:translateY(-4px); border-color:var(--cat-line); box-shadow:var(--sh-2)}
 .card.anim{animation:rise .5s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i,0) * 45ms)}
-.card-top{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.card-top{display:flex; align-items:center; justify-content:flex-start; gap:10px}
 .icon{width:48px; height:48px; flex:none; display:grid; place-items:center; border-radius:13px;
   color:var(--cat); border:1px solid var(--cat-line);
   background:linear-gradient(145deg, var(--cat-soft), rgba(255,255,255,.02))}
 .icon svg{width:24px; height:24px}
 .tag{flex:none; padding:6px 10px; border-radius:999px; font-size:var(--fs-mini); line-height:1;
   letter-spacing:.04em; color:var(--cat); background:var(--cat-soft); border:1px solid var(--cat-line)}
+.star{position:absolute; top:16px; right:16px; z-index:3; width:30px; height:30px;
+  display:grid; place-items:center; padding:0; border-radius:9px;
+  border:1px solid var(--line); background:rgba(8,10,18,.5); color:var(--ink-3);
+  transition:all .2s ease}
+.star svg{width:16px; height:16px}
+.star:hover{color:#FFD87A; border-color:rgba(255,216,122,.5)}
+.star[aria-pressed="true"]{color:#FFD87A; border-color:rgba(255,216,122,.5); background:rgba(255,216,122,.1)}
+.star[aria-pressed="true"] svg{fill:#FFD87A}
 .card h3{font-size:var(--fs-h1); line-height:1.3; font-weight:650; letter-spacing:.01em}
 .card p{font-size:var(--fs-body); line-height:1.72; color:var(--ink-2)}
 .card mark.hl{background:rgba(110,140,255,.26); color:var(--ink); border-radius:3px; padding:0 2px; box-shadow:inset 0 -1px 0 rgba(110,140,255,.6)}
+.meta{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.why{width:100%; font-size:12.5px; line-height:1.55; color:var(--ink-3)}
+.pill{font-size:11px; padding:3px 8px; border-radius:999px; white-space:nowrap;
+  border:1px solid var(--line); color:var(--ink-2); background:rgba(255,255,255,.04)}
+.task{color:var(--cat); border-color:var(--cat-line); background:var(--cat-soft)}
+.pill.good{color:#7EE0B0; border-color:rgba(126,224,176,.3); background:rgba(126,224,176,.08)}
+.pill.warn{color:#FFB27A; border-color:rgba(255,178,122,.3); background:rgba(255,178,122,.08)}
 .visit{display:inline-flex; align-items:center; gap:6px; margin-top:auto; padding-top:12px;
   border-top:1px solid rgba(255,255,255,.08); color:var(--cat);
   font-size:var(--fs-mini); font-weight:600; letter-spacing:.03em}
 .visit svg{width:14px; height:14px; transition:transform .24s cubic-bezier(.2,.7,.2,1)}
-.card:hover .visit svg, .card:focus-visible .visit svg{transform:translate(2px,-2px)}
+.card:hover .visit svg, .card:focus-within .visit svg{transform:translate(2px,-2px)}
 .cat-writing{--cat:var(--c-writing); --cat-soft:var(--c-writing-soft); --cat-line:var(--c-writing-line)}
 .cat-image{--cat:var(--c-image); --cat-soft:var(--c-image-soft); --cat-line:var(--c-image-line)}
 .cat-code{--cat:var(--c-code); --cat-soft:var(--c-code-soft); --cat-line:var(--c-code-line)}
@@ -233,6 +265,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 /* ========== 八、动效与响应式 ========== */
 @keyframes rise{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
 @keyframes sk{from{background-position:200% 0} to{background-position:-200% 0}}
+@keyframes textFlow{from{background-position:0% 50%} to{background-position:100% 50%}}
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important; transition:none !important}
 }
@@ -242,9 +275,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   .stats{gap:6px}
   .stats span{padding:5px 10px}
   .card h3{font-size:20px}
-  .chips{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px}
+  .chips{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px}
   .chip{justify-content:center; gap:4px; padding:6px 4px; font-size:13px; min-height:36px}
   .chip b{font-size:11px}
+  .switches{gap:6px}
+  .sw{font-size:12px; padding:5px 10px; min-height:32px}
   .sk-card{height:150px}
 }
 @media (max-width:380px){
@@ -260,11 +295,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   <header class="hd">
     <p class="kicker"><i></i>TOOL ATLAS · OFFLINE READY</p>
     <h1>AI <span>工具导航</span></h1>
-    <p class="lede">写作、绘图、编程、办公——好用的工具收进一页。搜名字、点卡片，直达官网。</p>
+    <p class="lede">写作、绘图、编程、办公——40 个好用的工具收进一页。按任务找、按条件筛，点卡片直达官网。</p>
     <div class="stats">
-      <span><b id="statTools">9</b> 个工具</span>
+      <span><b id="statTools">40</b> 个工具</span>
       <span><b id="statCats">4</b> 个分类</span>
-      <span><b id="statLinks">9</b> 个直达入口</span>
+      <span><b id="statLinks">40</b> 个直达入口</span>
     </div>
   </header>
 
@@ -275,7 +310,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
         <path d="m16 16 4.2 4.2"></path>
       </svg>
       <input id="q" type="search" autocomplete="off" spellcheck="false"
-             placeholder="搜索工具名，如 Cursor" aria-label="搜索工具名">
+             placeholder="搜工具名或任务，如 Cursor、做PPT" aria-label="搜索工具名或任务场景">
       <button id="clearBtn" type="button" aria-label="清除搜索" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
           <path d="m6 6 12 12M18 6 6 18"></path>
@@ -284,18 +319,26 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     </div>
 
     <div class="chips" id="chips" role="group" aria-label="按分类筛选">
-      <button class="chip" type="button" data-cat="all" aria-pressed="true">全部 <b data-count="all">9</b></button>
-      <button class="chip" type="button" data-cat="writing" aria-pressed="false">写作 <b data-count="writing">3</b></button>
-      <button class="chip" type="button" data-cat="image" aria-pressed="false">绘图 <b data-count="image">2</b></button>
-      <button class="chip" type="button" data-cat="code" aria-pressed="false">编程 <b data-count="code">2</b></button>
-      <button class="chip" type="button" data-cat="office" aria-pressed="false">办公 <b data-count="office">2</b></button>
+      <button class="chip" type="button" data-cat="all" aria-pressed="true">全部 <b data-count="all">40</b></button>
+      <button class="chip" type="button" data-cat="writing" aria-pressed="false">写作 <b data-count="writing">10</b></button>
+      <button class="chip" type="button" data-cat="image" aria-pressed="false">绘图 <b data-count="image">10</b></button>
+      <button class="chip" type="button" data-cat="code" aria-pressed="false">编程 <b data-count="code">10</b></button>
+      <button class="chip" type="button" data-cat="office" aria-pressed="false">办公 <b data-count="office">10</b></button>
+      <button class="chip" type="button" data-cat="fav" aria-pressed="false">★ 收藏 <b data-count="fav">0</b></button>
+      <button class="chip" type="button" data-cat="recent" aria-pressed="false">最近 <b data-count="recent">0</b></button>
+    </div>
+
+    <div class="switches" id="switches" role="group" aria-label="快捷筛选开关">
+      <button class="sw" type="button" data-sw="free" aria-pressed="false"><span class="dot">✓</span>免费可用</button>
+      <button class="sw" type="button" data-sw="nowall" aria-pressed="false"><span class="dot">✓</span>免翻墙</button>
+      <button class="sw" type="button" data-sw="cn" aria-pressed="false"><span class="dot">✓</span>中文友好</button>
     </div>
 
     <p class="hitline" id="hit" aria-live="polite">正在载入工具索引…</p>
   </section>
 
   <section class="list" id="list" aria-label="工具列表">
-    <div class="state loading" id="listLoading" aria-busy="true">
+    <div class="state loading" id="listLoading" aria-busy="true" hidden>
       <div class="sk-grid" aria-hidden="true">
         <div class="sk-card"><div class="sk-line short"></div><div class="sk-line"></div><div class="sk-line tiny"></div></div>
         <div class="sk-card"><div class="sk-line short"></div><div class="sk-line"></div><div class="sk-line tiny"></div></div>
@@ -313,7 +356,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
         </svg>
       </div>
       <h2 id="emptyTitle">没有找到匹配的工具</h2>
-      <p>换个关键词试试；也可以清空条件，回到全部 9 个工具。</p>
+      <p>换个关键词试试；也可以清空条件，回到全部工具。</p>
       <button class="act" id="emptyReset" type="button">清空条件，看全部</button>
     </div>
 
@@ -338,38 +381,110 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 
   <footer class="ft">
     本站为纯前端单文件索引，不含登录与推广；页面本身无外部请求，断网也能浏览。<br>
-    点击卡片会在新窗口打开对应工具官网，具体功能、收费与隐私条款以官网为准。
+    点击卡片会在新窗口打开对应工具官网。<b>免费额度与网络要求核对于 2026-11（见每条卡片标注）</b>，政策可能变化，使用前请以官网为准。
   </footer>
 </main>
 
 <script>
-/* 主逻辑：路由表 → 数据 → 三态 → 搜索/筛选 */
+/* 主逻辑：路由表 → 数据 → 三态 → 搜索/筛选/开关/收藏 */
 (function(){
   'use strict';
 
-  /* 路由表：分类的唯一来源 */
-  var ROUTES = {all:'全部', writing:'写作', image:'绘图', code:'编程', office:'办公'};
+  /* 路由表：分类与视图的唯一来源 */
+  var ROUTES = {all:'全部', writing:'写作', image:'绘图', code:'编程', office:'办公', fav:'我的收藏', recent:'最近访问'};
 
-  /* py：拼音全拼 + 首字母缩写，供拼音检索 */
+  /* 每条工具：name 名 / cat 分类 / task 任务场景 / keys 关键词 / py 拼音
+     icon 图标 / url 官网 / desc 简介 / free 免费政策 / freeOk 是否有免费档
+     wall 是否需代理 / cn 中文友好 / why 推荐理由
+     说明：free/wall/cn 核对于 2026-11，会变化，以官网为准。 */
   var TOOLS = [
-    {name:'Notion AI', cat:'writing', keys:'notion ai 笔记 文档 写作', py:'notion', icon:'doc', url:'https://www.notion.so/product/ai',
-     desc:'在笔记里改写、总结、起稿，资料和思路放在一处。'},
-    {name:'秘塔写作猫', cat:'writing', keys:'秘塔 写作猫 中文 校对 润色', py:'mita xiezuo mao mtxzm mts', icon:'pen', url:'https://xiezuocat.com/',
-     desc:'中文错别字、语病和措辞检查，改稿快一步。'},
-    {name:'DeepL Write', cat:'writing', keys:'deepl write 英文 改写 翻译', py:'deepl write dw', icon:'globe', url:'https://www.deepl.com/write',
-     desc:'英文句子改写与语气调整，邮件和论文都能用。'},
-    {name:'Midjourney', cat:'image', keys:'midjourney mj 绘图 出图 插画', py:'midjourney mj', icon:'image', url:'https://www.midjourney.com/',
-     desc:'一句提示词出图，风格化视觉与概念图首选。'},
-    {name:'Stable Diffusion', cat:'image', keys:'stable diffusion sd 开源 绘图 本地', py:'stable diffusion sd', icon:'layers', url:'https://stability.ai/',
-     desc:'开源绘图模型，本地部署，参数与风格全在手。'},
-    {name:'Cursor', cat:'code', keys:'cursor 编辑器 编程 补全 重构', py:'cursor', icon:'cursor', url:'https://cursor.com/',
-     desc:'把 AI 放进编辑器，整段改写、补全与解释代码。'},
-    {name:'GitHub Copilot', cat:'code', keys:'copilot github 编程 ide 补全', py:'github copilot gh', icon:'code', url:'https://github.com/features/copilot',
-     desc:'在 IDE 里边写边补全，测试和注释也能生成。'},
-    {name:'WPS AI', cat:'office', keys:'wps ai 办公 文档 表格 演示', py:'wps ai', icon:'grid', url:'https://ai.wps.cn/',
-     desc:'文档、表格、演示里的中文助手，起草与整理。'},
-    {name:'讯飞听见', cat:'office', keys:'讯飞 听见 iflytek 录音 转写 纪要', py:'xunfei tingjian xftj', icon:'wave', url:'https://www.iflyrec.com/',
-     desc:'录音转文字，会议结束就有可改的纪要底稿。'}
+    /* 写作 writing */
+    {name:'Notion AI', cat:'writing', task:'写文档', keys:'notion ai 笔记 文档 写作', py:'notion', icon:'doc', url:'https://www.notion.com/product/ai',
+     desc:'在笔记里改写、总结、起稿，资料和思路放在一处。', free:'有免费档，进阶需订阅', freeOk:true, wall:true, cn:false, why:'笔记与写作一体，资料思路集中'},
+    {name:'秘塔写作猫', cat:'writing', task:'校对润色', keys:'秘塔 写作猫 中文 校对 润色', py:'mita xiezuo mao mtxzm mts', icon:'pen', url:'https://xiezuocat.com/',
+     desc:'中文错别字、语病和措辞检查，改稿快一步。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'中文校对准确，学术改稿顺手'},
+    {name:'DeepL Write', cat:'writing', task:'翻译润色', keys:'deepl write 英文 改写 翻译', py:'deepl write dw', icon:'globe', url:'https://www.deepl.com/en/write',
+     desc:'英文句子改写与语气调整，邮件和论文都能用。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'英文改写地道，邮件论文适用'},
+    {name:'Kimi', cat:'writing', task:'长文阅读', keys:'kimi 长文 阅读 资料 深度研究', py:'kimi', icon:'doc', url:'https://www.kimi.com/',
+     desc:'超长文档阅读与整理，论文资料一次读完。', free:'对话基本免费', freeOk:true, wall:false, cn:true, why:'长文阅读强，资料党首选'},
+    {name:'通义千问', cat:'writing', task:'综合写作', keys:'通义 千问 qwen 阿里 写作 问答', py:'tongyi qianwen tyqw', icon:'spark', url:'https://qianwen.aliyun.com/',
+     desc:'问答、写作、文档处理一体，中文场景稳。', free:'基础功能免费', freeOk:true, wall:false, cn:true, why:'多模态全能，中文场景稳'},
+    {name:'文心助手', cat:'writing', task:'综合写作', keys:'文心 一言 百度 写作 画图', py:'wenxin yiyan wxyy', icon:'pen', url:'https://wenxin.baidu.com/',
+     desc:'聊天、写作、识图、读文档，基础功能免费。', free:'基础功能免费', freeOk:true, wall:false, cn:true, why:'百度生态，中文场景稳'},
+    {name:'DeepSeek', cat:'writing', task:'深度推理', keys:'deepseek 深度求索 推理 代码 长文', py:'deepseek', icon:'code', url:'https://chat.deepseek.com/',
+     desc:'推理、代码与长文处理强，网页端基本不限次。', free:'网页端免费', freeOk:true, wall:false, cn:true, why:'推理与代码强，无使用门槛'},
+    {name:'腾讯元宝', cat:'writing', task:'资料整理', keys:'元宝 腾讯 问答 资料 公众号', py:'yuanbao', icon:'chat', url:'https://yuanbao.tencent.com/',
+     desc:'问答与文档精读，公众号与视频号信息整合。', free:'个人免费', freeOk:true, wall:false, cn:true, why:'微信生态内容检索方便'},
+    {name:'智谱清言', cat:'writing', task:'长文写作', keys:'智谱 清言 glm 对话 写作 编程', py:'zhipu qingyan zpqy', icon:'chat', url:'https://chatglm.cn/',
+     desc:'对话、写作、编程与图片理解，Agent 能力突出。', free:'基础功能免费', freeOk:true, wall:false, cn:true, why:'长程任务能力强，合规性好'},
+    {name:'讯飞星火', cat:'writing', task:'语音写作', keys:'讯飞 星火 写作 翻译 语音', py:'xunfei xinghuo xfxh', icon:'wave', url:'https://xinghuo.xfyun.cn/',
+     desc:'问答、写作、翻译与语音能力均衡。', free:'有免费试用', freeOk:true, wall:false, cn:true, why:'语音与中文写作均衡'},
+
+    /* 绘图 image */
+    {name:'Midjourney', cat:'image', task:'风格出图', keys:'midjourney mj 绘图 出图 插画', py:'midjourney mj', icon:'image', url:'https://www.midjourney.com/',
+     desc:'一句提示词出图，风格化视觉与概念图首选。', free:'付费为主，试用有限', freeOk:false, wall:true, cn:false, why:'风格化出图顶级，需代理与外卡'},
+    {name:'Stable Diffusion', cat:'image', task:'本地绘图', keys:'stable diffusion sd 开源 绘图 本地', py:'stable diffusion sd', icon:'layers', url:'https://stability.ai/',
+     desc:'开源绘图模型，可本地部署，参数与风格全在手。', free:'开源免费', freeOk:true, wall:false, cn:false, why:'本地部署免网络，进阶玩家首选'},
+    {name:'即梦', cat:'image', task:'海报封面', keys:'即梦 剪映 绘图 海报 视频 字节', py:'jimeng', icon:'image', url:'https://jimeng.jianying.com/',
+     desc:'中文提示词理解好，绘图与视频创作一体。', free:'每日约 60 积分', freeOk:true, wall:false, cn:true, why:'中文理解最好，接剪映做视频'},
+    {name:'通义万相', cat:'image', task:'国风海报', keys:'通义 万相 阿里 绘图 国风 海报', py:'tongyi wanxiang tywx', icon:'layers', url:'https://tongyi.aliyun.com/wan/',
+     desc:'国风、海报与中文文字渲染强，网页版额度够用。', free:'每日约 50 灵感值', freeOk:true, wall:false, cn:true, why:'国风独一档，中文文字渲染强'},
+    {name:'可灵', cat:'image', task:'视频生成', keys:'可灵 快手 视频 绘图 运镜', py:'keling', icon:'video', url:'https://klingai.com/',
+     desc:'视频生成是招牌，写实画质与运镜出色。', free:'每日约 66 灵感值', freeOk:true, wall:false, cn:true, why:'运镜好看，写实画质好'},
+    {name:'哩布哩布', cat:'image', task:'模型创作', keys:'liblib 哩布哩布 sd 模型 lora 社区', py:'libulibu', icon:'layers', url:'https://www.liblib.art/',
+     desc:'大量社区模型，可换风格、自己训练 LoRA。', free:'每日算力免费', freeOk:true, wall:false, cn:true, why:'模型最丰富，可玩 LoRA'},
+    {name:'Adobe Firefly', cat:'image', task:'商用设计', keys:'firefly adobe 绘图 商用 设计', py:'firefly', icon:'spark', url:'https://www.adobe.com/products/firefly.html',
+     desc:'商用授权清晰，与 Adobe 设计工具打通。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'商用授权清晰，需代理'},
+    {name:'海艺AI', cat:'image', task:'二次元插画', keys:'海艺 seaart 绘图 二次元 插画', py:'haiyi', icon:'image', url:'https://www.seaart.ai/',
+     desc:'二次元与插画风格有特色，出图快、额度大方。', free:'额度大方', freeOk:true, wall:false, cn:true, why:'二次元风格突出，出图快'},
+    {name:'腾讯混元', cat:'image', task:'中文海报', keys:'混元 腾讯 绘图 海报 中文', py:'hunyuan', icon:'image', url:'https://hunyuan.tencent.com/',
+     desc:'中文文字渲染准，海报与电商图适用。', free:'文生图免费', freeOk:true, wall:false, cn:true, why:'中文海报文字渲染强'},
+    {name:'Microsoft Copilot', cat:'image', task:'快速出图', keys:'copilot bing 微软 绘图 出图', py:'copilot', icon:'spark', url:'https://copilot.microsoft.com/',
+     desc:'浏览器内快速出图，每日有免费次数。', free:'每日约 15 次', freeOk:true, wall:true, cn:false, why:'浏览器内出图快，需代理'},
+
+    /* 编程 code */
+    {name:'Cursor', cat:'code', task:'代码重构', keys:'cursor 编辑器 编程 补全 重构', py:'cursor', icon:'cursor', url:'https://cursor.com/',
+     desc:'把 AI 放进编辑器，整段改写、补全与解释代码。', free:'Hobby 免费档', freeOk:true, wall:true, cn:false, why:'AI 原生编辑器，多文件改造强'},
+    {name:'GitHub Copilot', cat:'code', task:'代码补全', keys:'copilot github 编程 ide 补全', py:'github copilot gh', icon:'code', url:'https://github.com/features/copilot',
+     desc:'在 IDE 里边写边补全，生态最完整，学生免费。', free:'免费档/学生免费', freeOk:true, wall:true, cn:false, why:'补全生态最全，学生可免费'},
+    {name:'Trae', cat:'code', task:'代码生成', keys:'trae 字节 编辑器 编程 中文', py:'trae', icon:'cursor', url:'https://www.trae.cn/',
+     desc:'中文 AI IDE，自然语言描述就能写代码。', free:'完全免费', freeOk:true, wall:false, cn:true, why:'中文界面，国内直连免费'},
+    {name:'通义灵码', cat:'code', task:'代码补全', keys:'通义 灵码 阿里 编程 补全', py:'tongyi lingma tylm', icon:'code', url:'https://lingma.aliyun.com/',
+     desc:'阿里出品插件，Python、Java 补全稳。', free:'个人免费', freeOk:true, wall:false, cn:true, why:'国内直连，后端语言稳'},
+    {name:'CodeGeeX', cat:'code', task:'本地编码', keys:'codegeex 智谱 开源 编程 本地', py:'codegeex', icon:'code', url:'https://codegeex.cn/',
+     desc:'开源免费，可本地部署，数据不出厂。', free:'开源免费', freeOk:true, wall:false, cn:true, why:'可本地部署，数据不出厂'},
+    {name:'文心快码', cat:'code', task:'代码补全', keys:'comate 文心快码 百度 编程 补全', py:'wenxin kuaima wxkm', icon:'code', url:'https://comate.baidu.com/',
+     desc:'百度插件，中文注释与说明质量好。', free:'个人免费', freeOk:true, wall:false, cn:true, why:'中文注释好，个人免费'},
+    {name:'Claude', cat:'code', task:'复杂编码', keys:'claude anthropic 编程 代码 推理', py:'claude', icon:'spark', url:'https://claude.ai/',
+     desc:'复杂编码与长程任务强，网页版有免费档，但对中国用户限制严格。', free:'有免费档(受限)', freeOk:true, wall:true, cn:false, why:'编码强，但中国用户封锁严格'},
+    {name:'Windsurf', cat:'code', task:'Agent编码', keys:'windsurf 编辑器 编程 agent 补全', py:'windsurf', icon:'cursor', url:'https://windsurf.com/',
+     desc:'Agent 式编辑器，能跟着上下文改多个文件。', free:'有免费档', freeOk:true, wall:true, cn:false, why:'Agent 式编辑，需代理'},
+    {name:'v0', cat:'code', task:'前端生成', keys:'v0 vercel 前端 生成 界面', py:'v0', icon:'code', url:'https://v0.app/',
+     desc:'一句提示词生成前端页面与组件。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'提示词直出前端页面'},
+    {name:'Gemini', cat:'code', task:'多模态编程', keys:'gemini 谷歌 编程 多模态 代码', py:'gemini', icon:'spark', url:'https://gemini.google.com/',
+     desc:'多模态能力强，代码与图文都能处理。', free:'有免费档', freeOk:true, wall:true, cn:false, why:'多模态强，需代理'},
+
+    /* 办公 office */
+    {name:'WPS AI', cat:'office', task:'做PPT', keys:'wps ai 办公 文档 表格 演示', py:'wps ai', icon:'grid', url:'https://ai.wps.cn/',
+     desc:'文档、表格、演示里的中文助手，起草与整理。', free:'部分免费', freeOk:true, wall:false, cn:true, why:'中文办公套件，上手快'},
+    {name:'讯飞听见', cat:'office', task:'转写会议', keys:'讯飞 听见 iflytek 录音 转写 纪要', py:'xunfei tingjian xftj', icon:'wave', url:'https://www.iflyrec.com/',
+     desc:'录音转文字，会议结束就有可改的纪要底稿。', free:'有免费时长', freeOk:true, wall:false, cn:true, why:'录音转写准，纪要底稿快'},
+    {name:'天工', cat:'office', task:'做PPT', keys:'天工 skywork 办公 ppt 表格 deepresearch', py:'tiangong', icon:'grid', url:'https://www.tiangong.cn/',
+     desc:'深度研究与文档、PPT、表格处理一体。', free:'注册可体验', freeOk:true, wall:false, cn:true, why:'报告与方案一条龙'},
+    {name:'纳米AI搜索', cat:'office', task:'查资料', keys:'纳米 ai 搜索 360 资料 汇总', py:'nami', icon:'search', url:'https://www.n.cn/',
+     desc:'搜索替代，汇总网页、PDF 与视频内容。', free:'免费使用', freeOk:true, wall:false, cn:true, why:'资料汇总快，国内直连'},
+    {name:'Gamma', cat:'office', task:'做PPT', keys:'gamma ppt 演示 生成 办公', py:'gamma', icon:'grid', url:'https://gamma.app/',
+     desc:'一句话生成演示稿与文档，排版省心。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'演示稿生成快，需代理'},
+    {name:'Perplexity', cat:'office', task:'查资料溯源', keys:'perplexity 搜索 溯源 学术 核查', py:'perplexity', icon:'search', url:'https://www.perplexity.ai/',
+     desc:'每句话标注来源，适合学术与事实核查。', free:'有免费版', freeOk:true, wall:true, cn:false, why:'逐句标来源，核查方便'},
+    {name:'腾讯会议AI', cat:'office', task:'会议纪要', keys:'腾讯会议 纪要 转写 会议 ai', py:'tengxun huiyi txhy', icon:'wave', url:'https://meeting.tencent.com/',
+     desc:'会议结束自动整理纪要与待办。', free:'免费版可用', freeOk:true, wall:false, cn:true, why:'会议纪要自动整理'},
+    {name:'飞书妙记', cat:'office', task:'会议纪要', keys:'飞书 妙记 转写 会议 纪要', py:'feishu miaoji fsmj', icon:'wave', url:'https://www.feishu.cn/',
+     desc:'会议转写并沉淀到知识库，检索方便。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'转写沉淀到知识库'},
+    {name:'百度文库AI', cat:'office', task:'文档整理', keys:'百度文库 ai 文档 范文 ppt', py:'baidu wenku bdwk', icon:'doc', url:'https://wenku.baidu.com/',
+     desc:'文档素材与智能生成一体，找范文写初稿。', free:'部分免费', freeOk:true, wall:false, cn:true, why:'文档素材多，起稿快'},
+    {name:'秘塔AI搜索', cat:'office', task:'查资料溯源', keys:'秘塔 搜索 metaso 溯源 研究', py:'mita sousuo mts', icon:'search', url:'https://metaso.cn/',
+     desc:'无广告深度搜索，答案可点回原文。', free:'免费不限次', freeOk:true, wall:false, cn:true, why:'无广告可溯源，学生友好'}
   ];
 
   var ICONS = {
@@ -381,12 +496,43 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     cursor:'<path d="m5 3.2 13.4 7.6-6.1 1.1-2.6 6.9z"></path>',
     code:'<path d="m8.2 7.4-4.6 4.6 4.6 4.6"></path><path d="m15.8 7.4 4.6 4.6-4.6 4.6"></path><path d="m13.6 5.6-3.2 12.8"></path>',
     grid:'<rect x="3.8" y="4.2" width="16.4" height="15.6" rx="2"></rect><path d="M9.4 4.4v15.2M3.9 12h16.2"></path><path d="M15.8 8.2v2.2M15.8 13.4v2.2"></path>',
-    wave:'<path d="M3.8 10.8v2.4M7 8.6v6.8M10.2 5.6v12.8M13.4 8v8M16.6 6.4v11.2M19.8 9.4v5.2"></path>'
+    wave:'<path d="M3.8 10.8v2.4M7 8.6v6.8M10.2 5.6v12.8M13.4 8v8M16.6 6.4v11.2M19.8 9.4v5.2"></path>',
+    spark:'<path d="M12 3.2 13.8 9l5.8 1.8-5.8 1.8L12 18.4l-1.8-5.8L4.4 10.8 10.2 9z"></path><path d="M18.6 16.2 19.2 18l1.8.6-1.8.6-.6 1.8-.6-1.8-1.8-.6 1.8-.6z"></path>',
+    chat:'<path d="M20 11.6a7.6 7.6 0 0 1-7.6 7.6 8 8 0 0 1-3.2-.7L4.2 20l1.5-4.8A7.6 7.6 0 1 1 20 11.6z"></path><path d="M8.8 11.6h6.4M8.8 8.2h4"></path>',
+    search:'<circle cx="10.6" cy="10.6" r="6.2"></circle><path d="m15.4 15.4 4.4 4.4"></path>',
+    video:'<rect x="3.6" y="5.2" width="16.8" height="13.6" rx="2.2"></rect><path d="m10.2 9.4 5 2.6-5 2.6z"></path>'
   };
+  var STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.2 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.7l6.1-.9z"></path></svg>';
 
-  var STATE = {cat:'all', q:'', ready:false, animate:true};
+  var STATE = {cat:'all', q:'', ready:false, animate:true,
+    sw:{free:false, nowall:false, cn:false}, fav:[], recent:[]};
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var switchSeq = 0;
+  var FAV_KEY = 'ainav_fav_v1', RECENT_KEY = 'ainav_recent_v1';
+
+  function loadArr(key){
+    try{ var a = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
+  }
+  function saveArr(key, a){ try{ localStorage.setItem(key, JSON.stringify(a)); }catch(e){} }
+  function isFav(name){ return STATE.fav.indexOf(name) > -1; }
+  function toggleFav(name){
+    var i = STATE.fav.indexOf(name);
+    if(i > -1) STATE.fav.splice(i, 1); else STATE.fav.push(name);
+    saveArr(FAV_KEY, STATE.fav);
+    if(STATE.ready){ setCounts(); render(false); }
+  }
+  function addRecent(name){
+    var i = STATE.recent.indexOf(name);
+    if(i > -1) STATE.recent.splice(i, 1);
+    STATE.recent.unshift(name);
+    STATE.recent = STATE.recent.slice(0, 12);
+    saveArr(RECENT_KEY, STATE.recent);
+    setCounts();
+  }
+
+  STATE.fav = loadArr(FAV_KEY);
+  STATE.recent = loadArr(RECENT_KEY);
 
   var grid = document.getElementById('grid');
   var listLoading = document.getElementById('listLoading');
@@ -398,6 +544,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   var q = document.getElementById('q');
   var clearBtn = document.getElementById('clearBtn');
   var chips = document.getElementById('chips');
+  var switches = document.getElementById('switches');
 
   function esc(s){
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -411,18 +558,26 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   }
   function matches(t){
     var kw = STATE.q.trim().toLowerCase();
-    if(STATE.cat !== 'all' && t.cat !== STATE.cat) return false;
+    if(STATE.cat === 'fav' && !isFav(t.name)) return false;
+    if(STATE.cat === 'recent' && STATE.recent.indexOf(t.name) < 0) return false;
+    if(STATE.cat !== 'all' && STATE.cat !== 'fav' && STATE.cat !== 'recent' && t.cat !== STATE.cat) return false;
+    if(STATE.sw.free && !t.freeOk) return false;
+    if(STATE.sw.nowall && t.wall) return false;
+    if(STATE.sw.cn && !t.cn) return false;
     if(!kw) return true;
-    return (t.name + ' ' + t.keys + ' ' + (t.py || '')).toLowerCase().indexOf(kw) > -1;
+    return (t.name + ' ' + t.keys + ' ' + (t.py || '') + ' ' + (t.task || '') + ' ' + (t.why || '')).toLowerCase().indexOf(kw) > -1;
   }
-  /* 关键词高亮：仅匹配到时包 <mark>，走 esc 防注入 */
+  /* 关键词高亮：所有匹配都包 <mark>，每段走 esc 防注入 */
   function mark(text){
     var kw = STATE.q.trim();
     if(!kw) return esc(text);
-    var i = text.toLowerCase().indexOf(kw.toLowerCase());
-    if(i < 0) return esc(text);
-    return esc(text.slice(0,i)) + '<mark class="hl">' + esc(text.slice(i, i+kw.length))
-      + '</mark>' + esc(text.slice(i+kw.length));
+    var lower = text.toLowerCase(), needle = kw.toLowerCase();
+    var out = '', from = 0, i;
+    while((i = lower.indexOf(needle, from)) > -1){
+      out += esc(text.slice(from, i)) + '<mark class="hl">' + esc(text.slice(i, i + kw.length)) + '</mark>';
+      from = i + kw.length;
+    }
+    return out + esc(text.slice(from));
   }
   function syncChips(){
     for(var i=0;i<chips.children.length;i++){
@@ -430,31 +585,49 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
       b.setAttribute('aria-pressed', b.getAttribute('data-cat') === STATE.cat ? 'true' : 'false');
     }
   }
+  function syncSwitches(){
+    for(var i=0;i<switches.children.length;i++){
+      var b = switches.children[i];
+      b.setAttribute('aria-pressed', STATE.sw[b.getAttribute('data-sw')] ? 'true' : 'false');
+    }
+  }
   function setCounts(){
     Object.keys(ROUTES).forEach(function(k){
-      var n = k === 'all' ? TOOLS.length : TOOLS.filter(function(t){return t.cat === k;}).length;
+      var n;
+      if(k === 'all') n = TOOLS.length;
+      else if(k === 'fav') n = STATE.fav.length;
+      else if(k === 'recent') n = STATE.recent.length;
+      else n = TOOLS.filter(function(t){return t.cat === k;}).length;
       var el = document.querySelector('[data-count="' + k + '"]');
       if(el) el.textContent = n;
     });
-    /* 头部统计随数据自动计算，不再写死 */
     var st = document.getElementById('statTools'), sc = document.getElementById('statCats'),
         sl = document.getElementById('statLinks');
     if(st) st.textContent = TOOLS.length;
-    if(sc) sc.textContent = Object.keys(ROUTES).length - 1;
+    if(sc) sc.textContent = 4;   /* 真实分类数：写作/绘图/编程/办公，收藏与最近是视图 */
     if(sl) sl.textContent = TOOLS.filter(function(t){return !!t.url;}).length;
   }
   function cardHTML(t,i){
-    return '<a class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '"'
-      + ' href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"'
-      + ' aria-label="打开 ' + esc(t.name) + ' 官网（新窗口）" style="--i:' + i + '">'
+    var fav = isFav(t.name);
+    var pills = ''
+      + '<span class="pill task">' + esc(t.task) + '</span>'
+      + '<span class="pill ' + (t.freeOk ? 'good' : 'warn') + '" title="免费/网络政策核对于 2026-11，以官网为准">' + esc(t.free) + '</span>'
+      + (t.wall ? '<span class="pill warn">需代理</span>' : '<span class="pill good">国内直连</span>')
+      + (t.cn ? '<span class="pill good">中文友好</span>' : '');
+    return '<div class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '" style="--i:' + i + '">'
+      + '<a class="card-hit" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"'
+      + ' aria-label="打开 ' + esc(t.name) + ' 官网（新窗口）" data-rec="' + esc(t.name) + '"></a>'
+      + '<button class="star" type="button" data-fav="' + esc(t.name) + '" aria-pressed="' + (fav ? 'true' : 'false') + '"'
+      + ' aria-label="' + (fav ? '取消收藏 ' : '收藏 ') + esc(t.name) + '">' + STAR + '</button>'
       + '<div class="card-top"><span class="icon" aria-hidden="true">' + svg(ICONS[t.icon]) + '</span>'
       + '<span class="tag">' + ROUTES[t.cat] + '</span></div>'
       + '<h3>' + mark(t.name) + '</h3>'
       + '<p>' + mark(t.desc) + '</p>'
+      + '<div class="meta"><span class="why">推荐：' + esc(t.why) + '</span>' + pills + '</div>'
       + '<span class="visit">访问官网 '
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       + '<path d="M7 17 17 7"></path><path d="M9.5 7H17v7.5"></path></svg>'
-      + '</span></a>';
+      + '</span></div>';
   }
 
   function render(animate){
@@ -467,12 +640,19 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     listEmpty.hidden = list.length > 0;
 
     var kw = STATE.q.trim();
+    var swOn = [];
+    if(STATE.sw.free) swOn.push('免费可用');
+    if(STATE.sw.nowall) swOn.push('免翻墙');
+    if(STATE.sw.cn) swOn.push('中文友好');
+    var swText = swOn.length ? ' · ' + swOn.join('+') : '';
     if(kw){
-      hit.textContent = '命中 ' + list.length + ' 个工具 · 关键词「' + shortQ(kw) + '」';
+      hit.textContent = '命中 ' + list.length + ' 个工具 · 关键词「' + shortQ(kw) + '」' + swText;
       emptyTitle.textContent = '没有找到「' + shortQ(kw) + '」';
     }else{
-      hit.textContent = list.length + ' 个工具 · 当前分类「' + ROUTES[STATE.cat] + '」';
-      emptyTitle.textContent = '这个分类还没有工具';
+      hit.textContent = list.length + ' 个工具 · ' + ROUTES[STATE.cat] + swText;
+      if(STATE.cat === 'fav') emptyTitle.textContent = '还没有收藏';
+      else if(STATE.cat === 'recent') emptyTitle.textContent = '本次还没有访问记录';
+      else emptyTitle.textContent = '这个分类还没有工具';
     }
   }
 
@@ -504,33 +684,27 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     return ROUTES[h] ? h : 'all';
   }
 
+  /* 数据内联、同步可得：直接渲染，不空转假加载。
+     三态 DOM 与切换逻辑保留（空态/错误态仍由 render、catch 真实驱动），错误红点接真实异常。 */
   function boot(){
-    STATE.ready = false;
-    listLoading.hidden = false;
-    listEmpty.hidden = true;
-    listErr.hidden = true;
-    grid.hidden = true;
-    grid.innerHTML = '';
-    hit.textContent = '正在载入工具索引…';
-    setTimeout(function(){
-      try{
-        if(!TOOLS || !TOOLS.length) throw new Error('工具索引为空');
-        STATE.ready = true;
-        setCounts();
-        syncChips();
-        render(true);
-        grid.classList.remove('switching');
-      }catch(err){
-        STATE.ready = false;
-        listLoading.hidden = true;
-        grid.hidden = true;
-        listEmpty.hidden = true;
-        listErr.hidden = false;
-        errMsg.textContent = '错误信息：' + (err && err.message ? err.message : String(err));
-        hit.textContent = '索引载入失败';
-        if(window.__errLogAdd) window.__errLogAdd('工具索引载入失败：' + (err && err.message ? err.message : err));
-      }
-    }, 260);
+    try{
+      if(!TOOLS || !TOOLS.length) throw new Error('工具索引为空');
+      STATE.ready = true;
+      setCounts();
+      syncChips();
+      syncSwitches();
+      render(true);
+      grid.classList.remove('switching');
+    }catch(err){
+      STATE.ready = false;
+      listLoading.hidden = true;
+      grid.hidden = true;
+      listEmpty.hidden = true;
+      listErr.hidden = false;
+      errMsg.textContent = '错误信息：' + (err && err.message ? err.message : String(err));
+      hit.textContent = '索引载入失败';
+      if(window.__errLogAdd) window.__errLogAdd('工具索引载入失败：' + (err && err.message ? err.message : err));
+    }
   }
 
   chips.addEventListener('click', function(e){
@@ -539,12 +713,37 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     goto(btn.getAttribute('data-cat'));
   });
 
+  switches.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('.sw') : null;
+    if(!btn) return;
+    var key = btn.getAttribute('data-sw');
+    if(!(key in STATE.sw)) return;
+    STATE.sw[key] = !STATE.sw[key];
+    syncSwitches();
+    switchSeq++;
+    if(STATE.ready) render(false);
+  });
+
+  grid.addEventListener('click', function(e){
+    var star = e.target && e.target.closest ? e.target.closest('.star') : null;
+    if(star){
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFav(star.getAttribute('data-fav'));
+      return;
+    }
+    var link = e.target && e.target.closest ? e.target.closest('.card-hit') : null;
+    if(link) addRecent(link.getAttribute('data-rec'));
+  });
+
+  var qTimer = null;
   q.addEventListener('input', function(){
     STATE.q = q.value;
     clearBtn.hidden = !q.value;
     if(!STATE.ready) return;
     switchSeq++;
-    render(false);
+    if(qTimer) clearTimeout(qTimer);
+    qTimer = setTimeout(function(){ render(false); }, 120);
   });
   q.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && q.value){
@@ -557,6 +756,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   });
 
   clearBtn.addEventListener('click', function(){
+    if(qTimer) clearTimeout(qTimer);
     q.value = '';
     STATE.q = '';
     clearBtn.hidden = true;
@@ -570,7 +770,9 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     STATE.q = '';
     clearBtn.hidden = true;
     STATE.cat = 'all';
+    STATE.sw.free = STATE.sw.nowall = STATE.sw.cn = false;
     syncChips();
+    syncSwitches();
     try{ history.replaceState(null, '', '#all'); }catch(e){}
     switchSeq++;
     if(STATE.ready) render(false);

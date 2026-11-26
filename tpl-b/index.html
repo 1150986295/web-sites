@@ -28,6 +28,8 @@
 }
 /* ---------- 二、基础 ---------- */
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{overflow-x:hidden}            /* 无障碍①：禁横向溢出（导航站通用） */
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px}  /* 无障碍②：键盘焦点环 */
 body{margin:0; background:var(--paper); color:var(--ink); font-size:var(--fs-body); line-height:1.75;
   font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y; overflow:hidden}
 button{font-family:inherit; cursor:pointer; border:0}
@@ -255,7 +257,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 
   <!-- 顶部栏：标题由路由表驱动，不许各视图自写 -->
   <header class="topbar">
-    <div class="ttl" id="topTitle">首页</div>
+    <div class="ttl" id="topTitle" aria-live="polite">首页</div>
     <!-- 隐藏入口示例（管理后台）：按身份显隐，阶段2接入真实 WHO -->
     <button class="btn-soft gate ok" data-goto="admin" id="gateAdmin">管理后台</button>
   </header>
@@ -1067,6 +1069,7 @@ bindAttachFile();
    ================================================================ */
 const ENTER_SEEN = {}; /* 每个视图只播一次入场动画，回到已看过的页面不重复播 */
 let current = "home";
+let switchSeq = 0;                    /* 切场序号：连点防竞态（照搬导航站通用做法，勿删） */
 function goto(id){
   if(!ROUTES[id]){ window.__errLogAdd && window.__errLogAdd("goto未登记页面: "+id); return; }
   if(id === current) return;
@@ -1078,9 +1081,12 @@ function goto(id){
   if(ROUTES[id].needAuth && !WHO.token){
     openAuth("login", id); return;
   }
+  const my = ++switchSeq;            /* 本次切场序号；旧序号的定时器到点后自动作废 */
   cur.classList.add("leaving");
   setTimeout(()=>{
-    cur.classList.remove("on","leaving");
+    if(my !== switchSeq) return;     /* 已有更新的切场：丢弃本次，杜绝双视图叠加 */
+    /* 统一清理所有视图状态，再只点亮目标（多视图下不依赖 cur 引用，彻底防残留） */
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("on","leaving","entering"));
     nxt.classList.add("on");
     current = id;
     document.getElementById("topTitle").textContent = ROUTES[id].title;

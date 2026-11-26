@@ -28,7 +28,7 @@
   --c-code:#6FE0F2;   --c-code-soft:rgba(111,224,242,.12);   --c-code-line:rgba(111,224,242,.32);
   --c-office:#8BE3B4; --c-office-soft:rgba(139,227,180,.12); --c-office-line:rgba(139,227,180,.32);
 
-  /* 字号五档：正文不小于 16px */
+  /* 字号：正文 16px；徽标/辅助文字刻意降到 12px 做层级区分，移动端提升至 13px */
   --fs-hero:clamp(36px,6.4vw,60px);
   --fs-h1:21px;
   --fs-body:16px;
@@ -39,10 +39,10 @@
   --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
   --r-s:14px; --r-l:22px;
 
-  /* 阴影：X 恒为 0，模糊 > 偏移，扩散全为负，颜色 rgba(0,0,0,.14~.18) */
-  --sh-1:0 4px 12px -2px rgba(0,0,0,.18), 0 12px 30px -8px rgba(0,0,0,.16);
-  --sh-2:0 8px 32px -6px rgba(0,0,0,.18), 0 2px 10px -2px rgba(0,0,0,.14);
-  --sh-float:0 14px 40px -10px rgba(0,0,0,.18), 0 4px 14px -4px rgba(0,0,0,.16);
+  /* 阴影：深色底用黑阴影物理上不可见。改用低透明度亮色微光（X=0、模糊>偏移、扩散为负），在近黑背景提供层次 */
+  --sh-1:0 4px 12px -2px rgba(180,200,255,.10), 0 12px 30px -8px rgba(160,180,255,.07);
+  --sh-2:0 8px 32px -6px rgba(180,200,255,.14), 0 2px 10px -2px rgba(160,180,255,.09);
+  --sh-float:0 14px 40px -10px rgba(180,200,255,.15), 0 4px 14px -4px rgba(160,180,255,.10);
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 [hidden]{display:none !important}
@@ -52,7 +52,7 @@ body{
   background:var(--bg); color:var(--ink);
   font-size:var(--fs-body); line-height:1.7;
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
-  touch-action:pan-y;
+  touch-action:pan-y pinch-zoom;
 }
 img{max-width:100%; display:block}
 h1,h2,h3,p{margin:0}
@@ -127,7 +127,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 #clearBtn:hover{background:rgba(255,255,255,.12)}
 #clearBtn svg{width:14px; height:14px}
 .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:var(--sp-2)}
-.chip{display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:7px 14px;
+.chip{display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:8px 14px;
   border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.035);
   color:var(--ink-2); font-size:var(--fs-sub); font-weight:500;
   transition:color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
@@ -138,8 +138,12 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 .chip[aria-pressed="true"]{color:#07090F; border-color:transparent; font-weight:650;
   background:linear-gradient(120deg,#7FA0FF,#B58CFF); box-shadow:var(--sh-1)}
 .chip[aria-pressed="true"] b{color:rgba(7,9,15,.56)}
+/* 分层：内容分类在前，个人视图（收藏/最近）用竖线分隔，语义层级不混排 */
+.chip.view{position:relative}
+.chip.view[data-cat="fav"]{margin-left:12px}
+.chip.view[data-cat="fav"]::before{content:""; position:absolute; left:-10px; top:22%; height:56%; width:1px; background:var(--line-2)}
 .switches{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
-.sw{display:inline-flex; align-items:center; gap:7px; min-height:34px; padding:6px 12px;
+.sw{display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:8px 12px;
   border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.035);
   color:var(--ink-2); font-size:13px; transition:all .2s ease}
 .sw .dot{width:14px; height:14px; flex:none; display:grid; place-items:center;
@@ -164,15 +168,18 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   -webkit-backdrop-filter:blur(18px) saturate(130%); backdrop-filter:blur(18px) saturate(130%);
   transition:transform .24s cubic-bezier(.2,.7,.2,1), border-color .24s ease, box-shadow .24s ease;
 }
-.card-hit{position:absolute; inset:0; z-index:1; text-decoration:none; border-radius:var(--r-l); cursor:pointer}
-.card .card-top,.card h3,.card p,.card .meta,.card .visit{position:relative}
+/* 整卡即链接：文字内容放进 <a>，屏幕阅读器 Tab 时能读到标题/简介/徽标。
+   星标是独立按钮，放在 <a> 之外，避免交互元素嵌套。 */
+.card-hit{display:flex; flex-direction:column; gap:var(--sp-2); flex:1; min-width:0;
+  text-decoration:none; color:inherit; cursor:pointer; border-radius:var(--r-l)}
+.card-hit:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 .card::before{content:""; position:absolute; inset:0 0 auto; height:1px; opacity:.85;
   background:linear-gradient(90deg,var(--cat),rgba(255,255,255,.2) 38%,transparent 82%)}
 .card::after{content:""; position:absolute; right:-40px; top:-50px; width:180px; height:150px;
   pointer-events:none; opacity:.55;
   background:radial-gradient(circle at 50% 50%, var(--cat-soft), transparent 70%)}
 .card:hover{transform:translateY(-4px); border-color:var(--cat-line); box-shadow:var(--sh-2)}
-.card.anim{animation:rise .5s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i,0) * 45ms)}
+.card.anim{animation:rise .5s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(min(var(--i,0),8) * 45ms)}
 .card-top{display:flex; align-items:center; justify-content:flex-start; gap:10px}
 .icon{width:48px; height:48px; flex:none; display:grid; place-items:center; border-radius:13px;
   color:var(--cat); border:1px solid var(--cat-line);
@@ -192,8 +199,8 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
 .card p{font-size:var(--fs-body); line-height:1.72; color:var(--ink-2)}
 .card mark.hl{background:rgba(110,140,255,.26); color:var(--ink); border-radius:3px; padding:0 2px; box-shadow:inset 0 -1px 0 rgba(110,140,255,.6)}
 .meta{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-.why{width:100%; font-size:12.5px; line-height:1.55; color:var(--ink-3)}
-.pill{font-size:11px; padding:3px 8px; border-radius:999px; white-space:nowrap;
+.why{width:100%; font-size:13.5px; line-height:1.55; color:var(--ink-3)}
+.pill{font-size:12px; padding:3px 8px; border-radius:999px; white-space:nowrap;
   border:1px solid var(--line); color:var(--ink-2); background:rgba(255,255,255,.04)}
 .task{color:var(--cat); border-color:var(--cat-line); background:var(--cat-soft)}
 .pill.good{color:#7EE0B0; border-color:rgba(126,224,176,.3); background:rgba(126,224,176,.08)}
@@ -275,11 +282,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   .stats{gap:6px}
   .stats span{padding:5px 10px}
   .card h3{font-size:20px}
-  .chips{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px}
-  .chip{justify-content:center; gap:4px; padding:6px 4px; font-size:13px; min-height:36px}
-  .chip b{font-size:11px}
+  .chips{gap:6px}
+  .chip{justify-content:center; gap:4px; padding:8px 12px; font-size:13px; min-height:44px}
+  .chip b{font-size:12px}
   .switches{gap:6px}
-  .sw{font-size:12px; padding:5px 10px; min-height:32px}
+  .sw{font-size:12px; padding:5px 10px; min-height:44px; flex:1; justify-content:center}
   .sk-card{height:150px}
 }
 @media (max-width:380px){
@@ -324,8 +331,8 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
       <button class="chip" type="button" data-cat="image" aria-pressed="false">绘图 <b data-count="image">10</b></button>
       <button class="chip" type="button" data-cat="code" aria-pressed="false">编程 <b data-count="code">10</b></button>
       <button class="chip" type="button" data-cat="office" aria-pressed="false">办公 <b data-count="office">10</b></button>
-      <button class="chip" type="button" data-cat="fav" aria-pressed="false">★ 收藏 <b data-count="fav">0</b></button>
-      <button class="chip" type="button" data-cat="recent" aria-pressed="false">最近 <b data-count="recent">0</b></button>
+      <button class="chip view" type="button" data-cat="fav" aria-pressed="false">★ 收藏 <b data-count="fav">0</b></button>
+      <button class="chip view" type="button" data-cat="recent" aria-pressed="false">最近 <b data-count="recent">0</b></button>
     </div>
 
     <div class="switches" id="switches" role="group" aria-label="快捷筛选开关">
@@ -407,9 +414,9 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
      desc:'英文句子改写与语气调整，邮件和论文都能用。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'英文改写地道，邮件论文适用'},
     {name:'Kimi', cat:'writing', task:'长文阅读', keys:'kimi 长文 阅读 资料 深度研究', py:'kimi', icon:'doc', url:'https://www.kimi.com/',
      desc:'超长文档阅读与整理，论文资料一次读完。', free:'对话基本免费', freeOk:true, wall:false, cn:true, why:'长文阅读强，资料党首选'},
-    {name:'通义千问', cat:'writing', task:'综合写作', keys:'通义 千问 qwen 阿里 写作 问答', py:'tongyi qianwen tyqw', icon:'spark', url:'https://qianwen.aliyun.com/',
+    {name:'通义千问', cat:'writing', task:'综合写作', keys:'通义 千问 qwen 阿里 写作 问答', py:'tongyi qianwen tyqw', icon:'spark', url:'https://tongyi.aliyun.com/qianwen/',
      desc:'问答、写作、文档处理一体，中文场景稳。', free:'基础功能免费', freeOk:true, wall:false, cn:true, why:'多模态全能，中文场景稳'},
-    {name:'文心助手', cat:'writing', task:'综合写作', keys:'文心 一言 百度 写作 画图', py:'wenxin yiyan wxyy', icon:'pen', url:'https://wenxin.baidu.com/',
+    {name:'文心助手', cat:'writing', task:'综合写作', keys:'文心 一言 百度 写作 画图', py:'wenxin yiyan wxyy', icon:'pen', url:'https://yiyan.baidu.com/',
      desc:'聊天、写作、识图、读文档，基础功能免费。', free:'基础功能免费', freeOk:true, wall:false, cn:true, why:'百度生态，中文场景稳'},
     {name:'DeepSeek', cat:'writing', task:'深度推理', keys:'deepseek 深度求索 推理 代码 长文', py:'deepseek', icon:'code', url:'https://chat.deepseek.com/',
      desc:'推理、代码与长文处理强，网页端基本不限次。', free:'网页端免费', freeOk:true, wall:false, cn:true, why:'推理与代码强，无使用门槛'},
@@ -426,11 +433,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     {name:'Stable Diffusion', cat:'image', task:'本地绘图', keys:'stable diffusion sd 开源 绘图 本地', py:'stable diffusion sd', icon:'layers', url:'https://stability.ai/',
      desc:'开源绘图模型，可本地部署，参数与风格全在手。', free:'开源免费', freeOk:true, wall:false, cn:false, why:'本地部署免网络，进阶玩家首选'},
     {name:'即梦', cat:'image', task:'海报封面', keys:'即梦 剪映 绘图 海报 视频 字节', py:'jimeng', icon:'image', url:'https://jimeng.jianying.com/',
-     desc:'中文提示词理解好，绘图与视频创作一体。', free:'每日约 60 积分', freeOk:true, wall:false, cn:true, why:'中文理解最好，接剪映做视频'},
+     desc:'中文提示词理解好，绘图与视频创作一体。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'中文理解最好，接剪映做视频'},
     {name:'通义万相', cat:'image', task:'国风海报', keys:'通义 万相 阿里 绘图 国风 海报', py:'tongyi wanxiang tywx', icon:'layers', url:'https://tongyi.aliyun.com/wan/',
-     desc:'国风、海报与中文文字渲染强，网页版额度够用。', free:'每日约 50 灵感值', freeOk:true, wall:false, cn:true, why:'国风独一档，中文文字渲染强'},
+     desc:'国风、海报与中文文字渲染强，网页版额度够用。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'国风独一档，中文文字渲染强'},
     {name:'可灵', cat:'image', task:'视频生成', keys:'可灵 快手 视频 绘图 运镜', py:'keling', icon:'video', url:'https://klingai.com/',
-     desc:'视频生成是招牌，写实画质与运镜出色。', free:'每日约 66 灵感值', freeOk:true, wall:false, cn:true, why:'运镜好看，写实画质好'},
+     desc:'视频生成是招牌，写实画质与运镜出色。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'运镜好看，写实画质好'},
     {name:'哩布哩布', cat:'image', task:'模型创作', keys:'liblib 哩布哩布 sd 模型 lora 社区', py:'libulibu', icon:'layers', url:'https://www.liblib.art/',
      desc:'大量社区模型，可换风格、自己训练 LoRA。', free:'每日算力免费', freeOk:true, wall:false, cn:true, why:'模型最丰富，可玩 LoRA'},
     {name:'Adobe Firefly', cat:'image', task:'商用设计', keys:'firefly adobe 绘图 商用 设计', py:'firefly', icon:'spark', url:'https://www.adobe.com/products/firefly.html',
@@ -440,7 +447,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     {name:'腾讯混元', cat:'image', task:'中文海报', keys:'混元 腾讯 绘图 海报 中文', py:'hunyuan', icon:'image', url:'https://hunyuan.tencent.com/',
      desc:'中文文字渲染准，海报与电商图适用。', free:'文生图免费', freeOk:true, wall:false, cn:true, why:'中文海报文字渲染强'},
     {name:'Microsoft Copilot', cat:'image', task:'快速出图', keys:'copilot bing 微软 绘图 出图', py:'copilot', icon:'spark', url:'https://copilot.microsoft.com/',
-     desc:'浏览器内快速出图，每日有免费次数。', free:'每日约 15 次', freeOk:true, wall:true, cn:false, why:'浏览器内出图快，需代理'},
+     desc:'浏览器内快速出图，每日有免费次数。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'浏览器内出图快，需代理'},
 
     /* 编程 code */
     {name:'Cursor', cat:'code', task:'代码重构', keys:'cursor 编辑器 编程 补全 重构', py:'cursor', icon:'cursor', url:'https://cursor.com/',
@@ -477,7 +484,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
      desc:'一句话生成演示稿与文档，排版省心。', free:'有免费额度', freeOk:true, wall:true, cn:false, why:'演示稿生成快，需代理'},
     {name:'Perplexity', cat:'office', task:'查资料溯源', keys:'perplexity 搜索 溯源 学术 核查', py:'perplexity', icon:'search', url:'https://www.perplexity.ai/',
      desc:'每句话标注来源，适合学术与事实核查。', free:'有免费版', freeOk:true, wall:true, cn:false, why:'逐句标来源，核查方便'},
-    {name:'腾讯会议AI', cat:'office', task:'会议纪要', keys:'腾讯会议 纪要 转写 会议 ai', py:'tengxun huiyi txhy', icon:'wave', url:'https://meeting.tencent.com/',
+    {name:'腾讯会议AI', cat:'office', task:'会议纪要', keys:'腾讯会议 纪要 转写 会议 ai', py:'tengxun huiyi txhy', icon:'wave', url:'https://meeting.tencent.com/ai/',
      desc:'会议结束自动整理纪要与待办。', free:'免费版可用', freeOk:true, wall:false, cn:true, why:'会议纪要自动整理'},
     {name:'飞书妙记', cat:'office', task:'会议纪要', keys:'飞书 妙记 转写 会议 纪要', py:'feishu miaoji fsmj', icon:'wave', url:'https://www.feishu.cn/',
      desc:'会议转写并沉淀到知识库，检索方便。', free:'有免费额度', freeOk:true, wall:false, cn:true, why:'转写沉淀到知识库'},
@@ -549,6 +556,11 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   function esc(s){
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+  /* URL 协议白名单：纵深防御——即使数据被改成 javascript: 也不会执行 */
+  function safeUrl(u){
+    var s = String(u || '').trim();
+    return /^https?:\/\/\S+$/i.test(s) ? s : '#';
+  }
   function svg(inner){
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
       + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + '</svg>';
@@ -565,7 +577,7 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
     if(STATE.sw.nowall && t.wall) return false;
     if(STATE.sw.cn && !t.cn) return false;
     if(!kw) return true;
-    return (t.name + ' ' + t.keys + ' ' + (t.py || '') + ' ' + (t.task || '') + ' ' + (t.why || '')).toLowerCase().indexOf(kw) > -1;
+    return (t.name + ' ' + t.keys + ' ' + (t.py || '') + ' ' + (t.task || '') + ' ' + (t.why || '') + ' ' + t.desc).toLowerCase().indexOf(kw) > -1;
   }
   /* 关键词高亮：所有匹配都包 <mark>，每段走 esc 防注入 */
   function mark(text){
@@ -614,30 +626,39 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
       + '<span class="pill ' + (t.freeOk ? 'good' : 'warn') + '" title="免费/网络政策核对于 2026-11，以官网为准">' + esc(t.free) + '</span>'
       + (t.wall ? '<span class="pill warn">需代理</span>' : '<span class="pill good">国内直连</span>')
       + (t.cn ? '<span class="pill good">中文友好</span>' : '');
+    /* 整卡即链接：正文内容包在 <a> 内，屏幕阅读器可连续读到标题/简介/徽标；
+       星标按钮置于 <a> 之外，避免交互元素嵌套。data-rec 供点击记录最近访问。 */
     return '<div class="card cat-' + t.cat + (STATE.animate ? ' anim' : '') + '" style="--i:' + i + '">'
-      + '<a class="card-hit" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer"'
-      + ' aria-label="打开 ' + esc(t.name) + ' 官网（新窗口）" data-rec="' + esc(t.name) + '"></a>'
       + '<button class="star" type="button" data-fav="' + esc(t.name) + '" aria-pressed="' + (fav ? 'true' : 'false') + '"'
       + ' aria-label="' + (fav ? '取消收藏 ' : '收藏 ') + esc(t.name) + '">' + STAR + '</button>'
+      + '<a class="card-hit" href="' + safeUrl(t.url) + '" target="_blank" rel="noopener noreferrer" data-rec="' + esc(t.name) + '">'
       + '<div class="card-top"><span class="icon" aria-hidden="true">' + svg(ICONS[t.icon]) + '</span>'
       + '<span class="tag">' + ROUTES[t.cat] + '</span></div>'
       + '<h3>' + mark(t.name) + '</h3>'
       + '<p>' + mark(t.desc) + '</p>'
       + '<div class="meta"><span class="why">推荐：' + esc(t.why) + '</span>' + pills + '</div>'
-      + '<span class="visit">访问官网 '
+      + '<span class="visit">访问官网（新窗口）'
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       + '<path d="M7 17 17 7"></path><path d="M9.5 7H17v7.5"></path></svg>'
-      + '</span></div>';
+      + '</span></a></div>';
   }
 
   function render(animate){
     STATE.animate = animate !== false;
+    /* 焦点保护：全量替换 DOM 前记住当前焦点卡片，重建后按标识恢复，键盘用户不迷失 */
+    var ae = document.activeElement, focusSel = null;
+    if(ae && grid.contains(ae)){
+      var f = ae.getAttribute('data-fav'), r = ae.getAttribute('data-rec');
+      if(f) focusSel = '.star[data-fav="' + f + '"]';
+      else if(r) focusSel = '.card-hit[data-rec="' + r + '"]';
+    }
     var list = TOOLS.filter(matches);
     grid.innerHTML = list.map(cardHTML).join('');
     grid.hidden = list.length === 0;
     listLoading.hidden = true;
     listErr.hidden = true;
     listEmpty.hidden = list.length > 0;
+    if(focusSel){ var fe = grid.querySelector(focusSel); if(fe) fe.focus(); }
 
     var kw = STATE.q.trim();
     var swOn = [];
@@ -660,7 +681,6 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
   function goto(cat, opts){
     opts = opts || {};
     if(!ROUTES[cat]) cat = 'all';
-    if(STATE.cat === cat && opts.instant) syncChips();
     STATE.cat = cat;
     syncChips();
     try{ history.replaceState(null, '', '#' + cat); }catch(e){}
@@ -826,11 +846,12 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit}
       dot.onclick = function(){
         var p = document.getElementById('errPanel');
         if(p.style.display === 'block'){ p.style.display = 'none'; return; }
-        var b = '';
-        a.forEach(function(x){
+        /* 每次打开重新读取，避免闭包捕获创建时的旧列表导致新增错误看不到 */
+        var cur = load(), cn = cur.length, b = '';
+        cur.forEach(function(x){
           b += '<div class="row"><div class="t">' + fmt(x.t) + '</div><div>' + esc(x.m) + '</div></div>';
         });
-        p.innerHTML = '<h4>&#9888; 页面出过错（' + n + ' 条）</h4>'
+        p.innerHTML = '<h4>&#9888; 页面出过错（' + cn + ' 条）</h4>'
           + '<div class="hint">打开以来捕获的脚本错误记录。有红点说明某次运行中有代码出错。'
           + '把带时间的几行截图发给制作方定位；看完了可清除。</div>'
           + b + '<button class="clr">清除全部</button>';

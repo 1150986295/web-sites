@@ -45,12 +45,13 @@
 body{margin:0; background:var(--paper); color:var(--ink);
   font-size:var(--fs-body); line-height:1.75;
   font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
-  touch-action:pan-y; /* 硬规矩④：不许 none，否则列表滑不动 */
+  touch-action:pan-y pinch-zoom; /* 硬规矩④：不许 none，否则列表滑不动 */
   padding-bottom:84px} /* 给底部固定行动按钮留位 */
 img{max-width:100%; display:block}
 h1,h2,h3{margin:0}
 p{margin:0 0 var(--sp-2)}
 button{font-family:inherit; cursor:pointer; border:0}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px}  /* 无障碍：键盘焦点环（导航站通用） */
 /* 英文整词换行（禁止单词被劈成两半） */
 .en-word{display:inline-block; white-space:nowrap}
 /* ========== 三、五区块布局 ========== */
@@ -223,9 +224,11 @@ button{font-family:inherit; cursor:pointer; border:0}
       dot.onclick=function(){
         var p=document.getElementById('errPanel');
         if(p.style.display==='block'){p.style.display='none';return}
-        var b='';a.forEach(function(x){
+        /* 每次打开重新读取，避免闭包捕获创建时的旧列表导致新增错误看不到（导航站通用） */
+        var cur=load(),cn=cur.length,b='';
+        cur.forEach(function(x){
           b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
-        p.innerHTML='<h4>&#9888; 页面出过错（'+n+' 条）</h4>'
+        p.innerHTML='<h4>&#9888; 页面出过错（'+cn+' 条）</h4>'
           +'<div class="hint">打开以来捕获的脚本错误记录。出现红点说明某次运行中有代码出错。'
           +'把带时间的几行截图发给制作方定位修复；看完了可清除。</div>'
           +b+'<button class="clr">清除全部</button>';

@@ -31,7 +31,7 @@
 html{overflow-x:hidden}            /* 无障碍①：禁横向溢出（导航站通用） */
 :focus-visible{outline:2px solid var(--accent); outline-offset:3px}  /* 无障碍②：键盘焦点环 */
 body{margin:0; background:var(--paper); color:var(--ink); font-size:var(--fs-body); line-height:1.75;
-  font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y; overflow:hidden}
+  font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y pinch-zoom; overflow:hidden}
 button{font-family:inherit; cursor:pointer; border:0}
 .en-word{display:inline-block; white-space:nowrap}
 /* ---------- 三、布局壳：顶栏 + 内容区(扣tab) + 底部tab ---------- */
@@ -46,7 +46,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 .tabbar{flex:0 0 auto; height:calc(var(--tab-h) + env(safe-area-inset-bottom));
   padding-bottom:env(safe-area-inset-bottom); display:flex; background:var(--card);
   box-shadow:0 -1px 0 var(--line); z-index:900}
-.tabbar .tab{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+.tabbar .tab{min-height:44px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;  /* 无障碍：触控目标≥44px */
   gap:2px; font-size:var(--fs-mini); color:var(--ink-3); background:none}
 .tabbar .tab.on{color:var(--primary); font-weight:600}
 .tabbar .tab .ico{font-size:18px; line-height:1}
@@ -151,7 +151,7 @@ button{font-family:inherit; cursor:pointer; border:0}
   font-size:15px; color:var(--ink-3); pointer-events:none}
 .filters{display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px}
 .filters::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1.5px solid var(--line);
+.chip{flex:0 0 auto; min-height:44px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line);  /* 无障碍：触控目标≥44px */
   background:var(--card); color:var(--ink-2); font-size:var(--fs-mini); white-space:nowrap}
 .chip.on{background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600}
 .hitline{font-size:var(--fs-mini); color:var(--ink-3); min-height:1em; padding:0 2px}
@@ -1134,9 +1134,11 @@ applyIdentity();
       dot.onclick=function(){
         var p=document.getElementById('errPanel');
         if(p.style.display==='block'){p.style.display='none';return}
-        var b='';a.forEach(function(x){
+        /* 每次打开重新读取，避免闭包捕获创建时的旧列表导致新增错误看不到（导航站通用） */
+        var cur=load(),cn=cur.length,b='';
+        cur.forEach(function(x){
           b+='<div class="row"><div class="t">'+fmt(x.t)+'</div><div>'+esc(x.m)+'</div></div>'});
-        p.innerHTML='<h4>&#9888; 页面出过错（'+n+' 条）</h4>'
+        p.innerHTML='<h4>&#9888; 页面出过错（'+cn+' 条）</h4>'
           +'<div class="hint">打开以来捕获的脚本错误记录。把带时间的几行截图发给制作方定位修复；看完了可清除。</div>'
           +b+'<button class="clr">清除全部</button>';
         p.style.display='block';

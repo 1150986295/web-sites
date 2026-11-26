@@ -134,7 +134,7 @@ button{font-family:inherit; cursor:pointer; border:0}
 /* ========== 四、红点（内置能力，勿删） ========== */
 #errDot{position:fixed;right:16px;bottom:96px;z-index:9990;width:44px;height:44px;border-radius:50%;
   background:var(--accent);color:var(--on-accent);display:none;align-items:center;justify-content:center;
-  font-size:18px;cursor:pointer;box-shadow:var(--sh-float);
+  font-size:18px;cursor:pointer;box-shadow:var(--sh-float);padding:0;font-family:inherit;
   border:2px solid var(--ring-light)}
 #errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
   background:var(--accent);border:1.5px solid var(--paper);color:var(--on-accent);font-size:11px;line-height:16px;
@@ -253,7 +253,10 @@ button{font-family:inherit; cursor:pointer; border:0}
     var a=load(),n=a.length,dot=document.getElementById('errDot');
     if(!n){if(dot){dot.style.display='none'}return}
     if(!dot){
-      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      /* 用原生 button：键盘 Tab 可达、Enter/Space 可触发，比 div+role 更可靠 */
+      dot=document.createElement('button');dot.type='button';dot.id='errDot';
+      dot.setAttribute('aria-label','查看页面错误记录');
+      dot.innerHTML='&#9888;<span class="n"></span>';
       dot.onclick=function(){
         var p=document.getElementById('errPanel');
         if(p.style.display==='block'){p.style.display='none';return}

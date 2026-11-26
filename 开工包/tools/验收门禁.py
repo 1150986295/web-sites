@@ -43,7 +43,6 @@ SKELETON_STATIC = {
     "设计令牌:root": r':root\s*\{',
     "唯一主标题h1": r'<h1[\s>]',
     "键盘焦点可见": r':focus-visible|:focus\s*\{|:focus\b',
-    "触控目标44px": r'44px|--tap\s*:',
 }
 
 def check(path, kind_override=None):
@@ -54,7 +53,10 @@ def check(path, kind_override=None):
     if not os.path.isfile(path):
         return None, f"文件不存在: {path}"
     src=open(path,encoding="utf-8",errors="replace").read()
-    kind, why = detect_kind(src, kind_override)
+    # 先抽出脚本再判站型：正文/注释里提到 ROUTES 不该被判成多页应用
+    scripts=re.findall(r"<script[^>]*>(.*?)</script>",src,re.S)
+    js="\n".join(s for s in scripts if s.strip())
+    kind, why = detect_kind(js, kind_override)
     add("文件存在且非空", len(src.strip())>500, f"{len(src)}字符")
 
     # 1. HTML 基本结构
@@ -63,8 +65,6 @@ def check(path, kind_override=None):
     add("中文语言标记", 'lang="zh' in src[:500], "html lang=zh")
 
     # 2. JS 语法（node --check）
-    scripts=re.findall(r"<script[^>]*>(.*?)</script>",src,re.S)
-    js="\n".join(s for s in scripts if s.strip())
     if not js.strip():
         # 纯静态站没有脚本是合法形态，不能算失败；但要说清"没检查"
         add("存在JS逻辑", kind=="static", "纯静态站，无脚本（N/A）" if kind=="static" else "多页应用没有脚本，请说明站型")
@@ -118,6 +118,12 @@ def check(path, kind_override=None):
         for name,pat in SKELETON_STATIC.items():
             ok=bool(re.search(pat,src,re.I))
             add("骨架·"+name, ok, "存在" if ok else "缺失")
+        # 触控目标：没有交互元素的页面 N/A，不硬判（仿图片 alt 的 N/A 逻辑）
+        has_ui=bool(re.search(r'<(?:button|a|input|select|textarea)\b|data-act\s*=',src,re.I))
+        tap_ok=bool(re.search(r'44px|--tap\s*:',src,re.I))
+        add("骨架·触控目标44px",
+            (not has_ui) or tap_ok,
+            "无交互元素（N/A）" if not has_ui else ("存在" if tap_ok else "有交互元素但未声明 44px/--tap"))
         # 静态站第 5 项：图片必须都有 alt（无图片则 N/A 通过）
         imgs=re.findall(r'<img\b[^>]*>',src,re.I)
         noalt=[t[:60] for t in imgs if not re.search(r'\balt\s*=',t,re.I)]
@@ -126,10 +132,20 @@ def check(path, kind_override=None):
             (f"无图片（N/A）" if not imgs else (f"{len(imgs)} 张图全部有 alt" if not noalt else f"{len(noalt)} 张缺 alt: {noalt[0]}")))
 
     # 5. 常见致命坑
-    # eval / new Function：必须按"标识符边界"判断，否则 retrieval( / interval( 这类函数名会误伤
-    evals=re.findall(r'(?<![A-Za-z0-9_$.])(?:eval|Function)\s*\(',src)
+    # eval / new Function：按"标识符边界"判断，但允许点号前缀——
+    # window.eval( / obj["x"].eval( 是真实的动态执行，不能因为前面有 . 就放过；
+    # retrieval( / interval( 这类函数名仍要排除。
+    evals=re.findall(r'(?<![A-Za-z0-9_$])(?:eval|Function)\s*\(',src)
     add("无eval动态执行", not evals, "无 eval/new Function" if not evals else f"含 {len(evals)} 处动态执行（eval/new Function）需人工确认")
-    add("无硬编码密钥/token", not bool(re.search(r'(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,})',src)), "无token痕迹")
+    token_ok=not bool(re.search(r'(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,})',src))
+    # demo 站常见：mock 登录 + 明文密码种子。不算失败，但要在结论里提醒人工确认
+    mock_pw=bool(kind=="app"
+                 and re.search(r'\bmock\s*\(',src)
+                 and re.search(r'(?:password|passwd|pwd|密码)\s*[:=]\s*["\']?(?:123456|admin|password|888888)',src,re.I))
+    add("无硬编码密钥/token", token_ok,
+        ("无token痕迹" if token_ok else "发现密钥痕迹")
+        + ("；WARN: mock 登录含明文密码种子，仅限演示，上线前须替换" if mock_pw else ""),
+        warn=mock_pw)
 
     passed=sum(1 for r in results if r["ok"]); total=len(results)
     warns=sum(1 for r in results if r.get("warn"))

@@ -28,6 +28,8 @@
 }
 @media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* 键盘焦点可见：只对键盘操作出现，鼠标点击不干扰 */
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 body{margin:0; background:var(--paper); color:var(--ink); font-size:var(--fs-body); line-height:1.75;
   font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif; touch-action:pan-y}
 img{max-width:100%} h1,h2,h3{margin:0} button{font-family:inherit; cursor:pointer; border:0}

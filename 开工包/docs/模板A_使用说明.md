@@ -30,8 +30,8 @@
 2. 375 宽：无横向滚动、无文字溢出
 3. 底部主按钮点得到、点了对
 4. 改一个颜色令牌 → 全站同步变
-5. 跑一次巡检：`python3 tools/网页巡检.py --config 巡检配置.json --out 巡检结果_新站`
-   看 `index.md` 的 FAIL 表（结论只认"首屏 PASS"）
+5. 跑一次巡检：`python3 开工包/tools/网页巡检.py --config <你的配置>.json --out 巡检结果_新站`
+   ——配置写法照 `开工包/tools/巡检配置_全仓库.json` 改（把 `files` 换成你的页面）；看输出目录里 `patrol.md` 的 FAIL 表（结论只认"首屏 PASS"）
 
 ## 出问题找谁
 

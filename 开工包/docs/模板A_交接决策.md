@@ -5,7 +5,7 @@
 ## 项目结构
 
 ```
-模板A_单页站/
+tpl-a/                  ← 仓库内唯一版本；/workspace/模板A_单页站/ 是历史快照，不再同步
 ├── index.html            # 唯一入口：内联 CSS+JS，五区块+三态演示+红点
 ├── assets/               # hero.jpg（主图位）+ share.png（转发缩略图）占位说明
 ├── README_使用说明.md     # 复制新站五步 + 上线自查 + 红线
@@ -26,7 +26,7 @@
 1. 设计令牌（:root 全变量化，改一处全站变）
 2. 三态：加载（骨架屏）/ 空（说明+下一步）/ 错误（三段式+重试）
 3. 错误红点：`tplA_errlog_v1`，断网/报错→localStorage 持久→刷新还在
-4. 移动端四条：files 拷贝（无上传故暂无此码）/ 弹层扣 tab / z-index 分层 / `touch-action:pan-y`
+4. 移动端四条：files 拷贝（无上传故暂无此码）/ 弹层扣 tab / z-index 分层 / `touch-action:pan-y pinch-zoom`
 5. 首屏防白屏：body 底色内联于 `<style>` 首部；主图渐进淡入+失败占位
 6. 英文整词换行 `.en-word`
 7. 巡检配置 + 结论只写"首屏 PASS"

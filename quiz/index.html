@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>城轨运营刷题台 · 多科目题库练习</title>
-<meta content="城市轨道交通运营管理多科目题库：应急处置、客运英语，四类题型即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。" name="description">
-<meta content="#F1EEE5" name="theme-color">
+<meta name="description" content="城市轨道交通运营管理多科目题库：应急处置、客运英语，四类题型即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。">
+<meta name="theme-color" content="#F1EEE5">
 <script>
 /* 主题在解析 CSS 之前定好，避免先闪一下浅色/深色。默认浅色（宣纸），用户点过才记 */
 (function(){
@@ -542,6 +542,14 @@ details[open] .ans-body{animation:fadeUp .26s ease-out both}
 .imp-stat{margin:4px 0 10px; font-size:13.5px; color:var(--ink-2)}
 .imp-stat b{color:var(--primary); font-size:15px}
 .imp-stat em{font-style:normal; color:var(--bad)}
+.imp-target{display:flex; align-items:center; gap:9px; margin:2px 0 11px}
+.imp-target label{font-size:11.5px; color:var(--ink-3); flex:0 0 auto}
+.imp-target select{
+  flex:1; min-width:0; min-height:38px; padding:0 11px; border:0; border-radius:11px;
+  font-size:13px; font-family:inherit; color:var(--primary); background:var(--well);
+  box-shadow:var(--nm-in-sm);
+}
+.imp-target select:focus{outline:none; box-shadow:var(--nm-in-sm), 0 0 0 2px var(--primary-soft)}
 .imp-list{display:flex; flex-direction:column; gap:10px; padding:2px}
 .imp-item{
   padding:11px 12px; border-radius:14px; background:var(--card);
@@ -554,11 +562,27 @@ details[open] .ans-body{animation:fadeUp .26s ease-out both}
   color:var(--primary); background:var(--well); box-shadow:var(--nm-in-sm);
   font-family:inherit;
 }
+.imp-sel:focus{outline:none; box-shadow:var(--nm-in-sm), 0 0 0 2px var(--primary-soft)}
+.imp-howto{font-size:11.5px; line-height:1.55; color:var(--ink-3); margin:0 0 9px}
+.imp-howto b{font-weight:600; color:var(--primary); letter-spacing:.06em}
+.imp-howto[hidden]{display:none}
 .imp-del{
   margin-left:auto; min-height:32px; padding:0 10px; border-radius:9px;
   font-size:12px; color:var(--bad); background:var(--bad-soft);
 }
 .imp-stem{font-size:14.5px; line-height:1.6; color:var(--ink); word-break:auto-phrase}
+/* 题干可改：要换挖空位置，直接把光标放进去改 ______ 就行 */
+.imp-stem-edit{
+  display:block; width:100%; margin:0; padding:5px 7px; border:0; border-radius:9px;
+  font-family:inherit; font-size:14.5px; line-height:1.6; color:var(--ink);
+  background:transparent; box-shadow:inset 0 0 0 1px transparent;
+  resize:none; overflow:hidden; word-break:auto-phrase;
+}
+.imp-stem-edit:hover{box-shadow:inset 0 0 0 1px var(--line)}
+.imp-stem-edit:focus{
+  outline:none; background:var(--field);
+  box-shadow:inset 1px 1px 3px var(--field-in), 0 0 0 2px var(--primary-soft);
+}
 .imp-opts{margin-top:5px; font-size:12.5px; color:var(--ink-3); line-height:1.55}
 .imp-opts span{display:inline-block; margin-right:10px}
 .imp-ansline{display:flex; align-items:center; gap:8px; margin-top:8px}
@@ -571,6 +595,7 @@ details[open] .ans-body{animation:fadeUp .26s ease-out both}
 .imp-ans:focus{outline:none; box-shadow:inset 1px 1px 3px var(--field-in), 0 0 0 2px var(--primary-soft)}
 .imp-warn{font-size:11.5px; color:var(--bad); margin-top:4px}
 .imp-field{display:block; margin-top:14px}
+.imp-field[hidden]{display:none}   /* 追加到已有题库时整块收起 */
 .imp-field span{display:block; font-size:12px; color:var(--ink-3); margin-bottom:5px}
 .imp-field input{
   width:100%; min-height:var(--tap); padding:0 13px; border:0; border-radius:12px;
@@ -591,6 +616,15 @@ details[open] .ans-body{animation:fadeUp .26s ease-out both}
 }
 .imp-empty{font-size:12.5px; color:var(--ink-3)}
 body.lock{overflow:hidden}
+/* 追加成功后的轻提示 */
+.toast{
+  position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom));
+  transform:translate(-50%, 10px); z-index:1200;
+  max-width:86vw; padding:9px 16px; border-radius:12px;
+  font-size:13px; line-height:1.5; text-align:center; color:var(--card); background:var(--ink);
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+}
+.toast.on{opacity:1; transform:translate(-50%, 0)}
 
 /* ============================================================
    六、底部行动条（全站唯一强调色 + 唯一主操作）
@@ -685,27 +719,28 @@ body::before{
 </head>
 <body data-lang="zh">
 
-<div aria-hidden="true" class="read-progress" id="readProgress"><i></i></div>
+<div class="read-progress" id="readProgress" aria-hidden="true"><i></i></div>
 
 <div class="wrap">
   <!-- ① 头部 -->
   <header class="hd">
-    <button aria-label="切换到深色模式" aria-pressed="false" class="theme-toggle" data-act="theme" id="themeToggle" title="切换到深色模式" type="button">
-      <svg aria-hidden="true" class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2M12 18.8v2M3.2 12h2M18.8 12h2M5.8 5.8l1.4 1.4M16.8 16.8l1.4 1.4M18.2 5.8l-1.4 1.4M7.2 16.8l-1.4 1.4"/></svg>
-      <svg aria-hidden="true" class="i-moon" viewBox="0 0 24 24"><path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4z"/></svg>
+    <button class="theme-toggle" id="themeToggle" data-act="theme" type="button"
+            aria-label="切换到深色模式" aria-pressed="false" title="切换到深色模式">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2M12 18.8v2M3.2 12h2M18.8 12h2M5.8 5.8l1.4 1.4M16.8 16.8l1.4 1.4M18.2 5.8l-1.4 1.4M7.2 16.8l-1.4 1.4"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4z"/></svg>
     </button>
     <p class="kicker" id="kicker">城轨运营刷题台 · 应急处置</p>
     <h1 id="pageTitle">应急处置 · 刷题台</h1>
     <p class="sub" id="subText">依据课件整理 · 四类题型共 <b id="totalA">34</b> 题<br>答题记录只存本机，换设备不同步</p>
-    <nav aria-label="题库切换" class="banks" id="bankNav" role="tablist"></nav>
+    <nav class="banks" id="bankNav" role="tablist" aria-label="题库切换"></nav>
   </header>
 
   <!-- ② 仪表盘 -->
-  <section aria-label="练习进度" class="dash glass">
+  <section class="dash glass" aria-label="练习进度">
     <div class="ring-wrap">
-      <svg aria-hidden="true" viewBox="0 0 100 100">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
         <circle class="ring-bg" cx="50" cy="50" r="34"></circle>
-        <circle class="ring-fg" cx="50" cy="50" id="ringFg" r="34"></circle>
+        <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="34"></circle>
       </svg>
       <div class="ring-num"><b id="numDone">0</b><span>/ <i id="totalB">34</i></span></div>
     </div>
@@ -713,7 +748,7 @@ body::before{
       <p class="dash-t">已掌握 <em id="numDoneTxt">0</em> / <span id="totalC">34</span> 题</p>
       <p class="dash-s" id="dashSub">答对或标记掌握后计入进度</p>
       <div class="dash-btns">
-        <button class="ghost" data-act="redoWrong" disabled id="btnRedo">
+        <button class="ghost" id="btnRedo" data-act="redoWrong" disabled>
           <span data-gl>暂无错题</span><b id="wrongCnt">0</b>
         </button>
         <button class="ghost" data-act="reset" id="btnReset"><span data-gl>清空记录</span></button>
@@ -721,7 +756,7 @@ body::before{
     </div>
   </section>
 
-  <div class="notice" hidden id="storeWarn">
+  <div class="notice" id="storeWarn" hidden>
     <b>进度保存失败</b>
     <p>发生了什么：本轮答题记录没能写入浏览器本地存储。<br>
        为什么：可能开了无痕/隐私模式，或浏览器禁用了 localStorage。<br>
@@ -732,17 +767,17 @@ body::before{
 <!-- ③ 题型切换 -->
 <div class="tabs-wrap">
   <div class="wrap">
-    <div aria-label="题型切换" class="tabs" role="tablist">
-      <button aria-controls="panel-choice" aria-selected="true" class="tab" data-act="tab" data-k="choice" id="tab-choice" role="tab">
+    <div class="tabs" role="tablist" aria-label="题型切换">
+      <button class="tab" role="tab" data-act="tab" data-k="choice" aria-selected="true" aria-controls="panel-choice" id="tab-choice">
         <span class="tl">选择题</span><span class="cnt" data-cnt="choice">0/10</span>
       </button>
-      <button aria-controls="panel-judge" aria-selected="false" class="tab" data-act="tab" data-k="judge" id="tab-judge" role="tab">
+      <button class="tab" role="tab" data-act="tab" data-k="judge" aria-selected="false" aria-controls="panel-judge" id="tab-judge">
         <span class="tl">判断题</span><span class="cnt" data-cnt="judge">0/10</span>
       </button>
-      <button aria-controls="panel-blank" aria-selected="false" class="tab" data-act="tab" data-k="blank" id="tab-blank" role="tab">
+      <button class="tab" role="tab" data-act="tab" data-k="blank" aria-selected="false" aria-controls="panel-blank" id="tab-blank">
         <span class="tl">填空题</span><span class="cnt" data-cnt="blank">0/8</span>
       </button>
-      <button aria-controls="panel-essay" aria-selected="false" class="tab" data-act="tab" data-k="essay" id="tab-essay" role="tab">
+      <button class="tab" role="tab" data-act="tab" data-k="essay" aria-selected="false" aria-controls="panel-essay" id="tab-essay">
         <span class="tl">应用题</span><span class="cnt" data-cnt="essay">0/6</span>
       </button>
     </div>
@@ -751,10 +786,10 @@ body::before{
 
 <!-- ④ 题目区 -->
 <main class="wrap" id="panelWrap">
-  <section aria-labelledby="tab-choice" class="panel" data-k="choice" id="panel-choice" role="tabpanel"></section>
-  <section aria-labelledby="tab-judge" class="panel" data-k="judge" hidden id="panel-judge" role="tabpanel"></section>
-  <section aria-labelledby="tab-blank" class="panel" data-k="blank" hidden id="panel-blank" role="tabpanel"></section>
-  <section aria-labelledby="tab-essay" class="panel" data-k="essay" hidden id="panel-essay" role="tabpanel"></section>
+  <section class="panel" id="panel-choice" role="tabpanel" aria-labelledby="tab-choice" data-k="choice"></section>
+  <section class="panel" id="panel-judge" role="tabpanel" aria-labelledby="tab-judge" data-k="judge" hidden></section>
+  <section class="panel" id="panel-blank" role="tabpanel" aria-labelledby="tab-blank" data-k="blank" hidden></section>
+  <section class="panel" id="panel-essay" role="tabpanel" aria-labelledby="tab-essay" data-k="essay" hidden></section>
 
   <footer class="ft">
     <span id="footText">题目与答案要点依据课件《应急处置》整理，现场处置以本单位现行预案为准</span><br>
@@ -769,36 +804,42 @@ body::before{
       <span class="lab" id="actLab">选择题 0/10</span>
       <span class="track"><i id="actFill"></i></span>
     </div>
-    <button data-act="main" id="actMain">继续下一题</button>
+    <button id="actMain" data-act="main">继续下一题</button>
   </div>
 </div>
 
 <!-- ⑥ 题库入口：粘贴 → 自动识别 → 校对 → 存本机 -->
-<div class="sheet-mask" hidden id="impMask">
-  <div aria-labelledby="impTitle" aria-modal="true" class="sheet" role="dialog">
+<div class="sheet-mask" id="impMask" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="impTitle">
     <div class="sheet-hd">
       <h2 id="impTitle">导入题库</h2>
-      <button aria-label="关闭" class="sheet-x" data-act="impClose" type="button">&#10005;</button>
+      <button class="sheet-x" type="button" data-act="impClose" aria-label="关闭">&#10005;</button>
     </div>
     <div class="sheet-bd">
       <div id="impStep1">
         <p class="sheet-tip">把题目整段粘进来，自动认题号、题干、选项、答案和解析；<b>选择题、判断题、填空题、应用题</b>都能认。识别完可以在预览里改题型、改答案、删掉不要的题。</p>
-        <textarea class="ta imp-ta" id="impText" placeholder="1. 车站大客流组织的影响因素不包括？&#10;A. 站厅面积与站台面积&#10;B. 楼梯与通道的通过能力&#10;C. 自动售检票设备的通过能力&#10;D. 车站商业广告位的数量&#10;答案：D&#10;解析：影响因素共 6 项……&#10;&#10;2. 列车在区间发生火灾时，邻线列车可以照常放行。（ ）&#10;答案：错&#10;&#10;3. 大客流情况下，行车方面的应对措施包括及时使用______、合理组织空客车。&#10;答案：备用车" rows="9" spellcheck="false"></textarea>
-        <p class="sheet-tip" hidden id="impMsg"></p>
+        <textarea id="impText" class="ta imp-ta" rows="9" spellcheck="false"
+          placeholder="1. 车站大客流组织的影响因素不包括？&#10;A. 站厅面积与站台面积&#10;B. 楼梯与通道的通过能力&#10;C. 自动售检票设备的通过能力&#10;D. 车站商业广告位的数量&#10;答案：D&#10;解析：影响因素共 6 项……&#10;&#10;2. 列车在区间发生火灾时，邻线列车可以照常放行。（ ）&#10;答案：错&#10;&#10;3. 大客流情况下，行车方面的应对措施包括及时使用______、合理组织空客车。&#10;答案：备用车"></textarea>
+        <p class="sheet-tip" id="impMsg" hidden></p>
         <div class="imp-row">
-          <button class="btn-main" data-act="impParse" type="button">识别题目</button>
-          <button class="ghost" data-act="impSample" type="button">填入示例</button>
+          <button class="btn-main" type="button" data-act="impParse">识别题目</button>
+          <button class="ghost" type="button" data-act="impSample">填入示例</button>
         </div>
       </div>
 
-      <div hidden id="impStep2">
+      <div id="impStep2" hidden>
         <p class="imp-stat" id="impStat"></p>
+        <div class="imp-target">
+          <label for="impTarget">存到</label>
+          <select id="impTarget" aria-label="题目存到哪个题库"></select>
+        </div>
+        <p class="imp-howto" id="impHowto" hidden>题干可以直接改：要挖哪几个字，把那几个字换成 <b>______</b> 就行。</p>
         <div class="imp-list" id="impList"></div>
-        <label class="imp-field"><span>题库名称（最多 20 字）</span>
-          <input autocomplete="off" id="impName" maxlength="20" placeholder="我的题库"></label>
+        <label class="imp-field" id="impNameField"><span>新题库名称（最多 20 字）</span>
+          <input id="impName" maxlength="20" placeholder="我的题库" autocomplete="off"></label>
         <div class="imp-row">
-          <button class="btn-main" data-act="impSave" type="button">保存并开始练</button>
-          <button class="ghost" data-act="impBack" type="button">重新粘贴</button>
+          <button class="btn-main" id="impSaveBtn" type="button" data-act="impSave">保存并开始练</button>
+          <button class="ghost" type="button" data-act="impBack">重新粘贴</button>
         </div>
       </div>
 
@@ -1253,6 +1294,82 @@ function loadCustomBanks(){
     BANK_ORDER.push(b.id);
   });
 }
+
+/* ---------- 追加到已有题库：内置库不能改源码，追加的题单独存一份 ---------- */
+var EXTRA_KEY = 'yjcz_extra_v1';
+var QK = ['choice', 'judge', 'blank', 'essay'];
+function readExtras(){
+  try{
+    var o = JSON.parse(localStorage.getItem(EXTRA_KEY) || '{}');
+    return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+  }catch(e){ return {}; }
+}
+function writeExtras(o){
+  try{ localStorage.setItem(EXTRA_KEY, JSON.stringify(o)); return true; }
+  catch(e){ return false; }
+}
+function loadExtras(){
+  var o = readExtras();
+  Object.keys(o).forEach(function(id){
+    var b = BANKS[id], add = o[id];
+    if(!b || !add) return;
+    QK.forEach(function(k){
+      if(!b.q[k]) b.q[k] = [];
+      if(Array.isArray(add[k])) add[k].forEach(function(item){ b.q[k].push(item); });
+    });
+  });
+}
+/* 追加并落盘：自建库写进整库存档，内置库写进 extras（可整批撤回） */
+function appendToBank(id, q){
+  var b = BANKS[id];
+  if(!b) return false;
+  var added = { choice: [], judge: [], blank: [], essay: [] };
+  QK.forEach(function(k){
+    if(q[k] && q[k].length) added[k] = q[k];
+  });
+  if(b.custom){
+    var list = readCustomBanks(), hit = null;
+    list.forEach(function(x){ if(x && x.id === id) hit = x; });
+    if(!hit || !hit.q) return false;
+    QK.forEach(function(k){
+      if(!hit.q[k]) hit.q[k] = [];
+      added[k].forEach(function(item){ hit.q[k].push(item); });
+    });
+    if(!writeCustomBanks(list)) return false;
+  }else{
+    var ex = readExtras(), cell = ex[id] || {};
+    QK.forEach(function(k){
+      if(!Array.isArray(cell[k])) cell[k] = [];
+      added[k].forEach(function(item){ cell[k].push(item); });
+    });
+    ex[id] = cell;
+    if(!writeExtras(ex)) return false;
+  }
+  /* 用 push 保持外层 q 的引用，页面上的 Q 不用重新绑 */
+  QK.forEach(function(k){
+    if(!b.q[k]) b.q[k] = [];
+    added[k].forEach(function(item){ b.q[k].push(item); });
+  });
+  return true;
+}
+/* 内置库「清空追加」：把 extras 里这批移除，同时从内存里摘掉 */
+function dropExtras(id){
+  var o = readExtras(), add = o[id];
+  if(!add) return 0;
+  var b = BANKS[id], n = 0;
+  if(b){
+    var addIds = {};
+    QK.forEach(function(k){
+      (add[k] || []).forEach(function(x){ addIds[x.id] = 1; n++; });
+    });
+    QK.forEach(function(k){
+      b.q[k] = (b.q[k] || []).filter(function(x){ return !addIds[x.id]; });
+    });
+  }
+  delete o[id];
+  writeExtras(o);
+  return n;
+}
 /* 题库导航：默认两个 + 自建 + 末尾的「导入」入口 */
 function renderBanks(){
   var nav = document.getElementById('bankNav');
@@ -1279,6 +1396,10 @@ function syncBankNav(){
   }
 }
 
+/* 先把本机存档并进 BANKS，再算 Q / TOTAL，否则自建和追加的题进不了总数 */
+loadCustomBanks();
+loadExtras();
+
 var bank = 'yingji';
 var KEY_BASE = 'yjcz_quiz_v1';
 var Q = BANKS[bank].q;
@@ -1290,7 +1411,6 @@ var TOTAL = countQ(Q);
 var KEY = KEY_BASE + '::' + (BANKS[bank].storeKey || bank);
 var cur = 'choice';
 var S = {a:{}};
-loadCustomBanks();
 
 /* ---------- 存取 ---------- */
 function loadState(){
@@ -2057,6 +2177,7 @@ document.addEventListener('click', function(e){
   if(act === 'impSave'){ impSave(); return; }
   if(act === 'impMineGo'){ impClose(); switchBank(t.dataset.b); return; }
   if(act === 'impMineDel'){ arm(t, '再点一次', function(){ deleteBank(t.dataset.b); }); return; }
+  if(act === 'impExtraDrop'){ arm(t, '再点一次', function(){ dropMineExtra(t.dataset.b); }); return; }
   if(act === 'impAns'){ return; }
   if(act === 'theme'){ applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true); return; }
   if(act === 'bank'){ switchBank(t.dataset.b); return; }
@@ -2354,7 +2475,39 @@ function countBlankSlots(stem){
   }
   return Math.max(1, n);
 }
-function stemToSlots(stem, n){
+function hasSlots(stem){
+  return /_{2,}/.test(stem) || /\{\{\s*\d+\s*\}\}/.test(stem) || /[（(]\s{0,4}[）)]/.test(stem);
+}
+/* 在题干里找一段文字：英文卡词边界（site 不命中 website），中文直接找；
+   答案带括注时（如「自动售检票设备（AFC）」）再去掉括注试一次 */
+function findSpan(stem, txt){
+  var t = String(txt || '').trim();
+  if(!t) return null;
+  var cands = [t];
+  var noParen = t.replace(/[（(][^）)]{0,24}[）)]/g, '').trim();
+  if(noParen && noParen !== t && noParen.length >= 2) cands.push(noParen);
+  var src = String(stem), low = src.toLowerCase();
+  for(var c = 0; c < cands.length; c++){
+    var cd = cands[c], lc = cd.toLowerCase();
+    if(lc.length < 2) continue;
+    var from = 0, idx;
+    while((idx = low.indexOf(lc, from)) !== -1){
+      var pre = idx > 0 ? src.charAt(idx - 1) : '';
+      var post = idx + cd.length < src.length ? src.charAt(idx + cd.length) : '';
+      var latin = /[A-Za-z]/.test(cd.charAt(0)) || /[A-Za-z]/.test(cd.charAt(cd.length - 1));
+      var okPre = !latin || !pre || !/[A-Za-z0-9]/.test(pre);
+      var okPost = !latin || !post || !/[A-Za-z0-9]/.test(post);
+      if(okPre && okPost) return { start: idx, end: idx + cd.length };
+      from = idx + 1;
+    }
+  }
+  return null;
+}
+/* 题干 → 带 {{n}} 的题面。parts 是各空答案，用来判断该挖在哪：
+   题干本来没空位时（多是从选择题改过来的），先把答案原文从题干里挖掉，
+   空就落在它该在的位置；实在找不到的才补句末，并在 out.missed 里回报 */
+function stemToSlots(stem, n, parts){
+  parts = parts || [];
   var i = 0, out;
   if(/_{2,}/.test(stem)){
     out = stem.replace(/_{2,}/g, function(){ return (i++ < n) ? '{{' + (i - 1) + '}}' : '____'; });
@@ -2365,10 +2518,32 @@ function stemToSlots(stem, n){
   }else{
     out = stem;
   }
-  /* 从选择题改成填空题时题干本来没有空位，补在末尾，别让卡片只有题没有输入框 */
-  var have = (out.match(/\{\{\s*\d+\s*\}\}/g) || []).length;
-  while(have < n){ out += ' {{' + have + '}}'; have++; }
-  return out;
+
+  var used = {}, got = out.match(/\{\{\s*\d+\s*\}\}/g) || [];
+  got.forEach(function(s){ used[parseInt(s.replace(/[^\d]/g, ''), 10)] = 1; });
+  if(Object.keys(used).length >= n) return { body: out, missed: [] };
+
+  /* 长的先挖，避免「站台」把「站台面积」吃掉 */
+  var todo = [];
+  for(var k = 0; k < n; k++) if(!used[k] && parts[k]) todo.push({ i: k, a: String(parts[k]).trim() });
+  todo.sort(function(x, y){ return y.a.length - x.a.length; });
+
+  var missed = [];
+  todo.forEach(function(t){
+    var sp = findSpan(out, t.a);
+    if(sp){
+      out = out.slice(0, sp.start) + '{{' + t.i + '}}' + out.slice(sp.end);
+      used[t.i] = 1;
+    }else{
+      missed.push({ i: t.i, a: t.a });
+    }
+  });
+
+  /* 剩下挖不到的补句末，但要把是哪几个字没找到告诉预览，让用户手改 */
+  missed.forEach(function(m){ out += ' {{' + m.i + '}}'; used[m.i] = 1; });
+  /* 编号补齐（有些题给的空比答案多） */
+  for(var q = 0; q < n; q++) if(!used[q]) out += ' {{' + q + '}}';
+  return { body: out, missed: missed };
 }
 
 function impAnalyze(text){
@@ -2377,6 +2552,19 @@ function impAnalyze(text){
     if(!p.stem) return null;
     return { stem: p.stem, opts: p.opts, ansText: p.ansText, exp: p.exp, type: decideType(p) };
   }).filter(Boolean);
+}
+
+/* 填空题的答案列表：从选择题改过来时答案是「D」，换成那个选项的原文 */
+function blankParts(it){
+  var ps = splitAnsText(it.ansText);
+  if(ps.length === 1 && it.opts.length >= 2){
+    var oi = letterIdx(ps[0]);
+    if(oi >= 0 && oi < it.opts.length) return [String(it.opts[oi].text).trim()];
+  }
+  return ps;
+}
+function blankCount(it, parts){
+  return hasSlots(it.stem) ? countBlankSlots(it.stem) : Math.max(1, parts.length);
 }
 
 /* 预览里提示「哪里可能不准」，不改用户的选择 */
@@ -2394,9 +2582,14 @@ function impWarn(it){
     }
   }
   if(it.type === 'blank'){
-    var n = countBlankSlots(it.stem);
-    var ps = splitAnsText(a);
+    var ps = blankParts(it);
+    var n = blankCount(it, ps);
     if(!ps.length) return '没有答案，练习时这些空不判分';
+    var r = stemToSlots(it.stem, n, ps);
+    if(r.missed.length){
+      return '题干里找不到「' + r.missed.map(function(m){ return m.a; }).join('」「') + '」，'
+        + r.missed.length + ' 个空只能补在句末 —— 点题干，把要挖掉的那几个字改成 ______ 就行。';
+    }
     if(ps.length < n) return '识别到 ' + n + ' 空但只有 ' + ps.length + ' 个答案，缺答案的空不判分';
   }
   if(it.type === 'essay' && !a) return '没有参考答案，只能当思考题';
@@ -2405,7 +2598,8 @@ function impWarn(it){
 
 /* item → 站内题目对象（k 是题型，q 是题） */
 function impToQuestion(it, idx){
-  var id = 'im' + idx;
+  /* 追加到已有题库时，id 必须全局唯一，否则会和上一次导入的题撞进度 */
+  var id = 'im' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + '_' + idx;
   var from = '导入题库';
   var tip = it.exp || '';
   if(it.type === 'choice' && it.opts.length >= 2){
@@ -2428,13 +2622,13 @@ function impToQuestion(it, idx){
       tip: tip || ('正确答案：' + (v ? '正确' : '错误')) } };
   }
   if(it.type === 'blank'){
-    var n = countBlankSlots(it.stem);
-    var parts = splitAnsText(it.ansText);
-    var body = stemToSlots(it.stem, n);
+    var parts = blankParts(it);
+    var n = blankCount(it, parts);
+    var r = stemToSlots(it.stem, n, parts);
     var blanks = [];
     for(var i = 0; i < n; i++) blanks.push(parts[i] ? [parts[i]] : []);
     if(parts.length > n && n > 0) blanks[n - 1] = [parts.slice(n - 1).join('；')];
-    return { k:'blank', q:{ id:id, from:from, stem:body, blanks:blanks,
+    return { k:'blank', q:{ id:id, from:from, stem:r.body, blanks:blanks,
       tip: tip || ('参考答案：' + (parts.join('；') || '（未填答案）')) } };
   }
   return { k:'essay', q:{ id:id, from:from, stem:it.stem,
@@ -2450,6 +2644,41 @@ function impMsg(text){
   el.textContent = text || '';
   el.hidden = !text;
   el.style.color = 'var(--bad)';
+}
+function toast(msg){
+  var el = document.getElementById('toast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.className = 'toast';
+    el.setAttribute('role', 'status');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('on'); }, 2600);
+}
+function syncImpNameField(){
+  var sel = document.getElementById('impTarget');
+  var f = document.getElementById('impNameField');
+  var btn = document.getElementById('impSaveBtn');
+  if(!sel || !f) return;
+  var to = !!sel.value;
+  f.hidden = to;   /* 追加到已有题库不用起名 */
+  if(btn) btn.textContent = to ? '追加并去练' : '保存并开始练';
+}
+function renderImpTarget(keepVal){
+  var sel = document.getElementById('impTarget');
+  if(!sel) return;
+  var keep = (keepVal === undefined) ? sel.value : keepVal;
+  sel.innerHTML = '<option value="">＋ 新建题库</option>' + BANK_ORDER.map(function(id){
+    var b = BANKS[id];
+    if(!b) return '';
+    return '<option value="' + id + '">' + esc(b.name) + '（现有 ' + countQ(b.q) + ' 题，追加到末尾）</option>';
+  }).join('');
+  sel.value = (keep && BANKS[keep]) ? keep : '';
+  syncImpNameField();
 }
 function impStep(n){
   IMP.step = n;
@@ -2468,6 +2697,7 @@ function impStep(n){
     }
     var nameEl = document.getElementById('impName');
     if(nameEl && !nameEl.value) nameEl.value = '我的题库';
+    renderImpTarget('');   /* 每批新识别的题都从「新建」起，避免误追加到上一批的目标 */
     renderImpList();
     var box = document.querySelector('.sheet-bd');
     if(box) box.scrollTop = 0;
@@ -2518,6 +2748,11 @@ function impTypeOptions(cur){
     return '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + IMP_TYPE_LABEL[k] + '</option>';
   }).join('');
 }
+function impGrow(t){
+  if(!t) return;
+  t.style.height = 'auto';
+  t.style.height = Math.max(24, t.scrollHeight) + 'px';
+}
 function renderImpList(){
   var box = document.getElementById('impList');
   if(!box) return;
@@ -2526,7 +2761,14 @@ function renderImpList(){
     count[it.type]++;
     var w = impWarn(it);
     if(w) warn++;
-    var stem = it.stem.length > 90 ? it.stem.slice(0, 90) + '…' : it.stem;
+    /* 题干里显示成 ______，比 {{0}} 直观；填空题先把自动挖的空算出来，
+       这样切过去就能看见空落在哪，不用等保存后才发现 */
+    var view = String(it.stem || '');
+    if(it.type === 'blank'){
+      var vp = blankParts(it), vn = blankCount(it, vp);
+      view = stemToSlots(view, vn, vp).body;
+    }
+    view = view.replace(/\{\{\s*\d+\s*\}\}/g, '______');
     var opts = it.opts.length
       ? '<div class="imp-opts">' + it.opts.map(function(o){
           return '<span>' + o.ch + '. ' + esc(o.text.length > 24 ? o.text.slice(0, 24) + '…' : o.text) + '</span>';
@@ -2538,12 +2780,15 @@ function renderImpList(){
       + '<select class="imp-sel" data-act="impType" data-i="' + i + '" aria-label="第 ' + (i + 1) + ' 题题型">' + impTypeOptions(it.type) + '</select>'
       + '<button class="imp-del" type="button" data-act="impDel" data-i="' + i + '">删除</button>'
       + '</div>'
-      + '<p class="imp-stem">' + esc(stem) + '</p>' + opts
+      + '<textarea class="imp-stem-edit" data-act="impStem" data-i="' + i + '" rows="1" spellcheck="false"'
+      + ' aria-label="第 ' + (i + 1) + ' 题题干，交卷前可直接改"'
+      + ' title="可直接改；要挖空的地方写 ______">' + esc(view) + '</textarea>' + opts
       + '<div class="imp-ansline"><label>答案</label>'
       + '<input class="imp-ans" data-act="impAns" data-i="' + i + '" value="' + esc(it.ansText) + '" placeholder="（没识别到答案）" autocomplete="off"></div>'
       + (w ? '<p class="imp-warn">' + esc(w) + '</p>' : '')
       + '</div>';
   }).join('');
+  box.querySelectorAll('.imp-stem-edit').forEach(impGrow);
   var stat = document.getElementById('impStat');
   if(stat){
     var bits = [];
@@ -2553,6 +2798,8 @@ function renderImpList(){
     stat.innerHTML = '识别到 <b>' + IMP.items.length + '</b> 题：' + bits.join(' · ')
       + (warn ? ' · <em>' + warn + ' 题要核对</em>' : '');
   }
+  var ht = document.getElementById('impHowto');
+  if(ht) ht.hidden = !count.blank;
 }
 function impRefreshOne(i){
   var it = IMP.items[i];
@@ -2571,6 +2818,8 @@ function impRefreshOne(i){
   }else if(old){ old.parentNode.removeChild(old); }
 }
 function impSave(){
+  var sel = document.getElementById('impTarget');
+  var to = sel ? sel.value : '';
   var nameEl = document.getElementById('impName');
   var name = ((nameEl && nameEl.value) || '').trim().slice(0, 20) || '我的题库';
   var q = {choice: [], judge: [], blank: [], essay: []};
@@ -2581,6 +2830,29 @@ function impSave(){
   });
   var total = q.choice.length + q.judge.length + q.blank.length + q.essay.length;
   if(!total){ impMsg('没有可保存的题目'); return; }
+
+  /* 追加到已有题库（内置库、之前导入的库都行） */
+  if(to && BANKS[to]){
+    var bname = BANKS[to].name;
+    if(!appendToBank(to, q)){
+      impMsg('保存失败：浏览器本地存储不可用（无痕模式或已满）。');
+      return;
+    }
+    IMP.items = [];
+    var ta0 = document.getElementById('impText');
+    if(ta0) ta0.value = '';
+    impClose();
+    if(bank === to){
+      TOTAL = countQ(Q);
+      syncTotals();
+      renderAll();
+      syncTabs();
+    }else{
+      switchBank(to);
+    }
+    toast('已追加 ' + total + ' 题到「' + bname + '」');
+    return;
+  }
   var bid = 'c' + Date.now().toString(36);
   var sample = IMP.items.map(function(it){ return it.stem; }).join(' ');
   var bankObj = {
@@ -2612,18 +2884,42 @@ function renderMine(){
   var wrap = document.getElementById('impMine');
   if(!wrap) return;
   var mine = BANK_ORDER.filter(function(id){ return BANKS[id] && BANKS[id].custom; });
+  var ex = readExtras();
+  var extraIds = Object.keys(ex).filter(function(id){ return BANKS[id] && !BANKS[id].custom; });
   var head = '<h3>我的题库</h3>';
-  if(!mine.length){
-    wrap.innerHTML = head + '<p class="imp-empty">还没导入过。粘贴题目保存后，会出现在上面的题库切换里，也计入本机。</p>';
-    return;
-  }
-  wrap.innerHTML = head + mine.map(function(id){
+  var rows = mine.map(function(id){
     var b = BANKS[id];
-    var n = countQ(b.q);
-    return '<div class="imp-mine-row"><b>' + esc(b.name) + '</b><span>' + n + ' 题</span>'
+    return '<div class="imp-mine-row"><b>' + esc(b.name) + '</b><span>' + countQ(b.q) + ' 题</span>'
       + '<button type="button" data-act="impMineGo" data-b="' + id + '">去练</button>'
       + '<button type="button" data-act="impMineDel" data-b="' + id + '">删除</button></div>';
   }).join('');
+  var extraRows = extraIds.map(function(id){
+    var b = BANKS[id], add = ex[id], n = 0;
+    QK.forEach(function(k){ n += (add[k] || []).length; });
+    return '<div class="imp-mine-row"><b>' + esc(b.name) + '</b><span>追加 ' + n + ' 题</span>'
+      + '<button type="button" data-act="impMineGo" data-b="' + id + '">去练</button>'
+      + '<button type="button" data-act="impExtraDrop" data-b="' + id + '">撤回</button></div>';
+  }).join('');
+  if(!rows && !extraRows){
+    wrap.innerHTML = head + '<p class="imp-empty">还没导入过。粘贴题目保存后，会出现在上面的题库切换里，也计入本机。</p>';
+    return;
+  }
+  wrap.innerHTML = head + rows + extraRows;
+}
+/* 撤回追加到内置题库的那批题 */
+function dropMineExtra(id){
+  var n = dropExtras(id);
+  if(!n) return;
+  if(bank === id){
+    TOTAL = countQ(Q);
+    syncTotals();
+    renderAll();
+    syncTabs();
+    cur = firstTabWithItems();
+    setTab(cur, false);
+  }
+  renderMine();
+  toast('已撤回 ' + n + ' 题');
 }
 function impDel(i){
   IMP.items.splice(i, 1);
@@ -2651,13 +2947,21 @@ function deleteBank(id){
 /* 题型下拉与答案输入：即时回写，不重绘整行（保住输入焦点） */
 document.addEventListener('change', function(e){
   var t = e.target;
+  if(t && t.id === 'impTarget'){ syncImpNameField(); return; }
   if(t && t.dataset && t.dataset.act === 'impType'){
     var i = Number(t.dataset.i);
-    if(IMP.items[i]){
-      IMP.items[i].type = t.value;
-      impRefreshOne(i);
-      renderImpList();   /* 题型变了，统计数字跟着变 */
+    var it = IMP.items[i];
+    if(!it) return;
+    var letter = (it.opts.length >= 2) ? letterIdx(it.ansText) : -1;
+    it.type = t.value;
+    /* 选择/判断题 → 填空题：答案「D」得换成选项原文，题干里才找得到能挖的字 */
+    if(t.value === 'blank' && letter >= 0 && letter < it.opts.length){
+      it.ansText = String(it.opts[letter].text).trim();
     }
+    impRefreshOne(i);
+    renderImpList();   /* 题型变了，统计数字跟着变 */
+    var sel = document.querySelector('.imp-sel[data-i="' + i + '"]');
+    if(sel) sel.focus({preventScroll:true});
   }
 });
 document.addEventListener('input', function(e){
@@ -2665,6 +2969,14 @@ document.addEventListener('input', function(e){
   if(t && t.dataset && t.dataset.act === 'impAns'){
     var i = Number(t.dataset.i);
     if(IMP.items[i]){ IMP.items[i].ansText = t.value; impRefreshOne(i); }
+  }
+  if(t && t.dataset && t.dataset.act === 'impStem'){
+    var j = Number(t.dataset.i);
+    if(IMP.items[j]){
+      IMP.items[j].stem = t.value;
+      impGrow(t);
+      impRefreshOne(j);
+    }
   }
 });
 document.addEventListener('keydown', function(e){

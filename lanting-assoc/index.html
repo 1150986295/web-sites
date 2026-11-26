@@ -147,11 +147,17 @@ button{font-family:inherit; cursor:pointer; border:0; color:inherit; background:
 .quote .qt{font-size:15px; line-height:1.9; letter-spacing:1px}
 .quote .qf{font-size:var(--fs-mini); color:var(--ink-3); margin-top:6px; text-align:right}
 
-/* ========== 八、动态（占位，可增删）========== */
-.news{background:var(--paper-2); border:1px dashed var(--line); border-radius:var(--r-s);
-  padding:16px 18px; color:var(--ink-3); font-size:var(--fs-sub)}
-.news .nh{font-weight:700; color:var(--ink-2); margin-bottom:6px}
-.news .nhint{font-size:var(--fs-mini); line-height:1.8}
+/* ========== 八、协会动态（照片墙，点开看大图）========== */
+.events{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+.ev{margin:0; position:relative; border-radius:var(--r-s); overflow:hidden;
+  border:1px solid var(--line); background:var(--paper-2); cursor:zoom-in}
+.ev img{display:block; width:100%; aspect-ratio:4/3; object-fit:cover}
+.ev.lead{grid-column:1/-1}
+.ev.lead img{aspect-ratio:16/9}
+.ev figcaption{position:absolute; left:0; right:0; bottom:0; padding:20px 10px 8px;
+  font-size:var(--fs-mini); line-height:1.5; color:#F5EFE2;
+  background:linear-gradient(to top, rgba(24,18,12,.82), rgba(24,18,12,0))}
+.ev:focus-visible{outline:2px solid var(--zhu); outline-offset:2px}
 
 /* ========== 九、加入 ========== */
 .join{text-align:center; background:var(--paper-2); border:1px solid var(--line);
@@ -272,16 +278,31 @@ footer{text-align:center; margin-top:36px; font-size:var(--fs-mini); color:var(-
     <div class="quotes" id="quoteList"></div>
   </section>
 
-  <!-- ⑤ 协会动态（占位，可增删） -->
+  <!-- ⑤ 协会动态（真实活动照片，点开看大图） -->
   <section class="section" id="news">
     <div class="sec-hd"><span class="num">肆</span><h2>协会动态</h2></div>
-    <div class="sec-sub">活动与比赛 · 这里先占位，后续加照片即可</div>
-    <div class="news">
-      <div class="nh">📷 近期活动 · 待添加</div>
-      <div class="nhint">
-        这里放协会活动 / 比赛照片和一句话说明。<br>
-        现在先用占位，等你给真图后再替换——增删只需改这一块的 HTML，不影响其它板块。
-      </div>
+    <div class="sec-sub">笔会 · 宣讲 · 作品交流，都是我们自己拍的</div>
+    <div class="events" id="eventGrid">
+      <figure class="ev lead" tabindex="0" role="button" data-i="0" aria-label="查看大图：中秋主题笔会">
+        <img src="images/events/02_zhongqiu.jpg" alt="社员举着红色中秋主题书法作品合影" loading="lazy">
+        <figcaption>中秋主题笔会 · 社员与作品合影</figcaption>
+      </figure>
+      <figure class="ev" tabindex="0" role="button" data-i="1" aria-label="查看大图：日常笔会">
+        <img src="images/events/01_bihui.jpg" alt="社员围坐长桌临帖，桌上铺着毛毡、字帖与笔墨" loading="lazy">
+        <figcaption>日常笔会 · 长桌临帖，写完互相看</figcaption>
+      </figure>
+      <figure class="ev" tabindex="0" role="button" data-i="2" aria-label="查看大图：社团宣讲">
+        <img src="images/events/03_xuanjiang.jpg" alt="教室里社员站起发言，其他人在座位上听" loading="lazy">
+        <figcaption>社团宣讲 · 教室里的一次分享</figcaption>
+      </figure>
+      <figure class="ev" tabindex="0" role="button" data-i="3" aria-label="查看大图：作品交流">
+        <img src="images/events/04_jiaoliu.jpg" alt="几名社员围在平板前看稿，桌上散着字帖和糖" loading="lazy">
+        <figcaption>作品交流 · 围着屏幕看稿改字</figcaption>
+      </figure>
+      <figure class="ev" tabindex="0" role="button" data-i="4" aria-label="查看大图：社员作品">
+        <img src="images/events/05_zuopin.jpg" alt="六张红纸书法小品拼图，写的是中秋相关诗句" loading="lazy">
+        <figcaption>社员作品 · 中秋主题红纸小品</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -534,6 +555,28 @@ footer{text-align:center; margin-top:36px; font-size:var(--fs-mini); color:var(-
   document.getElementById('lbPrev').addEventListener('click',function(){stepLB(-1);});
   document.getElementById('lbNext').addEventListener('click',function(){stepLB(1);});
   lb.addEventListener('click',function(e){ if(e.target===lb) closeLB(); });
+
+  /* 协会动态：点照片开灯箱（复用碑帖灯箱，支持左右切换/键盘） */
+  var eventGrid = document.getElementById('eventGrid');
+  if(eventGrid){
+    var EV_FIGS = [].slice.call(eventGrid.querySelectorAll('.ev'));
+    var EV_LIST = EV_FIGS.map(function(fig){
+      var im = fig.querySelector('img'), cap = fig.querySelector('figcaption');
+      return {img: im ? im.getAttribute('src') : '',
+              title: cap ? cap.textContent : '',
+              sub: '兰亭书画协会 · 活动记录'};
+    });
+    function openEvent(i){
+      if(!EV_LIST[i]) return;
+      openLB({list: EV_LIST, idx: i, img: EV_LIST[i].img, title: EV_LIST[i].title, sub: EV_LIST[i].sub});
+    }
+    EV_FIGS.forEach(function(fig, i){
+      fig.addEventListener('click', function(){ openEvent(i); });
+      fig.addEventListener('keydown', function(ev){
+        if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); openEvent(i); }
+      });
+    });
+  }
   document.addEventListener('keydown',function(e){
     if(!lb.classList.contains('open')) return;
     if(e.key==='Escape') closeLB();

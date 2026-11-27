@@ -1,0 +1,34 @@
+# 验收门禁 · push 到 main 时跑全仓库巡检（门禁 + 站内引用）
+# 定位：只做"看得见"——有意外 FAIL 变红叉，不阻断合并（仓库没配 branch protection）。
+# 页面清单不写死：由 巡检配置_全仓库.json 的 discover.glob 自动发现，新增页面自动纳入。
+# 已登记的快照页（jingmo）仍会跑、仍打印失败项，但不算"意外失败"。
+name: 验收门禁
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - '开工包/tools/**'
+      - '.github/workflows/gate.yml'
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 巡检（配置自动发现页面）
+        run: python3 开工包/tools/网页巡检.py --config 开工包/tools/巡检配置_全仓库.json --out "$RUNNER_TEMP/patrol"
+      - name: 上传巡检报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patrol-report
+          path: |
+            ${{ runner.temp }}/patrol/patrol.md
+            ${{ runner.temp }}/patrol/patrol.json
+          if-no-files-found: warn

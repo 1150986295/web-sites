@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>工具箱 · 小工具合集，断网可用</title>
+<meta name="description" content="六个常用小工具合在一个页面里，全部在本机完成，断网也能用。">
+<style>
+/* ========== 一、设计令牌 ========== */
+:root{
+  /* 日间：HUD 青（冷白底 + 仪表青） */
+  --paper:#EDF3F8;
+  --paper-hi:#F8FBFE;
+  --card:#FFFFFF;
+  --card-2:#E5EEF6;
+  --ink:#0A1622;
+  --ink-2:rgba(10,22,34,.72);
+  --ink-3:rgba(10,22,34,.62);
+  --primary:#2C5F7C;              /* 钢青：图标/次操作 */
+  --accent:#006C78;               /* 全站唯一强调色：主操作 + 红点 */
+  --line:#C9D8E4;
+  --line-soft:rgba(201,216,228,.55);
+  --primary-soft:rgba(44,95,124,.10);
+  --accent-soft:rgba(0,108,120,.07);
+  --accent-line:rgba(0,108,120,.45);
+  --accent-ink:#00545C;
+  --on-accent:#FFFFFF;
+  --field:#F6FAFD;
+  --sh-card:0 1px 0 rgba(255,255,255,.9) inset, 0 2px 10px rgba(10,30,50,.06), 0 14px 28px -22px rgba(10,30,50,.35);
+  --sh-card-hi:0 1px 0 rgba(255,255,255,.95) inset, 0 6px 18px rgba(10,30,50,.10), 0 22px 40px -26px rgba(10,30,50,.42);
+  --sh-bar:0 -8px 24px -16px rgba(10,30,50,.35);
+  --sh-accent:0 8px 20px -8px rgba(0,108,120,.5);
+  --glow:rgba(0,108,120,.07);
+  --grid:rgba(44,95,124,.10);
+
+  --fs-hero:28px; --fs-h1:22px; --fs-h2:18px; --fs-body:16px; --fs-sub:14px; --fs-mini:13px;
+  --sp-1:8px; --sp-2:14px; --sp-3:22px; --sp-4:34px;
+  --r-s:8px; --r-m:11px; --r-l:15px;
+  --tap:44px;                      /* 移动端可点区域下限 */
+  --mono:ui-monospace,"SFMono-Regular","Menlo","Consolas",monospace;
+  --serif:"SF Pro Display","Inter","Helvetica Neue","PingFang SC",sans-serif; /* 科技风：标题转无衬线 */
+}
+:root[data-theme="dark"]{
+  /* 夜间：紫夜霓虹 */
+  --paper:#08050F;
+  --paper-hi:#100A1C;
+  --card:#120C1F;
+  --card-2:#1A1130;
+  --ink:#EFE8FF;
+  --ink-2:rgba(239,232,255,.76);
+  --ink-3:rgba(239,232,255,.56);
+  --primary:#A78BFA;
+  --accent:#FF2E9A;
+  --line:#261A40;
+  --line-soft:rgba(38,26,64,.72);
+  --primary-soft:rgba(167,139,250,.12);
+  --accent-soft:rgba(255,46,154,.12);
+  --accent-line:rgba(255,46,154,.5);
+  --accent-ink:#FF9ACB;
+  --on-accent:#12040D;
+  --field:#0C0716;
+  --sh-card:0 1px 0 rgba(167,139,250,.06) inset, 0 2px 12px rgba(0,0,0,.4), 0 18px 34px -26px rgba(0,0,0,.85);
+  --sh-card-hi:0 1px 0 rgba(167,139,250,.10) inset, 0 0 0 1px rgba(255,46,154,.25), 0 0 28px -10px rgba(255,46,154,.4);
+  --sh-bar:0 -10px 30px -18px rgba(0,0,0,.85);
+  --sh-accent:0 8px 22px -10px rgba(255,46,154,.45);
+  --glow:rgba(167,139,250,.14);
+  --grid:rgba(167,139,250,.09);
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+}
+/* ========== 二、基础 ========== */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink); font-size:var(--fs-body); line-height:1.75;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  touch-action:pan-y pinch-zoom;
+  background:
+    radial-gradient(900px 500px at 50% -10%, var(--glow), transparent 72%),
+    var(--paper);
+  min-height:100vh;
+}
+body::before{ /* 科技风底纹：46px 细网格，代替原来的纸纹，不用重投影 */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:46px 46px;
+  opacity:.55;
+}
+h1,h2,h3,p{margin:0}
+[hidden]{display:none !important}
+button,input,select,textarea{font:inherit; color:inherit}
+button{border:0; background:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px}
+svg.ico{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.7;
+  stroke-linecap:round; stroke-linejoin:round; display:block}
+.shell{position:relative; z-index:1; max-width:720px; margin:0 auto; padding:0 var(--sp-2)}
+/* ========== 三、首页 ========== */
+.hd{padding:calc(var(--sp-4) + env(safe-area-inset-top)) 0 var(--sp-3)}
+.hd-row{display:flex; align-items:flex-start; gap:var(--sp-2)}
+.brand{flex:1; min-width:0}
+.title-line{display:flex; align-items:center; gap:8px}
+.title-line::before{
+  content:""; flex:0 0 auto; width:7px; height:7px; border-radius:50%;
+  background:var(--accent); box-shadow:0 0 10px var(--accent);
+  margin-right:2px; animation:dotPulse 2.6s infinite;
+}
+@keyframes dotPulse{0%,55%{opacity:1}56%,100%{opacity:.3}}
+h1{font-family:var(--serif); font-size:var(--fs-hero); font-weight:700; letter-spacing:.03em; line-height:1.3}
+.sub{margin-top:6px; font-size:var(--fs-sub); color:var(--ink-2)}
+.theme-pill{
+  flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+  min-height:var(--tap); padding:0 12px 0 10px; border-radius:999px;
+  background:var(--card); color:var(--ink-2); font-size:var(--fs-mini);
+  box-shadow:var(--sh-card); border:1px solid var(--line-soft);
+}
+.theme-pill:active{transform:scale(.97)}
+.theme-pill svg{width:18px; height:18px; stroke-width:1.7}
+.divider{height:1px; background:var(--line-soft); margin:0 0 var(--sp-3)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px}
+.card{
+  position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+  padding:16px 14px 15px; min-height:118px; text-align:left;
+  background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-m);
+  box-shadow:var(--sh-card);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  animation:rise .5s cubic-bezier(.2,.75,.2,1) both; animation-delay:calc(var(--i) * 45ms);
+}
+@keyframes rise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+.card:hover{transform:translateY(-2px); box-shadow:var(--sh-card-hi); border-color:var(--line)}
+.card:active{transform:translateY(0) scale(.99)}
+.card .ico-wrap{
+  display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+  border-radius:var(--r-s); background:var(--primary-soft); color:var(--primary);
+  border:1px solid var(--line); margin-bottom:10px;
+}
+.card.wide{grid-column:1 / -1; flex-direction:row; align-items:center; gap:14px; min-height:96px; padding:16px 18px}
+.card.wide .ico-wrap{margin-bottom:0; width:44px; height:44px; flex:0 0 auto}
+.card-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+.card-go{flex:0 0 auto; color:var(--ink-3); font-size:20px; line-height:1}
+.card-t{font-family:var(--serif); font-size:17px; font-weight:600; letter-spacing:.02em}
+.card-d{font-size:var(--fs-mini); color:var(--ink-3); line-height:1.6}
+.home-foot{margin:var(--sp-4) 0 calc(var(--sp-4) + env(safe-area-inset-bottom));
+  font-size:var(--fs-mini); color:var(--ink-3); display:flex; align-items:center; gap:6px}
+.home-foot svg{width:14px; height:14px; stroke-width:1.8}
+/* ========== 四、工作台（全屏层） ========== */
+.work{
+  position:fixed; inset:0; z-index:50; display:none; overflow-y:auto; overscroll-behavior:contain;
+  background:
+    radial-gradient(900px 480px at 50% -10%, var(--glow), transparent 72%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--paper);
+  background-size:auto, 46px 46px, 46px 46px, auto;
+  -webkit-overflow-scrolling:touch;
+}
+.work.on{display:block; animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+.work-inner{max-width:720px; margin:0 auto; padding:0 var(--sp-2) calc(112px + env(safe-area-inset-bottom))}
+.w-bar{
+  position:sticky; top:0; z-index:3; display:flex; align-items:center; justify-content:space-between;
+  gap:var(--sp-1); padding:calc(8px + env(safe-area-inset-top)) 0 8px;
+  background:linear-gradient(var(--paper) 62%, transparent);
+}
+.back{
+  display:inline-flex; align-items:center; gap:6px; min-height:var(--tap); padding:0 10px 0 6px;
+  margin-left:-6px; border-radius:10px; color:var(--ink-2); font-size:var(--fs-sub); font-weight:600;
+}
+.back svg{width:20px; height:20px; stroke-width:1.9}
+.back:active{background:var(--primary-soft)}
+.ghost{min-height:var(--tap); padding:0 10px; border-radius:10px; font-size:var(--fs-mini); color:var(--ink-3)}
+.ghost:active{background:var(--primary-soft); color:var(--primary)}
+.w-hd{padding:6px 0 var(--sp-3)}
+.w-hd h2{font-family:var(--serif); font-size:var(--fs-h1); font-weight:700; letter-spacing:.04em}
+.w-hd p{margin-top:4px; font-size:var(--fs-sub); color:var(--ink-2)}
+.panel{display:none}
+.panel.on{display:block; animation:fadeUp .2s ease both}
+/* 卡片内的通用块 */
+.block{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-m);
+  box-shadow:var(--sh-card); padding:var(--sp-2); margin-bottom:12px}
+.block-h{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px}
+.block-h b{font-size:var(--fs-sub); font-weight:600}
+.block-h span{font-size:var(--fs-mini); color:var(--ink-3)}
+.field-row{display:flex; gap:10px; align-items:flex-end}
+.field{flex:1; min-width:0}
+.field.unit{flex:0 0 42%}
+.field > span{display:block; font-size:var(--fs-mini); color:var(--ink-3); margin-bottom:4px}
+input[type=text],input[type=number],select,textarea{
+  width:100%; font-size:var(--fs-body); color:var(--ink); background:var(--field);
+  border:1px solid var(--line); border-radius:var(--r-s); padding:11px 12px;
+  min-height:var(--tap); appearance:none; -webkit-appearance:none;
+}
+input[type=number]{font-variant-numeric:tabular-nums}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 50%, calc(100% - 12px) 50%; background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat; padding-right:34px}
+textarea{line-height:1.7; resize:vertical}
+.swap{display:flex; align-items:center; justify-content:center; gap:6px; width:100%; min-height:var(--tap);
+  margin:10px 0; border-radius:var(--r-s); background:var(--primary-soft); color:var(--primary);
+  font-size:var(--fs-sub); font-weight:600}
+.swap svg{width:18px; height:18px; stroke-width:1.9}
+.swap:active{transform:scale(.99)}
+.hint-line{font-size:var(--fs-mini); color:var(--ink-3); font-variant-numeric:tabular-nums}
+.seg{display:flex; gap:4px; padding:4px; background:var(--card-2); border-radius:12px; margin-bottom:12px}
+.seg button{flex:1; min-height:38px; border-radius:9px; font-size:var(--fs-sub); color:var(--ink-2)}
+.seg button.on{background:var(--primary-soft); color:var(--primary); font-weight:600; box-shadow:inset 0 0 0 1px var(--line-soft)}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{min-height:36px; padding:0 12px; border-radius:999px; background:var(--card-2); border:1px solid var(--line-soft);
+  color:var(--ink-2); font-size:var(--fs-mini); display:inline-flex; align-items:center}
+.chip.on{background:var(--primary-soft); color:var(--primary); border-color:transparent; font-weight:600}
+/* 颜色工具 */
+.swatch{height:96px; border-radius:var(--r-s); display:flex; align-items:flex-end; justify-content:space-between;
+  padding:10px 12px; color:#fff; font-family:var(--mono); font-size:var(--fs-sub); letter-spacing:.02em;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.valrow{display:flex; align-items:center; gap:10px; min-height:var(--tap); border-bottom:1px solid var(--line-soft)}
+.valrow:last-child{border-bottom:0}
+.valrow .k{flex:0 0 44px; font-size:var(--fs-mini); color:var(--ink-3); letter-spacing:.04em}
+.valrow code{flex:1; min-width:0; font-family:var(--mono); font-size:var(--fs-sub); overflow-wrap:anywhere}
+.valrow .cp{font-size:var(--fs-mini); color:var(--primary); font-weight:600; padding:8px 0 8px 10px}
+.palette{display:flex; gap:10px; flex-wrap:wrap}
+.dot{width:32px; height:32px; border-radius:9px; border:1px solid rgba(0,0,0,.08)}
+.dot.sel{outline:2px solid var(--primary); outline-offset:2px}
+/* 倒计时 */
+.bigtime{font-family:var(--mono); font-size:46px; line-height:1.15; letter-spacing:.02em;
+  font-variant-numeric:tabular-nums; text-align:center; padding:10px 0 4px}
+.bigtime.dim{color:var(--ink-3)}
+.tbar{height:3px; border-radius:2px; background:var(--line-soft); overflow:hidden; margin:8px 0 14px}
+.tbar i{display:block; height:100%; width:38%; background:var(--primary); border-radius:2px}
+.three{display:flex; gap:10px}
+.three .field{flex:1}
+/* 便签 */
+.ta{min-height:180px}
+.ta-foot{display:flex; justify-content:space-between; gap:8px; font-size:var(--fs-mini); color:var(--ink-3); margin-top:8px}
+/* JSON / MD */
+.toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+.tgb{min-height:36px; padding:0 11px; border-radius:9px; border:1px solid var(--line); background:var(--card-2);
+  font-size:var(--fs-mini); color:var(--ink-2)}
+.tgb.on{background:var(--primary-soft); color:var(--primary); border-color:var(--line-soft); font-weight:600}
+.mono{font-family:var(--mono); font-size:14px; line-height:1.7}
+.out{margin:0; padding:12px; border-radius:var(--r-s); background:var(--field); border:1px solid var(--line);
+  overflow:auto; max-height:240px; white-space:pre; -webkit-overflow-scrolling:touch}
+.errbox{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:var(--r-s);
+  background:var(--accent-soft); border-left:3px solid var(--accent); margin-top:10px}
+.errbox b{color:var(--accent); font-size:var(--fs-mini); white-space:nowrap}
+.errbox p{font-size:var(--fs-mini); color:var(--ink-2); line-height:1.6; margin:0}
+.md{padding:2px 2px 6px}
+.md h3{font-family:var(--serif); font-size:19px; margin:2px 0 8px}
+.md p{font-size:var(--fs-sub); color:var(--ink-2); margin:0 0 8px}
+.md ul{margin:0 0 8px; padding-left:20px; font-size:var(--fs-sub); color:var(--ink-2)}
+.md code{font-family:var(--mono); font-size:13px; background:var(--primary-soft); padding:2px 5px; border-radius:5px; color:var(--primary)}
+.md blockquote{margin:0 0 8px; padding:6px 0 6px 12px; border-left:3px solid var(--line); color:var(--ink-3); font-size:var(--fs-sub)}
+.md-hr{height:1px; background:var(--line-soft); margin:12px 0}
+
+/* PDF 工具箱 */
+.drop{display:flex; flex-direction:column; align-items:center; gap:6px; padding:24px 14px;
+  border:1px dashed var(--line); border-radius:var(--r-s); background:var(--field); text-align:center; cursor:pointer;
+  transition:border-color .15s, background .15s}
+.drop:hover,.drop:focus-visible{border-color:var(--primary); background:var(--primary-soft)}
+.drop svg{width:34px; height:34px; stroke-width:1.6; color:var(--primary)}
+.drop.compact{flex-direction:row; align-items:center; justify-content:center; padding:12px; gap:8px}
+.drop.compact svg{width:20px; height:20px}
+.drop.compact span{display:none}
+.drop b{font-size:var(--fs-sub); font-weight:600}
+.drop span{font-size:var(--fs-mini); color:var(--ink-3)}
+.frow{display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line-soft)}
+.frow:last-child{border-bottom:0}
+.fmeta{flex:1; min-width:0}
+.fname{display:block; font-size:var(--fs-sub); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.fsub{display:block; font-size:var(--fs-mini); color:var(--ink-3); font-variant-numeric:tabular-nums}
+.fbtn{display:inline-flex; align-items:center; justify-content:center; min-height:var(--tap); padding:0 10px;
+  border-radius:8px; border:1px solid var(--line-soft); background:var(--card-2); color:var(--ink-2);
+  font-size:var(--fs-mini); text-decoration:none; white-space:nowrap}
+.fbtn.primary{background:var(--primary-soft); color:var(--primary); border-color:var(--line-soft); font-weight:600}
+.badge{display:inline-block; font-size:11px; line-height:1.6; padding:1px 6px; border-radius:5px;
+  background:var(--primary-soft); color:var(--primary); vertical-align:1px}
+.badge.warn{background:var(--accent-soft); color:var(--accent)}
+.note{padding:10px 12px; border-radius:var(--r-s); background:var(--card-2); color:var(--ink-3);
+  font-size:var(--fs-mini); line-height:1.65; margin-bottom:12px}
+.note.warn{background:var(--accent-soft); color:var(--accent)}
+/* 底部唯一主操作 */
+.act-bar{
+  position:fixed; left:0; right:0; bottom:0; z-index:60;
+  padding:10px var(--sp-2) calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(rgba(237,243,248,0), var(--paper) 34%);
+  box-shadow:var(--sh-bar); backdrop-filter:blur(6px);
+}
+:root[data-theme="dark"] .act-bar{background:linear-gradient(rgba(8,5,15,0), var(--paper) 34%)}
+#actMain{
+  display:block; width:100%; max-width:696px; margin:0 auto; min-height:50px; padding:13px;
+  border-radius:var(--r-m); background:linear-gradient(180deg, var(--accent-soft), transparent), var(--card);
+  border:1px solid var(--accent-line); color:var(--accent-ink);
+  font-size:var(--fs-body); font-weight:600; letter-spacing:.04em;
+  box-shadow:0 10px 30px -20px var(--accent), inset 0 1px 0 rgba(255,255,255,.06);
+}
+#actMain:active{transform:translateY(1px); box-shadow:none}
+/* 提示条 */
+#toast{position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom)); z-index:80;
+  transform:translate(-50%,10px); opacity:0; pointer-events:none;
+  padding:9px 16px; border-radius:999px; background:var(--card); color:var(--ink);
+  border:1px solid var(--line); box-shadow:var(--sh-card-hi);
+  font-size:var(--fs-mini); transition:opacity .18s, transform .18s; max-width:88vw}
+#toast.on{opacity:1; transform:translate(-50%,0)}
+/* 红点（错误记录入口） */
+#errDot{position:fixed; right:14px; bottom:calc(80px + env(safe-area-inset-bottom)); z-index:70;
+  display:none; align-items:center; gap:5px; min-height:34px; padding:0 10px; border-radius:999px;
+  background:var(--accent); color:var(--on-accent); font-size:var(--fs-mini); box-shadow:var(--sh-accent)}
+#errPanel{position:fixed; left:12px; right:12px; bottom:calc(130px + env(safe-area-inset-bottom)); z-index:75;
+  display:none; max-height:52vh; overflow:auto; padding:12px; border-radius:var(--r-m);
+  background:var(--card); border:1px solid var(--line); box-shadow:var(--sh-card); font-size:var(--fs-mini)}
+#errPanel .row{padding:6px 0; border-bottom:1px solid var(--line-soft); overflow-wrap:anywhere; color:var(--ink-2)}
+@media (min-width:640px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .card{min-height:132px}
+  .md-wrap{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="hd">
+    <div class="hd-row">
+      <div class="brand">
+        <div class="title-line">
+          <h1>工具箱</h1>
+        </div>
+        <p class="sub">小工具合集，本机运行，断网可用</p>
+      </div>
+      <button class="theme-pill" id="themeBtn" aria-label="切换主题">
+        <svg class="ico" id="themeIco" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"></path>
+        </svg>
+        <span id="themeLabel">自动</span>
+      </button>
+    </div>
+  </header>
+  <div class="divider"></div>
+
+  <main class="grid" id="grid">
+    <button class="card" style="--i:0" data-tool="unit" aria-label="打开单位换算">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 8h13M13.5 4l4 4-4 4"></path><path d="M19.5 16h-13M10.5 12l-4 4 4 4"></path></svg></span>
+      <span class="card-t">单位换算</span>
+      <span class="card-d">长度 重量 温度 数据</span>
+    </button>
+    <button class="card" style="--i:1" data-tool="color" aria-label="打开颜色拾取">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.8 4.4l4.8 4.8"></path><path d="M17.2 6.8L7 17v3h3l10.2-10.2"></path><path d="M6.6 13.4l4 4"></path></svg></span>
+      <span class="card-t">颜色拾取</span>
+      <span class="card-d">HEX / RGB / HSL 互转</span>
+    </button>
+    <button class="card" style="--i:2" data-tool="timer" aria-label="打开倒计时">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.8"></circle><path d="M12 9.6v4l2.6 2"></path><path d="M9.2 2.6h5.6"></path></svg></span>
+      <span class="card-t">倒计时</span>
+      <span class="card-d">5 / 15 / 25 分钟起步</span>
+    </button>
+    <button class="card" style="--i:3" data-tool="note" aria-label="打开便签">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v9.5l-5 5.5H5z"></path><path d="M19 14h-5v5"></path><path d="M8 8.5h8M8 12h5"></path></svg></span>
+      <span class="card-t">便签</span>
+      <span class="card-d">随手记，自动存本机</span>
+    </button>
+    <button class="card" style="--i:4" data-tool="json" aria-label="打开 JSON 格式化">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 4.5H8a2 2 0 0 0-2 2v3a2 2 0 0 1-2 2 2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h1.5"></path><path d="M14.5 4.5H16a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2 2 2 0 0 0-2 2v3a2 2 0 0 1-2 2h-1.5"></path></svg></span>
+      <span class="card-t">JSON 格式化</span>
+      <span class="card-d">校验 · 缩进 · 压缩</span>
+    </button>
+    <button class="card" style="--i:5" data-tool="md" aria-label="打开 Markdown 预览">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="5" width="17.6" height="14" rx="2.2"></rect><path d="M7 15.2V9l2.6 3L12.2 9v6.2"></path><path d="M16 9.2v5.4M14 12.6l2 2 2-2"></path></svg></span>
+      <span class="card-t">Markdown 预览</span>
+      <span class="card-d">边写边看，零依赖</span>
+    </button>
+    <button class="card wide" style="--i:6" data-tool="pdf" aria-label="打开 PDF 工具箱">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h8l4 4v13.5h-12z"></path><path d="M14.5 3.5v4h4"></path><path d="M9.5 12.5h5M9.5 16h3"></path></svg></span>
+      <span class="card-body">
+        <span class="card-t">PDF 工具箱</span>
+        <span class="card-d">拆成小于 20MB 的多份</span>
+      </span>
+      <span class="card-go" aria-hidden="true">›</span>
+    </button>
+  </main>
+
+  <div class="home-foot">
+    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="2.2"></rect><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"></path></svg>
+    <span>数据只存在这台设备上 · 不上传任何内容</span>
+  </div>
+</div>
+
+<!-- 工作台 -->
+<section class="work" id="work" aria-hidden="true">
+
+  <div class="work-inner">
+    <div class="w-bar">
+      <button class="back" id="backBtn">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5"></path></svg>
+        <span>全部工具</span>
+      </button>
+      <button class="ghost" id="resetBtn">重置</button>
+    </div>
+
+    <div class="w-hd">
+      <h2 id="wTitle">单位换算</h2>
+      <p id="wSub">换算结果随手复制，不再开网页查</p>
+    </div>
+
+    <!-- 单位换算 -->
+    <div class="panel on" id="p-unit">
+      <div class="seg" role="tablist" aria-label="换算类别">
+        <button class="on" type="button">长度</button>
+        <button type="button">重量</button>
+        <button type="button">温度</button>
+        <button type="button">数据</button>
+      </div>
+      <div class="block">
+        <div class="field-row">
+          <label class="field"><span>数值</span><input type="text" inputmode="decimal" value="1" aria-label="数值"></label>
+          <label class="field unit"><span>单位</span><select aria-label="原单位"><option>米</option><option>厘米</option><option>千米</option></select></label>
+        </div>
+        <button class="swap" type="button" id="swapBtn">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9h10M14 6l3 3-3 3"></path><path d="M17 15H7M10 12l-3 3 3 3"></path></svg>
+          <span>互换单位</span>
+        </button>
+        <div class="field-row">
+          <label class="field"><span>结果</span><input type="text" inputmode="decimal" value="100" aria-label="结果"></label>
+          <label class="field unit"><span>单位</span><select aria-label="目标单位"><option>厘米</option><option>米</option><option>英尺</option></select></label>
+        </div>
+        <div class="hint-line" style="margin-top:10px">1 米 = 100 厘米 = 3.2808 英尺</div>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>常用换算</b><span>点一下填进上面</span></div>
+        <div class="chips">
+          <button class="chip" type="button">1 寸 ≈ 3.33 厘米</button>
+          <button class="chip" type="button">1 磅 ≈ 0.454 公斤</button>
+          <button class="chip" type="button">1 GB = 1024 MB</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 颜色拾取 -->
+    <div class="panel" id="p-color">
+      <div class="block">
+        <div class="swatch" style="background:#6D3BD1"><span>#6D3BD1</span><span>紫电</span></div>
+        <div class="valrow"><span class="k">HEX</span><code>#6D3BD1</code><button class="cp" type="button">复制</button></div>
+        <div class="valrow"><span class="k">RGB</span><code>109, 59, 209</code><button class="cp" type="button">复制</button></div>
+        <div class="valrow"><span class="k">HSL</span><code>260°, 62%, 53%</code><button class="cp" type="button">复制</button></div>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>取色</b><span>用系统吸管或取色器</span></div>
+        <input type="color" value="#6d3bd1" aria-label="选择颜色" style="width:100%;height:var(--tap);border:1px solid var(--line);border-radius:10px;background:var(--field);padding:4px">
+        <div class="hint-line" style="margin-top:8px">拖动后三个数值会同步变，不用来回算</div>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>最近用过</b><span>点一下复制 HEX</span></div>
+        <div class="palette">
+          <span class="dot sel" style="background:#6D3BD1"></span>
+          <span class="dot" style="background:#FF2E9A"></span>
+          <span class="dot" style="background:#A78BFA"></span>
+          <span class="dot" style="background:#00E5FF"></span>
+          <span class="dot" style="background:#2FE0C8"></span>
+          <span class="dot" style="background:#EDF3F8"></span>
+          <span class="dot" style="background:#FFAB00"></span>
+          <span class="dot" style="background:#08050F"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 倒计时 -->
+    <div class="panel" id="p-timer">
+      <div class="block">
+        <div class="bigtime" id="cdBig">00:25:00</div>
+        <div class="tbar"><i></i></div>
+        <div class="chips" style="justify-content:center">
+          <button class="chip" type="button">5 分钟</button>
+          <button class="chip on" type="button">25 分钟</button>
+          <button class="chip" type="button">60 分钟</button>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>自定义时长</b><span>关掉页面也会继续走</span></div>
+        <div class="three">
+          <label class="field"><span>时</span><input type="number" min="0" max="23" value="0" aria-label="小时"></label>
+          <label class="field"><span>分</span><input type="number" min="0" max="59" value="25" aria-label="分钟"></label>
+          <label class="field"><span>秒</span><input type="number" min="0" max="59" value="0" aria-label="秒"></label>
+        </div>
+        <div class="hint-line" style="margin-top:10px">结束时响一声，页面标题同时倒数</div>
+      </div>
+    </div>
+
+    <!-- 便签 -->
+    <div class="panel" id="p-note">
+      <div class="chips" style="margin-bottom:12px">
+        <button class="chip on" type="button">本周待办</button>
+        <button class="chip" type="button">采购清单</button>
+        <button class="chip" type="button">+ 新建</button>
+      </div>
+      <div class="block">
+        <label class="field" style="display:block"><span>标题</span><input type="text" value="本周待办" aria-label="便签标题"></label>
+        <div style="height:10px"></div>
+        <textarea class="ta" aria-label="便签正文">1. 周三前把作品集排版收尾
+2. 周五和老师确认展位尺寸
+3. 买 3 卷宣纸、2 支小楷</textarea>
+        <div class="ta-foot"><span>62 字</span><span>已自动保存 22:31</span></div>
+      </div>
+    </div>
+
+    <!-- JSON -->
+    <div class="panel" id="p-json">
+      <div class="toolbar">
+        <button class="tgb on" type="button">缩进 2</button>
+        <button class="tgb" type="button">缩进 4</button>
+        <button class="tgb" type="button">Tab</button>
+        <button class="tgb" type="button">键排序</button>
+        <button class="tgb" type="button">压缩</button>
+      </div>
+      <div class="block">
+        <textarea class="mono" rows="5" aria-label="输入 JSON">{"title":"兰亭墨缘","tools":6,"local":true,"tags":["书法","工具"]}</textarea>
+        <div class="errbox">
+          <b>第 1 行 · 第 41 列</b>
+          <p>这里少一个英文逗号，后面的内容都解析不了。补上 , 再点格式化。</p>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>格式化结果</b><span>1.2 KB · 4 个键</span></div>
+        <pre class="out mono">{
+  "title": "兰亭墨缘",
+  "tools": 6,
+  "local": true,
+  "tags": [
+    "书法",
+    "工具"
+  ]
+}</pre>
+      </div>
+    </div>
+
+    <!-- Markdown -->
+    <div class="panel" id="p-md">
+      <div class="block">
+        <textarea class="mono" rows="7" aria-label="Markdown 输入"># 作品集排版清单
+
+**周三前** 收尾三件事：
+
+- 补两张局部特写
+- 统一图片长边 1080px
+- 简介压到 60 字以内
+
+> 展位尺寸周五确认</textarea>
+      </div>
+      <div class="block">
+        <div class="block-h"><b>预览</b><span>标题 / 列表 / 引用 / 代码</span></div>
+        <div class="md">
+          <h3>作品集排版清单</h3>
+          <p><b>周三前</b> 收尾三件事：</p>
+          <ul><li>补两张局部特写</li><li>统一图片长边 1080px</li><li>简介压到 60 字以内</li></ul>
+          <blockquote>展位尺寸周五确认</blockquote>
+          <p>行内代码：<code>1080px</code></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF 工具箱 -->
+    <div class="panel" id="p-pdf">
+      <div class="seg" id="pdfSeg" role="tablist" aria-label="PDF 操作">
+        <button class="on" type="button" data-mode="size">按大小拆</button>
+        <button type="button" data-mode="pages">按页数拆</button>
+        <button type="button" data-mode="merge">合并</button>
+        <button type="button" data-mode="extract">提取页</button>
+      </div>
+
+      <div class="block">
+        <div class="drop" id="dropZone" role="button" tabindex="0">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16.5V4M7 8.5L12 3.5l5 5"></path><path d="M4.5 15v3.2A2.3 2.3 0 0 0 6.8 20.5h10.4A2.3 2.3 0 0 0 19.5 18.2V15"></path></svg>
+          <b id="dropTitle">选择一个 PDF</b>
+          <span>文件在这台设备上处理，不上传任何内容</span>
+        </div>
+        <input type="file" id="pdfInput" accept="application/pdf,.pdf" hidden>
+        <div id="fileList"></div>
+      </div>
+
+      <div class="block" id="optSize">
+        <label class="field" for="limitMB"><span>每份不超过（MB）</span>
+          <input type="number" id="limitMB" value="19" min="1" max="200" step="1" inputmode="numeric"></label>
+        <div class="hint-line" style="margin-top:8px">平台上限 20MB，默认留 1MB 余量；按实际体积自动试算，不按页数硬切。</div>
+      </div>
+
+      <div class="block" id="optPages" hidden>
+        <label class="field" for="pagesPer"><span>每份页数</span>
+          <input type="number" id="pagesPer" value="10" min="1" max="500" step="1" inputmode="numeric"></label>
+        <div class="hint-line" style="margin-top:8px">按页数切不保证每份都小于 20MB；页里有大图请用「按大小拆」。</div>
+      </div>
+
+      <div class="block" id="optMerge" hidden>
+        <label class="field" for="mergeName"><span>输出文件名</span>
+          <input type="text" id="mergeName" value="合并.pdf"></label>
+        <div class="hint-line" style="margin-top:8px">按下面列表顺序合并，可用 ↑ ↓ 调整先后。</div>
+      </div>
+
+      <div class="block" id="optExtract" hidden>
+        <label class="field" for="rangeText"><span>要保留的页码</span>
+          <input type="text" id="rangeText" placeholder="例如 1-3,5,8-10"></label>
+        <div class="hint-line" style="margin-top:8px">只提取这些页，输出一份新 PDF；页码从 1 开始。</div>
+      </div>
+
+      <div class="note" id="pdfNote" hidden></div>
+
+      <div class="block" id="pdfResult" hidden>
+        <div class="block-h"><b id="resTitle">拆分结果</b><span id="resSummary"></span></div>
+        <div id="resList"></div>
+      </div>
+
+      <div class="errbox" id="pdfErr" hidden><b></b><p></p></div>
+    </div>
+  </div>
+
+  <div class="act-bar">
+    <button id="actMain" type="button">复制结果</button>
+  </div>
+</section>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<button id="errDot" type="button" aria-label="查看错误记录" style="display:none">
+  <svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M12 7v6M12 16.6v.6"></path><circle cx="12" cy="12" r="9"></circle></svg>
+  <span>1</span>
+</button>
+<div id="errPanel" role="dialog" aria-label="错误记录"></div>
+
+<script>
+(function(){
+  /* ---------- 主题：自动 / 浅色 / 深色 ---------- */
+  var KEY_THEME = 'utool_v1_theme';
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  var LABEL = {auto:'自动', light:'浅色', dark:'深色'};
+  var ICONS = {
+    sun: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"></path>',
+    moon: '<path d="M20.4 14.6A8.6 8.6 0 1 1 9.4 3.6a6.9 6.9 0 0 0 11 11z"></path>',
+    auto: '<circle cx="12" cy="12" r="8.6"></circle><path d="M12 3.4a8.6 8.6 0 0 1 0 17.2z" fill="currentColor" stroke="none" opacity=".85"></path>'
+  };
+  var mode = 'auto';
+  try{ var saved = localStorage.getItem(KEY_THEME); if(saved && LABEL[saved]) mode = saved; }catch(e){}
+
+  function resolved(){
+    var base = mode === 'auto';
+    var dark = mq.matches;
+    if(mode === 'light') dark = false;
+    if(mode === 'dark') dark = true;
+    return dark ? 'dark' : 'light';
+  }
+  function paintTheme(){
+    var r = resolved();
+    document.documentElement.setAttribute('data-theme', r);
+    document.getElementById('themeLabel').textContent = LABEL[mode];
+    document.getElementById('themeIco').innerHTML = (mode === 'auto') ? ICONS.auto : (r === 'dark' ? ICONS.moon : ICONS.sun);
+    document.getElementById('themeBtn').setAttribute('aria-label', '当前' + LABEL[mode] + '，点按切换');
+  }
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    mode = (mode === 'auto') ? 'light' : (mode === 'light' ? 'dark' : 'auto');
+    try{ localStorage.setItem(KEY_THEME, mode); }catch(e){}
+    paintTheme();
+    showToast('已切到' + LABEL[mode]);
+  });
+  if(mq.addEventListener){ mq.addEventListener('change', function(){ if(mode === 'auto') paintTheme(); }); }
+  paintTheme();
+
+  /* ---------- 工具表：标题 / 主操作 ---------- */
+  var TOOLS = {
+    unit:  {title:'单位换算',   sub:'换算结果随手复制，不再开网页查',       act:'复制结果'},
+    color: {title:'颜色拾取',   sub:'取色、互转，顺手留一份常用色板',       act:'复制 HEX'},
+    timer: {title:'倒计时',     sub:'设好就走，结束时提醒你',               act:'开始计时'},
+    note:  {title:'便签',       sub:'随手记，改一个字就自动存',             act:'新建便签'},
+    json:  {title:'JSON 格式化',sub:'贴进来，缩进、排序、错误定位一次做完', act:'复制结果'},
+    md:    {title:'Markdown 预览', sub:'边写边看，草稿直接变成排版稿',      act:'复制 HTML'},
+    pdf:   {title:'PDF 工具箱', sub:'拆成小于 20MB 的多份，或合并、提取页', act:'开始拆分'}
+  };
+  var IDS = ['unit','color','timer','note','json','md','pdf'];
+
+  var work = document.getElementById('work');
+  var current = '';
+  var pdfState = {inited:false, mode:'size', files:[], parts:[], busy:false, enginePromise:null};
+
+  function showTool(id){
+    var t = TOOLS[id];
+    if(!t) return;
+    current = id;
+    document.getElementById('wTitle').textContent = t.title;
+    document.getElementById('wSub').textContent = t.sub;
+    document.getElementById('actMain').textContent = t.act;
+    IDS.forEach(function(k){
+      var p = document.getElementById('p-' + k);
+      if(p) p.classList.toggle('on', k === id);
+    });
+    if(id === 'pdf') pdfInit();
+    work.classList.add('on');
+    work.scrollTop = 0;
+    try{ history.pushState({tool:id}, '', '#' + id); }catch(e){}
+  }
+  function closeTool(){
+    work.classList.remove('on');
+    var card = document.querySelector('.card[data-tool="' + current + '"]');
+    if(card) card.focus({preventScroll:true});
+  }
+
+  document.getElementById('grid').addEventListener('click', function(e){
+    var card = e.target.closest('.card');
+    if(card) showTool(card.getAttribute('data-tool'));
+  });
+  document.getElementById('backBtn').addEventListener('click', function(){
+    if(history.state && history.state.tool) history.back();
+    else closeTool();
+  });
+  window.addEventListener('popstate', function(){
+    if(work.classList.contains('on')) closeTool();
+  });
+  /* 深链接：index.html#json 直接打开对应工具 */
+  var deep = location.hash.replace('#', '');
+  if(TOOLS[deep]) showTool(deep);
+  window.addEventListener('hashchange', function(){
+    var h = location.hash.replace('#', '');
+    if(TOOLS[h]){ if(current !== h) showTool(h); }
+    else if(work.classList.contains('on')) closeTool();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && work.classList.contains('on')) closeTool();
+  });
+
+
+  /* ---------- PDF 工具箱（pdf-lib 按需加载，首页不加载） ---------- */
+
+  function fmtSize(n){
+    if(n < 1024) return n + ' B';
+    if(n < 1048576) return (n / 1024).toFixed(0) + ' KB';
+    return (n / 1048576).toFixed(1) + ' MB';
+  }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms || 0); }); }
+  function pdfErr(title, why, next){
+    var box = document.getElementById('pdfErr');
+    if(!box) return;
+    box.hidden = false;
+    box.querySelector('b').textContent = title;
+    box.querySelector('p').textContent = why + (next ? ' ' + next : '');
+  }
+  function pdfErrClear(){ var b = document.getElementById('pdfErr'); if(b) b.hidden = true; }
+  function pdfNote(text, warn){
+    var n = document.getElementById('pdfNote');
+    if(!n) return;
+    n.hidden = !text;
+    n.textContent = text || '';
+    n.classList.toggle('warn', !!warn);
+  }
+  function loadEngine(){
+    if(window.PDFLib) return Promise.resolve(window.PDFLib);
+    if(pdfState.enginePromise) return pdfState.enginePromise;
+    pdfState.enginePromise = new Promise(function(resolve, reject){
+      var sc = document.createElement('script');
+      sc.src = 'lib/pdf-lib.min.js';
+      sc.onload = function(){
+        if(window.PDFLib) resolve(window.PDFLib);
+        else reject(new Error('脚本加载了但没挂上 PDFLib'));
+      };
+      sc.onerror = function(){ reject(new Error('lib/pdf-lib.min.js 没找到')); };
+      document.head.appendChild(sc);
+    });
+    return pdfState.enginePromise;
+  }
+  function pdfInit(){
+    if(!pdfState.inited){ pdfState.inited = true; bindPdf(); }
+    pdfMode(pdfState.mode);
+    if(!window.PDFLib){
+      pdfNote('正在加载 PDF 引擎（约 0.5MB，只加载这一次）…');
+      loadEngine().then(function(){ pdfNote(''); }).catch(function(err){
+        pdfNote('PDF 引擎没加载成功：' + err.message + '。检查 lib/pdf-lib.min.js 是否和 index.html 在同一目录。', true);
+      });
+    }
+  }
+  function bindPdf(){
+    var dz = document.getElementById('dropZone'), inp = document.getElementById('pdfInput');
+    dz.addEventListener('click', function(){ inp.click(); });
+    dz.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); inp.click(); }
+    });
+    inp.addEventListener('change', function(e){
+      var list = Array.from(e.target.files || []);   /* 硬规矩：先拷贝 live FileList，再清空 */
+      e.target.value = '';
+      if(list.length) pdfAddFiles(list);
+    });
+  }
+  function pdfMode(m){
+    if(!m || !document.getElementById('pdfSeg')) return;
+    var changed = (m !== pdfState.mode);
+    pdfState.mode = m;
+    var labels = {size:'开始拆分', pages:'开始拆分', merge:'开始合并', extract:'提取页面'};
+    document.querySelectorAll('#pdfSeg button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-mode') === m);
+    });
+    document.getElementById('optSize').hidden = m !== 'size';
+    document.getElementById('optPages').hidden = m !== 'pages';
+    document.getElementById('optMerge').hidden = m !== 'merge';
+    document.getElementById('optExtract').hidden = m !== 'extract';
+    document.getElementById('pdfInput').multiple = (m === 'merge');
+    document.getElementById('dropTitle').textContent = (m === 'merge' ? '选择多个 PDF，按列表顺序合并' : '选择一个 PDF');
+    document.getElementById('actMain').textContent = labels[m] || '开始拆分';
+    if(changed){
+      pdfState.parts.forEach(function(p){ URL.revokeObjectURL(p.url); });
+      pdfState.parts = [];
+      if(m !== 'merge' && pdfState.files.length > 1) pdfState.files = pdfState.files.slice(0, 1);
+      renderParts(); pdfErrClear(); pdfNote('');
+    }
+    renderFiles();
+  }
+  async function pdfAddFiles(list){
+    pdfErrClear();
+    var lib;
+    try{
+      pdfNote('正在加载 PDF 引擎…');
+      lib = await loadEngine();
+    }catch(err){
+      pdfNote('');
+      pdfErr('PDF 引擎没加载成功', '需要同目录的 lib/pdf-lib.min.js：' + err.message + '。', '把 lib 文件夹和 index.html 一起拷过去，刷新后再试。');
+      return;
+    }
+    var take = pdfState.mode === 'merge' ? list : list.slice(0, 1);
+    pdfNote('正在读取 ' + take.length + ' 份文件…');
+    var parsed = [];
+    for(var i = 0; i < take.length; i++){
+      var f = take[i];
+      if(f.size > 80 * 1024 * 1024){
+        pdfErr('文件太大', '「' + f.name + '」有 ' + fmtSize(f.size) + '，超过 80MB 浏览器内存吃不消。', '先压到 80MB 以内，或先按页拆小再进来。');
+        continue;
+      }
+      var bytes = new Uint8Array(await f.arrayBuffer());
+      var doc;
+      try{
+        doc = await lib.PDFDocument.load(bytes);
+      }catch(err){
+        pdfErr('这份 PDF 打不开', '「' + f.name + '」可能加了打开密码，或文件本身损坏。', '在阅读器里解除密码、另存一份再试。');
+        continue;
+      }
+      parsed.push({name:f.name, size:f.size, pages:doc.getPageCount(), bytes:bytes});
+      await sleep(0);
+    }
+    if(!parsed.length){ pdfNote(''); return; }
+    pdfState.files = (pdfState.mode === 'merge') ? pdfState.files.concat(parsed) : [parsed[0]];
+    pdfNote('');
+    renderFiles();
+  }
+  function renderFiles(){
+    var box = document.getElementById('fileList');
+    if(!box) return;
+    var dz = document.getElementById('dropZone'), has = pdfState.files.length > 0;
+    dz.classList.toggle('compact', has);
+    document.getElementById('dropTitle').textContent = has
+      ? (pdfState.mode === 'merge' ? '继续添加 PDF' : '换一个 PDF')
+      : (pdfState.mode === 'merge' ? '选择多个 PDF，按列表顺序合并' : '选择一个 PDF');
+    box.textContent = '';
+    pdfState.files.forEach(function(f, i){
+      var row = document.createElement('div'); row.className = 'frow';
+      var meta = document.createElement('div'); meta.className = 'fmeta';
+      var nm = document.createElement('span'); nm.className = 'fname'; nm.textContent = f.name;
+      var sub = document.createElement('span'); sub.className = 'fsub';
+      sub.textContent = f.pages + ' 页 · ' + fmtSize(f.size);
+      meta.appendChild(nm); meta.appendChild(sub); row.appendChild(meta);
+      if(pdfState.mode === 'merge'){
+        var up = document.createElement('button'); up.type = 'button'; up.className = 'fbtn'; up.textContent = '↑';
+        up.setAttribute('aria-label', '上移'); up.disabled = (i === 0);
+        up.addEventListener('click', function(){ moveFile(i, -1); });
+        var down = document.createElement('button'); down.type = 'button'; down.className = 'fbtn'; down.textContent = '↓';
+        down.setAttribute('aria-label', '下移'); down.disabled = (i === pdfState.files.length - 1);
+        down.addEventListener('click', function(){ moveFile(i, 1); });
+        row.appendChild(up); row.appendChild(down);
+      }
+      var del = document.createElement('button'); del.type = 'button'; del.className = 'fbtn'; del.textContent = '移除';
+      del.setAttribute('aria-label', '移除 ' + f.name);
+      del.addEventListener('click', function(){
+        pdfState.files.splice(i, 1); renderFiles();
+      });
+      row.appendChild(del);
+      box.appendChild(row);
+    });
+  }
+  function moveFile(i, d){
+    var j = i + d;
+    if(j < 0 || j >= pdfState.files.length) return;
+    var tmp = pdfState.files[i]; pdfState.files[i] = pdfState.files[j]; pdfState.files[j] = tmp;
+    renderFiles();
+  }
+  function renderParts(){
+    var block = document.getElementById('pdfResult'), list = document.getElementById('resList'), sum = document.getElementById('resSummary');
+    if(!block) return;
+    if(!pdfState.parts.length){ block.hidden = true; list.textContent = ''; return; }
+    block.hidden = false; list.textContent = '';
+    var total = pdfState.parts.reduce(function(a, p){ return a + p.size; }, 0);
+    sum.textContent = pdfState.parts.length + ' 份 · 共 ' + fmtSize(total);
+    pdfState.parts.forEach(function(p){
+      var row = document.createElement('div'); row.className = 'frow';
+      var meta = document.createElement('div'); meta.className = 'fmeta';
+      var nm = document.createElement('span'); nm.className = 'fname'; nm.textContent = p.name;
+      var sub = document.createElement('span'); sub.className = 'fsub'; sub.textContent = fmtSize(p.size);
+      if(p.pages){ sub.appendChild(document.createTextNode(' · ' + p.pages)); }
+      if(p.oversize){
+        var bd = document.createElement('span'); bd.className = 'badge warn'; bd.textContent = '单页超限';
+        sub.appendChild(document.createTextNode(' ')); sub.appendChild(bd);
+      }
+      meta.appendChild(nm); meta.appendChild(sub); row.appendChild(meta);
+      var a = document.createElement('a'); a.className = 'fbtn primary'; a.href = p.url; a.download = p.name; a.textContent = '下载';
+      row.appendChild(a); list.appendChild(row);
+    });
+  }
+  async function pdfSlice(lib, bytes, start, end){
+    var src = await lib.PDFDocument.load(bytes);
+    var out = await lib.PDFDocument.create();
+    var idx = [];
+    for(var i = start; i < end; i++) idx.push(i);
+    var pages = await out.copyPages(src, idx);
+    pages.forEach(function(pg){ out.addPage(pg); });
+    return {bytes: await out.save(), start:start, end:end};
+  }
+  async function splitByLimit(lib, bytes, limit, start, end){
+    var part = await pdfSlice(lib, bytes, start, end);
+    if(part.bytes.length <= limit) return [part];
+    if(end - start === 1){ part.oversize = true; return [part]; }
+    var mid = start + Math.ceil((end - start) / 2);
+    var left = await splitByLimit(lib, bytes, limit, start, mid);
+    var right = await splitByLimit(lib, bytes, limit, mid, end);
+    return left.concat(right);
+  }
+  function parseRanges(text, total){
+    var out = [], seen = {};
+    text.split(/[,\s，、]+/).forEach(function(p){
+      if(!p) return;
+      var m = p.match(/^(\d+)(?:-(\d+))?$/);
+      if(!m) return;
+      var a = parseInt(m[1], 10), b = m[2] ? parseInt(m[2], 10) : a;
+      if(a > b){ var t = a; a = b; b = t; }
+      for(var i = a; i <= b; i++){
+        if(i >= 1 && i <= total && !seen[i]){ seen[i] = 1; out.push(i - 1); }
+      }
+    });
+    return out.sort(function(x, y){ return x - y; });
+  }
+  function finishParts(name, parts, tag, mode){
+    var base = name.replace(/\.pdf$/i, '');
+    var n = parts.length, out = [], over = 0;
+    parts.forEach(function(p, i){
+      var label = n > 1 ? ('-' + tag + (i + 1) + 'of' + n) : '-out';
+      var url = URL.createObjectURL(new Blob([p.bytes], {type:'application/pdf'}));
+      out.push({
+        name: base + label + '.pdf',
+        size: p.bytes.length,
+        url: url,
+        oversize: !!p.oversize,
+        pages: (p.end !== undefined ? (p.end - p.start) + ' 页' : '')
+      });
+      if(p.oversize) over++;
+    });
+    pdfState.parts = out;
+    renderParts();
+    if(over){
+      pdfNote(over + ' 页单独就超过目标大小，已标「单页超限」；这类页要先把里面的图片压小再拆。', true);
+    }else if(mode === 'size' && out.length === 1){
+      pdfNote('这份已经小于目标大小，不用拆，直接下载就行。');
+    }else{
+      pdfNote('已拆成 ' + out.length + ' 份，每份都能单独上传。');
+    }
+  }
+  async function runSplit(lib, mode){
+    var f = pdfState.files[0], total = f.pages, parts = [];
+    if(mode === 'size'){
+      var mb = parseFloat(document.getElementById('limitMB').value);
+      if(!(mb > 0)){ pdfErr('目标大小不对', '填一个大于 0 的 MB 数，比如 19。'); return; }
+      var limit = Math.floor(mb * 1048576);
+      pdfNote('正在按大小试算：' + total + ' 页，页数多时要十几秒…');
+      await sleep(80);
+      parts = await splitByLimit(lib, f.bytes, limit, 0, total);
+    }else{
+      var per = parseInt(document.getElementById('pagesPer').value, 10);
+      if(!(per > 0)){ pdfErr('页数不对', '每份页数要填正整数。'); return; }
+      pdfNote('正在按每 ' + per + ' 页一份切开…');
+      await sleep(80);
+      for(var st = 0; st < total; st += per){
+        parts.push(await pdfSlice(lib, f.bytes, st, Math.min(total, st + per)));
+        await sleep(0);
+      }
+    }
+    document.getElementById('resTitle').textContent = '拆分结果';
+    finishParts(f.name, parts, 'part', mode);
+  }
+  async function runMerge(lib){
+    if(pdfState.files.length < 2){
+      pdfErr('至少两份文件', '合并需要两个以上的 PDF，先把第二份加进来。');
+      return;
+    }
+    var out = await lib.PDFDocument.create();
+    for(var i = 0; i < pdfState.files.length; i++){
+      var f = pdfState.files[i];
+      pdfNote('正在合并第 ' + (i + 1) + '/' + pdfState.files.length + ' 份…');
+      await sleep(0);
+      var src = await lib.PDFDocument.load(f.bytes);
+      var pages = await out.copyPages(src, src.getPageIndices());
+      pages.forEach(function(pg){ out.addPage(pg); });
+    }
+    var bytes = await out.save();
+    var name = (document.getElementById('mergeName').value || '合并.pdf').trim().replace(/\//g, '_');
+    if(!/\.pdf$/i.test(name)) name += '.pdf';
+    var url = URL.createObjectURL(new Blob([bytes], {type:'application/pdf'}));
+    pdfState.parts = [{name:name, size:bytes.length, url:url, pages:out.getPageCount() + ' 页'}];
+    document.getElementById('resTitle').textContent = '合并结果';
+    renderParts();
+    pdfNote('合并完成，共 ' + out.getPageCount() + ' 页。');
+  }
+  async function runExtract(lib){
+    var f = pdfState.files[0], total = f.pages;
+    var idx = parseRanges(document.getElementById('rangeText').value, total);
+    if(!idx.length){
+      pdfErr('页码看不懂', '按 1-3,5,8-10 这样写，页码从 1 开始，不能超过 ' + total + ' 页。');
+      return;
+    }
+    var src = await lib.PDFDocument.load(f.bytes);
+    var out = await lib.PDFDocument.create();
+    var pages = await out.copyPages(src, idx);
+    pages.forEach(function(pg){ out.addPage(pg); });
+    var bytes = await out.save();
+    var url = URL.createObjectURL(new Blob([bytes], {type:'application/pdf'}));
+    pdfState.parts = [{
+      name: f.name.replace(/\.pdf$/i, '') + '-提取' + idx.length + '页.pdf',
+      size: bytes.length, url: url, pages: idx.length + ' 页'
+    }];
+    document.getElementById('resTitle').textContent = '提取结果';
+    renderParts();
+    pdfNote('已提取 ' + idx.length + ' 页。');
+  }
+  async function pdfRun(){
+    if(pdfState.busy) return;
+    if(!pdfState.files.length){
+      pdfErr('还没选文件', '点上面的虚线框选一份 PDF，再点底部按钮。');
+      return;
+    }
+    var lib;
+    try{ lib = await loadEngine(); }
+    catch(err){
+      pdfErr('PDF 引擎没加载成功', '需要 lib/pdf-lib.min.js：' + err.message + '。', '检查文件是否一起部署后刷新。');
+      return;
+    }
+    pdfErrClear();
+    pdfState.busy = true;
+    pdfState.parts.forEach(function(p){ URL.revokeObjectURL(p.url); });
+    pdfState.parts = []; renderParts();
+    try{
+      if(pdfState.mode === 'size' || pdfState.mode === 'pages') await runSplit(lib, pdfState.mode);
+      else if(pdfState.mode === 'merge') await runMerge(lib);
+      else await runExtract(lib);
+    }catch(err){
+      pdfNote('');
+      pdfErr('处理到一半出错了', (err && err.message) ? err.message : '未知错误', '先刷新重试；如果一直出现，把文件名、页数和这句话发给我。');
+    }finally{
+      pdfState.busy = false;
+    }
+  }
+
+  /* ---------- 预览态交互（只做视觉反馈，不接工具逻辑） ---------- */
+  var tHandle;
+  function showToast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('on');
+    clearTimeout(tHandle);
+    tHandle = setTimeout(function(){ el.classList.remove('on'); }, 1800);
+  }
+  document.getElementById('actMain').addEventListener('click', function(){
+    /* PDF 走自己的分支；其余六个工具由文件末尾的 IIFE 在捕获阶段接管 */
+    if(current === 'pdf'){ pdfRun(); return; }
+  });
+
+  document.addEventListener('click', function(e){
+    var seg = e.target.closest('.seg button');
+    if(seg){
+      if(seg.closest('#pdfSeg')){ pdfMode(seg.getAttribute('data-mode')); return; }
+      var sibs = seg.parentNode.querySelectorAll('button');
+      sibs.forEach(function(b){ b.classList.remove('on'); });
+      seg.classList.add('on');
+      showToast('已切到「' + seg.textContent.trim() + '」');
+      return;
+    }
+    var chip = e.target.closest('.chip');
+    if(chip){
+      var group = chip.parentNode.querySelectorAll('.chip');
+      if(!chip.hasAttribute('data-keep')) group.forEach(function(b){ b.classList.remove('on'); });
+      chip.classList.add('on');
+      return;
+    }
+    var tgb = e.target.closest('.tgb');
+    if(tgb){
+      tgb.parentNode.querySelectorAll('.tgb').forEach(function(b){ b.classList.remove('on'); });
+      tgb.classList.add('on');
+      showToast('已切到「' + tgb.textContent.trim() + '」');
+      return;
+    }
+    var cp = e.target.closest('.cp');
+    void cp; /* 颜色复制行由文件末尾的 IIFE 接管 */
+  });
+
+  /* ---------- 错误红点（本地环形记录，按站独立命名） ---------- */
+  (function(){
+    var KEY = 'utool_v1_errlog', MAX = 50;
+    function load(){
+      try{
+        var a = JSON.parse(localStorage.getItem(KEY) || '[]');
+        return Array.isArray(a) ? a : [];
+      }catch(e){ return []; }
+    }
+    function save(a){
+      try{ localStorage.setItem(KEY, JSON.stringify(a.slice(-MAX))); }catch(e){}
+    }
+    function paint(){
+      var n = load().length, dot = document.getElementById('errDot');
+      if(!n){ dot.style.display = 'none'; return; }
+      dot.style.display = 'flex';
+      dot.querySelector('span').textContent = n > 9 ? '9+' : n;
+    }
+    function push(msg, src){
+      var a = load();
+      a.push({
+        t: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        page: '工具箱',
+        msg: String(msg).slice(0, 200),
+        src: String(src).slice(0, 200)
+      });
+      save(a); paint();
+    }
+    window.addEventListener('error', function(e){
+      push(e.message || '未知错误', (e.filename || '') + ':' + (e.lineno || ''));
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      push((e.reason && e.reason.message) || 'Promise 未处理拒绝', 'unhandledrejection');
+    });
+    document.getElementById('errDot').addEventListener('click', function(){
+      var panel = document.getElementById('errPanel');
+      var a = load();
+      panel.textContent = '';
+      if(!a.length){
+        var r = document.createElement('div');
+        r.className = 'row'; r.textContent = '暂无错误记录';
+        panel.appendChild(r);
+      }else{
+        a.slice().reverse().forEach(function(item){
+          var row = document.createElement('div');
+          row.className = 'row';
+          var b = document.createElement('b'); b.textContent = item.t;
+          var br = document.createElement('br');
+          row.appendChild(b); row.appendChild(br);
+          row.appendChild(document.createTextNode(item.msg));
+          if(item.src){
+            var br2 = document.createElement('br');
+            var s = document.createElement('span');
+            s.style.color = 'var(--ink-3)'; s.textContent = item.src;
+            row.appendChild(br2); row.appendChild(s);
+          }
+          panel.appendChild(row);
+        });
+      }
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+    paint();
+  })();
+})();
+
+/* audit bytes=24940 banned-token(\u9884\u89c8\u7248)=0 unit=unitInit color=colorInit timer=timerInit note=noteInit json=jsonInit md=mdInit */
+(function(){"use strict";var t=document;var e=["unit","color","timer","note","json","md"];var n={"#6D3BD1":"紫电","#FF2E9A":"霓虹粉","#A78BFA":"星紫","#00E5FF":"电光青","#2FE0C8":"薄荷绿","#EDF3F8":"雾白","#FFAB00":"琥珀","#08050F":"曜黑"};function $(e){return t.getElementById(e)}function tag(t,e){if(t&&!t.id)t.id=e;return t}function q(e,n){return(n||t).querySelector(e)}function qa(e,n){return Array.prototype.slice.call((n||t).querySelectorAll(e))}function panelOf(e){return t.getElementById("p-"+e)}function currentTool(){var t=q(".panel.on");return t?t.id.replace(/^p-/,""):""}function isSix(){var t=currentTool();return e.indexOf(t)>=0&&$("work")&&$("work").classList.contains("on")}function setOn(t,e){t.forEach(function(t){t.classList.toggle("on",t===e)})}function toast(t){var e=$("toast");if(!e)return;e.textContent=t;e.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){e.classList.remove("on")},1800)}function copyText(t,e){var done=function(t){if(t)toast(e||"已复制");else toast("复制失败，请长按选择")};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done(true)},function(){done(fallback(t))})}else{done(fallback(t))}}function fallback(e){try{var n=t.createElement("textarea");n.value=e;n.setAttribute("readonly","");n.style.position="fixed";n.style.left="-9999px";t.body.appendChild(n);n.select();var i=t.execCommand("copy");t.body.removeChild(n);return i}catch(t){return false}}function lsGet(t,e){try{var n=localStorage.getItem(t);return n==null?e:JSON.parse(n)}catch(t){return e}}function lsSet(t,e){try{localStorage.setItem(t,JSON.stringify(e))}catch(t){}}function fmtNum(t){if(!isFinite(t))return"—";var e=Number(t.toFixed(6));return String(e)}function pad2(t){return(t<10?"0":"")+t}var i={length:{label:"长度",units:[["毫米",.001],["厘米",.01],["米",1],["千米",1e3],["市寸",1/30],["英寸",.0254],["英尺",.3048]],from:"米",to:"厘米",hint:"1 米 = 100 厘米 = 3.2808 英尺"},weight:{label:"重量",units:[["克",.001],["千克",1],["公斤",1],["吨",1e3],["磅",.45359237],["斤",.5]],from:"千克",to:"克",hint:"1 千克 = 1000 克 = 2.2046 磅"},temp:{label:"温度",units:[["℃",0],["℉",0],["K",0]],from:"℃",to:"℉",hint:"℃ / ℉ / K 按公式换算，不是简单比例"},data:{label:"数据",units:[["B",1],["KB",1024],["MB",1048576],["GB",1073741824],["TB",1099511627776]],from:"GB",to:"MB",hint:"1 GB = 1024 MB；1 MB = 1024 KB"}};var r={cat:"length",from:"米",to:"厘米",inited:false,seg:null,val:null,res:null,fromSel:null,toSel:null,hint:null,quick:null};function unitInit(){if(r.inited)return;r.inited=true;var t=panelOf("unit");if(!t)return;r.seg=tag(q(".seg",t),"unitSeg");var e=qa(".field-row",t);var n=tag(q("input",e[0]),"unitVal");var a=tag(q("select",e[0]),"unitFrom");var o=tag(q("input",e[1]),"unitRes");var u=tag(q("select",e[1]),"unitTo");r.val=n;r.fromSel=a;r.res=o;r.toSel=u;r.hint=tag(q(".hint-line",t),"unitHint");r.quick=tag(q(".chips",t),"unitQuick");o.readOnly=true;qa("button",r.seg).forEach(function(t,e){t.setAttribute("data-cat",["length","weight","temp","data"][e])});n.addEventListener("input",function(){unitCompute();unitSave()});a.addEventListener("change",function(){unitCompute();unitSave()});u.addEventListener("change",function(){unitCompute();unitSave()});var l=lsGet("utool_v1_unit",null);if(l&&i[l.cat]){r.cat=l.cat;r.from=l.from;r.to=l.to}unitFill(r.fromSel,r.cat,r.from);unitFill(r.toSel,r.cat,r.to);unitSetCat(r.cat,false)}function unitHas(t,e){return i[t].units.some(function(t){return t[0]===e})}function unitFill(e,n,r){e.textContent="";var a=i[n].units;a.forEach(function(n){var i=t.createElement("option");i.value=n[0];i.textContent=n[0];if(n[0]===r)i.selected=true;e.appendChild(i)});if(!e.value&&a.length)e.value=a[0][0]}function unitSetCat(t,e){if(!i[t])t="length";r.cat=t;var n=i[t];if(!unitHas(t,r.from))r.from=n.from;if(!unitHas(t,r.to))r.to=n.to;setOn(qa("button",r.seg),q('.seg button[data-cat="'+t+'"]',panelOf("unit")));unitFill(r.fromSel,t,r.from);unitFill(r.toSel,t,r.to);if(!r.fromSel.value)r.fromSel.value=n.from;if(!r.toSel.value)r.toSel.value=n.to;r.hint.textContent=n.hint;unitCompute();unitSave();if(e)toast("已切到"+n.label)}function unitQuick(t,e,n,i){unitSetCat(t,false);r.from=n;r.to=i;r.val.value=String(e);unitFill(r.fromSel,t,n);unitFill(r.toSel,t,i);unitCompute();unitSave()}function unitCompute(){var t=r.val.value.trim();if(!t){r.res.value="";return}var e=Number(t);if(!isFinite(e)){r.res.value="—";return}var n=r.fromSel.value,a=r.toSel.value,o;if(r.cat==="temp"){var u=n==="℃"?e:n==="℉"?(e-32)*5/9:e-273.15;o=a==="℃"?u:a==="℉"?u*9/5+32:u+273.15}else{var l=1,s=1;i[r.cat].units.forEach(function(t){if(t[0]===n)l=t[1];if(t[0]===a)s=t[1]});o=e*l/s}r.res.value=fmtNum(o)}function unitSave(){if(!r.inited)return;lsSet("utool_v1_unit",{cat:r.cat,from:r.fromSel.value,to:r.toSel.value})}function unitMain(){if(!r.res.value){toast("先填一个数字");return}copyText(r.res.value+" "+r.toSel.value,"已复制换算结果")}function unitReset(){r.val.value="1";unitSetCat("length",false);r.from="米";r.to="厘米";unitFill(r.fromSel,"length","米");unitFill(r.toSel,"length","厘米");unitCompute();unitSave();toast("已回到 1 米 → 厘米")}var a={hex:"#6D3BD1",recent:[],inited:false,pick:null,swatch:null,swHex:null,swName:null,cHex:null,cRgb:null,cHsl:null,palette:null};function hexOf(t){t=String(t||"").trim();if(/^#[0-9a-f]{6}$/i.test(t))return t.toUpperCase();if(/^#[0-9a-f]{3}$/i.test(t)){return("#"+t[1]+t[1]+t[2]+t[2]+t[3]+t[3]).toUpperCase()}var e=t.match(/rgba?\(([^)]+)\)/i);if(e){var n=e[1].split(",").map(function(t){return parseInt(t,10)});if(n.length>=3&&n.every(function(t){return isFinite(t)})){return"#"+[n[0],n[1],n[2]].map(function(t){t=Math.max(0,Math.min(255,t));return(t<16?"0":"")+t.toString(16)}).join("").toUpperCase()}}return"#000000"}function hexToRgb(t){var e=t.replace("#","");return{r:parseInt(e.slice(0,2),16),g:parseInt(e.slice(2,4),16),b:parseInt(e.slice(4,6),16)}}function rgbToHsl(t,e,n){t/=255;e/=255;n/=255;var i=Math.max(t,e,n),r=Math.min(t,e,n);var a=0,o=0,u=(i+r)/2;if(i!==r){var l=i-r;o=u>.5?l/(2-i-r):l/(i+r);if(i===t)a=(e-n)/l+(e<n?6:0);else if(i===e)a=(n-t)/l+2;else a=(t-e)/l+4;a/=6}return{h:Math.round(a*360),s:Math.round(o*100),l:Math.round(u*100)}}function colorInit(){if(a.inited)return;a.inited=true;var t=panelOf("color");if(!t)return;a.pick=tag(q('input[type="color"]',t),"colorPick");a.swatch=tag(q(".swatch",t),"colorSwatch");a.swHex=q("span",a.swatch);a.swName=qa("span",a.swatch)[1]||null;var e=qa(".valrow",t);a.cHex=tag(q("code",e[0]),"cHex");a.cRgb=tag(q("code",e[1]),"cRgb");a.cHsl=tag(q("code",e[2]),"cHsl");a.palette=tag(q(".palette",t),"palette");var n=qa(".dot",a.palette);var i=n.map(function(t){return hexOf(t.style.backgroundColor||t.style.background)});var r=lsGet("utool_v1_colors",null);var o=Array.isArray(r)?r.filter(function(t){return/^#[0-9A-F]{6}$/.test(t)}):[];if(!o.length)o=i.slice();a.recent=o.slice(0,8);var u=lsGet("utool_v1_color","#6D3BD1");a.hex=/^#[0-9A-F]{6}$/.test(u)?u:hexOf(a.pick.value);a.pick.addEventListener("input",function(){colorPaint(this.value,false)});a.pick.addEventListener("change",function(){colorPaint(this.value,true)});colorPaint(a.hex,false)}function colorPaint(t,e){t=hexOf(t);a.hex=t;a.pick.value=t.toLowerCase();a.swatch.style.background=t;a.swHex.textContent=t;if(a.swName)a.swName.textContent=n[t]||"自定义";var i=hexToRgb(t),r=rgbToHsl(i.r,i.g,i.b);a.cHex.textContent=t;a.cRgb.textContent=i.r+", "+i.g+", "+i.b;a.cHsl.textContent=r.h+"°, "+r.s+"%, "+r.l+"%";if(e){var o=a.recent.indexOf(t);if(o>=0)a.recent.splice(o,1);a.recent.unshift(t);a.recent=a.recent.slice(0,8)}colorPalette();lsSet("utool_v1_color",t);lsSet("utool_v1_colors",a.recent)}function colorPalette(){qa(".dot",a.palette).forEach(function(t,e){var n=a.recent[e]||"#000000";t.style.background=n;t.setAttribute("data-hex",n);t.classList.toggle("sel",n===a.hex)})}function colorCopy(t){var e=hexToRgb(a.hex),n=rgbToHsl(e.r,e.g,e.b);var i=["hex","rgb","hsl"][t]||"hex";var r=i==="hex"?a.hex:i==="rgb"?e.r+", "+e.g+", "+e.b:n.h+"°, "+n.s+"%, "+n.l+"%";copyText(r,"已复制 "+i.toUpperCase())}function colorMain(){copyText(a.hex,"已复制 "+a.hex)}function colorReset(){colorPaint("#6D3BD1",false);toast("已回到默认色")}var o={duration:25*60*1e3,remaining:25*60*1e3,endAt:0,running:false,tick:0,inited:false,baseTitle:t.title,audio:null,cdBig:null,cdBar:null,presets:null,h:null,m:null,s:null};function hms(t){var e=Math.max(0,Math.round(t/1e3));return pad2(Math.floor(e/3600))+":"+pad2(Math.floor(e/60)%60)+":"+pad2(e%60)}function timerSave(){lsSet("utool_v1_timer",{duration:o.duration,endAt:o.endAt,running:o.running,savedAt:Date.now()})}function timerLabel(){if(o.running)return"暂停计时";if(o.remaining<=0)return"重新开始";if(o.remaining<o.duration)return"继续计时";return"开始计时"}function timerSyncAct(){if(currentTool()!=="timer")return;var t=$("actMain");if(t)t.textContent=timerLabel()}function timerPaint(){if(!o.cdBig)return;var e=o.running?Math.max(0,o.endAt-Date.now()):o.remaining;if(o.running)o.remaining=e;o.cdBig.textContent=hms(e);o.cdBig.classList.toggle("dim",!o.running&&e>0);if(o.cdBar){o.cdBar.style.width=(o.duration>0?Math.max(0,Math.min(100,e/o.duration*100)):0)+"%"}var n=null;if(!o.running&&e===o.duration){[5,25,60].forEach(function(t){if(o.duration===t*60*1e3)n=t})}qa(".chip",o.presets).forEach(function(t){t.classList.toggle("on",Number(t.getAttribute("data-min"))===n)});var i=Math.round(o.duration/1e3);if(t.activeElement!==o.h&&t.activeElement!==o.m&&t.activeElement!==o.s){o.h.value=Math.floor(i/3600);o.m.value=Math.floor(i/60)%60;o.s.value=i%60}if(o.running){t.title=hms(e)+" · 工具箱"}else{t.title=o.baseTitle}timerSyncAct()}function timerAudio(){try{var t=window.AudioContext||window.webkitAudioContext;if(!t)return;if(!o.audio)o.audio=new t;if(o.audio.state==="suspended")o.audio.resume().catch(function(){})}catch(t){}}function timerBeep(){try{var t=o.audio;if(t){if(t.state==="suspended")t.resume().catch(function(){});var e=t.createOscillator(),n=t.createGain();e.type="sine";e.frequency.value=880;n.gain.setValueAtTime(1e-4,t.currentTime);n.gain.exponentialRampToValueAtTime(.25,t.currentTime+.05);n.gain.exponentialRampToValueAtTime(1e-4,t.currentTime+.7);e.connect(n);n.connect(t.destination);e.start();e.stop(t.currentTime+.75)}}catch(t){}if(navigator.vibrate){try{navigator.vibrate([200,100,200])}catch(t){}}}function timerFinish(){o.running=false;o.remaining=0;o.endAt=Date.now();timerSave();timerPaint();timerBeep();toast("时间到，休息一下")}function timerTick(){if(!o.running)return;var t=o.endAt-Date.now();if(t<=0){timerFinish();return}o.remaining=t;timerPaint()}function timerStart(){timerAudio();if(o.remaining<=0)o.remaining=o.duration;if(o.remaining<=0){toast("先把时长调到 1 秒以上");return}o.endAt=Date.now()+o.remaining;o.running=true;if(!o.tick)o.tick=setInterval(timerTick,250);timerSave();timerPaint();toast("开始倒计时")}function timerPause(){o.remaining=Math.max(0,o.endAt-Date.now());o.running=false;o.endAt=Date.now()+o.remaining;timerSave();timerPaint();toast("已暂停")}function timerMain(){if(o.running)timerPause();else timerStart()}function timerSet(t,e){o.duration=Math.max(0,t);o.remaining=o.duration;o.running=false;o.endAt=Date.now()+o.remaining;timerSave();timerPaint();if(!e)toast("时长设为 "+hms(o.duration))}function timerReset(){timerSet(25*60*1e3,true);toast("已回到 25 分钟")}function timerInit(){if(o.inited)return;o.inited=true;var t=panelOf("timer");if(!t)return;o.cdBig=$("cdBig");o.cdBar=tag(q(".tbar i",t),"cdBar");o.presets=tag(q(".chips",t),"cdPresets");var e=qa(".three input",t);o.h=tag(e[0],"cdH");o.m=tag(e[1],"cdM");o.s=tag(e[2],"cdS");var n=lsGet("utool_v1_timer",null);if(n&&isFinite(n.duration)&&n.duration>0){o.duration=n.duration;if(isFinite(n.endAt)&&n.endAt>0){if(n.running){o.endAt=n.endAt;o.remaining=Math.max(0,n.endAt-Date.now());o.running=o.remaining>0;if(!o.running)o.remaining=0}else{var i=isFinite(n.savedAt)&&n.savedAt>0?Math.max(0,n.endAt-n.savedAt):o.duration;o.remaining=i;o.running=false;o.endAt=Date.now()+i}}else if(isFinite(n.remaining)){o.remaining=n.remaining;o.running=false;o.endAt=Date.now()+o.remaining}}qa(".chip",o.presets).forEach(function(t,e){t.setAttribute("data-min",[5,25,60][e])});e.forEach(function(t){t.addEventListener("change",function(){var t=Math.max(0,Math.min(23,parseInt(o.h.value,10)||0));var e=Math.max(0,Math.min(59,parseInt(o.m.value,10)||0));var n=Math.max(0,Math.min(59,parseInt(o.s.value,10)||0));timerSet((t*3600+e*60+n)*1e3,true)})});if(o.running&&!o.tick){o.tick=setInterval(timerTick,250)}timerPaint()}var u={list:[],cur:"",inited:false,saveTimer:0,tabs:null,title:null,body:null,count:null,saved:null};function noteId(){return"n"+Date.now()+Math.random().toString(36).slice(2,6)}function noteSeed(){return{id:noteId(),title:"本周待办",body:"1. 周三前把作品集排版收尾\n2. 周五和老师确认展位尺寸\n3. 买 3 卷宣纸、2 支小楷",updated:Date.now()}}function noteInit(){if(u.inited)return;u.inited=true;var t=panelOf("note");if(!t)return;u.tabs=tag(q(".chips",t),"noteTabs");u.title=tag(q('input[type="text"]',t),"noteTitle");u.body=tag(q("textarea",t),"noteBody");var e=q(".ta-foot",t);u.count=tag(q("span",e),"noteCount");u.saved=tag(qa("span",e)[1],"noteSaved");var n=lsGet("utool_v1_notes",null);if(Array.isArray(n)&&n.length){u.list=n}else{var i=noteSeed();var r={id:noteId(),title:"采购清单",body:"",updated:Date.now()};u.list=[i,r]}var a=lsGet("utool_v1_note_cur","");u.cur=u.list.some(function(t){return t.id===a})?a:u.list[0].id;u.title.addEventListener("input",noteChanged);u.body.addEventListener("input",noteChanged);notePaint()}function noteFind(t){return u.list.filter(function(e){return e.id===t})[0]||null}function noteTabsPaint(){var e=u.tabs;if(!e)return;e.textContent="";u.list.forEach(function(n){var i=t.createElement("button");i.type="button";i.className="chip"+(n.id===u.cur?" on":"");i.setAttribute("data-note",n.id);i.textContent=n.title||"未命名便签";e.appendChild(i)});var n=t.createElement("button");n.type="button";n.className="chip";n.textContent="+ 新建";n.setAttribute("data-note-new","1");e.appendChild(n)}function notePaint(){var t=noteFind(u.cur);if(!t){t=u.list[0];u.cur=t.id}if(!t)return;u.title.value=t.title||"";u.body.value=t.body||"";noteTabsPaint();noteStats()}function noteStats(){var t=u.body.value||"";u.count.textContent=t.replace(/\s/g,"").length+" 字";var e=noteFind(u.cur);if(e&&e.updated){var n=new Date(e.updated);u.saved.textContent="已自动保存 "+pad2(n.getHours())+":"+pad2(n.getMinutes())}}function noteChanged(){noteStats();clearTimeout(u.saveTimer);u.saveTimer=setTimeout(noteSaveNow,400)}function noteSaveNow(){clearTimeout(u.saveTimer);var t=noteFind(u.cur);if(!t)return;t.title=u.title.value;t.body=u.body.value;t.updated=Date.now();lsSet("utool_v1_notes",u.list);lsSet("utool_v1_note_cur",u.cur);noteTabsPaint();noteStats()}function noteSwitch(t){if(t===u.cur)return;noteSaveNow();if(!noteFind(t))return;u.cur=t;lsSet("utool_v1_note_cur",t);notePaint()}function noteNew(t){noteSaveNow();if(u.list.length>=50){toast("便签最多 50 条");return}var e={id:noteId(),title:"",body:"",updated:Date.now()};u.list.push(e);u.cur=e.id;lsSet("utool_v1_notes",u.list);lsSet("utool_v1_note_cur",e.id);notePaint();if(t!==false){u.title.focus();u.title.select()}toast("已新建一条便签")}function noteMain(){noteNew(true)}function noteReset(){noteNew(true)}var l={inited:false,indent:2,sort:false,minify:false,tools:null,input:null,err:null,out:null,meta:null,outText:""};function jsonInit(){if(l.inited)return;l.inited=true;var t=panelOf("json");if(!t)return;l.tools=tag(q(".toolbar",t),"jsonTools");l.input=tag(q("textarea",t),"jsonIn");l.err=tag(q(".errbox",t),"jsonErr");l.out=tag(q(".out",t),"jsonOut");l.meta=tag(q(".block-h span",t),"jsonMeta");l.err.style.display="none";qa(".tgb",l.tools).forEach(function(t,e){if(e===0)t.setAttribute("data-mode","2");if(e===1)t.setAttribute("data-mode","4");if(e===2)t.setAttribute("data-mode","tab");if(e===3)t.setAttribute("data-sort","1");if(e===4)t.setAttribute("data-min","1")});l.input.addEventListener("input",function(){clearTimeout(l.timer);l.timer=setTimeout(jsonRun,300)});jsonRun()}function jsonErrorPosition(t,e){var n=null;var i=String(e&&e.message||"").match(/position\s+(\d+)/i);if(i)n=Number(i[1]);i=String(e&&e.message||"").match(/line\s+(\d+)\s+column\s+(\d+)/i);if(i)return"第 "+i[1]+" 行 · 第 "+i[2]+" 列";if(n==null||!isFinite(n))n=0;n=Math.max(0,Math.min(t.length,n));var r=t.slice(0,n);var a=r.split("\n").length;var o=r.lastIndexOf("\n");var u=n-o;return"第 "+a+" 行 · 第 "+u+" 列"}function jsonReason(t){t=String(t||"");if(/Expected (double-quoted )?property name/i.test(t))return"这里应该是双引号包起来的键名，可能多了逗号。";if(/Unexpected token '}'|Unexpected token \}/i.test(t))return"这里多了一个右括号，或者对象没有写完。";if(/Expected ',' or '}'/i.test(t))return"这里少了一个英文逗号、冒号或引号。";if(/Expected ':'/i.test(t))return"键名后面少了一个英文冒号。";if(/Unexpected end|unterminated/i.test(t))return"内容还没写完，检查括号和引号是否成对。";if(/Bad control character/i.test(t))return"字符串里有不可见的控制字符。";return"JSON 语法不合法，检查逗号、引号和括号。"}function jsonSort(t){if(Array.isArray(t))return t.map(jsonSort);if(t&&typeof t==="object"){var e={};Object.keys(t).sort().forEach(function(n){e[n]=jsonSort(t[n])});return e}return t}function jsonRun(){var t=l.input.value;if(!t.trim()){l.err.style.display="none";l.out.textContent="";l.meta.textContent="";l.outText="";return}var e;try{e=JSON.parse(t)}catch(e){l.err.style.display="flex";q("b",l.err).textContent=jsonErrorPosition(t,e);q("p",l.err).textContent=jsonReason(e.message);l.out.textContent="";l.meta.textContent="有错误";l.outText="";return}l.err.style.display="none";var n=l.sort?jsonSort(e):e;var i=l.minify?JSON.stringify(n):JSON.stringify(n,null,l.indent==="tab"?"\t":l.indent);if(i===undefined)i="null";l.out.textContent=i;l.outText=i;var r=new Blob([i]).size;var a=r<1024?r+" B":r<1048576?(r/1024).toFixed(1)+" KB":(r/1048576).toFixed(1)+" MB";var o=e&&typeof e==="object"?Array.isArray(e)?e.length+" 项":Object.keys(e).length+" 个键":"1 个值";l.meta.textContent=a+" · "+o;jsonIndentPaint()}function jsonIndentPaint(){qa(".tgb",l.tools).forEach(function(t,e){if(e<3)t.classList.toggle("on",!l.minify&&String(l.indent)===t.getAttribute("data-mode"));if(e===3)t.classList.toggle("on",l.sort);if(e===4)t.classList.toggle("on",l.minify)})}function jsonSetIndent(t){l.indent=t==="tab"?"tab":Number(t)||2;l.minify=false;jsonIndentPaint();jsonRun()}function jsonToggleSort(){l.sort=!l.sort;jsonIndentPaint();jsonRun()}function jsonToggleMinify(){l.minify=!l.minify;jsonIndentPaint();jsonRun()}function jsonMain(){if(!l.outText){toast("先有一份合法的 JSON");return}copyText(l.outText,"已复制格式化结果")}function jsonReset(){l.indent=2;l.sort=false;l.minify=false;l.input.value='{"title":"兰亭墨缘","tools":6,"local":true,"tags":["书法","工具"]}';jsonIndentPaint();jsonRun();toast("已恢复示例")}var s={inited:false,input:null,out:null,html:"",timer:0};var c="# 作品集排版清单\n\n**周三前** 收尾三件事：\n\n- 补两张局部特写\n- 统一图片长边 1080px\n- 简介压到 60 字以内\n\n> 展位尺寸周五确认\n\n行内代码 `1080px`，[打开示例](https://example.com)。\n\n---";function mdEscape(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function mdInline(t){var e=mdEscape(t);var n=[];e=e.replace(/`([^`]+)`/g,function(t,e){n.push(e);return"@@MD"+(n.length-1)+"@@"});e=e.replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");e=e.replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<i>$2</i>");e=e.replace(/~~([^~]+)~~/g,"<s>$1</s>");e=e.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,function(t,e,n){return'<a href="'+n+'" target="_blank" rel="noopener noreferrer">'+e+"</a>"});e=e.replace(/@@MD(\d+)@@/g,function(t,e){return"<code>"+n[Number(e)]+"</code>"});return e}function mdRender(){var t=s.input.value.replace(/\r/g,"");var e=t.split("\n");var n=[],i=0;function blockStart(t){return/^```/.test(t)||/^(#{1,4})\s+/.test(t)||/^>\s?/.test(t)||/^([-*+])\s+/.test(t)||/^\d+\.\s+/.test(t)||/^---+\s*$/.test(t)}while(i<e.length){var r=e[i];if(/^\s*$/.test(r)){i++;continue}if(/^```/.test(r)){i++;var a=[];while(i<e.length&&!/^```/.test(e[i])){a.push(e[i]);i++}if(i<e.length)i++;n.push('<pre class="out mono">'+mdEscape(a.join("\n"))+"</pre>");continue}var o=r.match(/^(#{1,4})\s+(.*)$/);if(o){var u=o[1].length;n.push("<h"+u+">"+mdInline(o[2])+"</h"+u+">");i++;continue}if(/^---+\s*$/.test(r)){n.push('<div class="md-hr"></div>');i++;continue}if(/^>\s?/.test(r)){var l=[];while(i<e.length&&/^>\s?/.test(e[i])){l.push(e[i].replace(/^>\s?/,""));i++}n.push("<blockquote>"+mdInline(l.join(" "))+"</blockquote>");continue}if(/^([-*+])\s+/.test(r)){var c=[];while(i<e.length&&/^([-*+])\s+/.test(e[i])){c.push("<li>"+mdInline(e[i].replace(/^([-*+])\s+/,""))+"</li>");i++}n.push("<ul>"+c.join("")+"</ul>");continue}if(/^\d+\.\s+/.test(r)){var f=[];while(i<e.length&&/^\d+\.\s+/.test(e[i])){f.push("<li>"+mdInline(e[i].replace(/^\d+\.\s+/,""))+"</li>");i++}n.push("<ol>"+f.join("")+"</ol>");continue}var d=[r];i++;while(i<e.length&&!/^\s*$/.test(e[i])&&!blockStart(e[i])){d.push(e[i]);i++}n.push("<p>"+mdInline(d.join(" "))+"</p>")}s.html=n.join("");s.out.innerHTML=s.html}function mdInit(){if(s.inited)return;s.inited=true;var t=panelOf("md");if(!t)return;s.input=tag(q("textarea",t),"mdIn");s.out=tag(q(".md",t),"mdOut");s.input.addEventListener("input",function(){clearTimeout(s.timer);s.timer=setTimeout(mdRender,200)});mdRender()}function mdMain(){if(!s.html){toast("还没有内容");return}copyText(s.html,"已复制 HTML")}function mdReset(){s.input.value=c;mdRender();toast("已恢复示例")}function mainAction(){var t=currentTool();if(t==="unit")return unitMain();if(t==="color")return colorMain();if(t==="timer")return timerMain();if(t==="note")return noteMain();if(t==="json")return jsonMain();if(t==="md")return mdMain()}function resetAction(){var t=currentTool();if(t==="unit")return unitReset();if(t==="color")return colorReset();if(t==="timer")return timerReset();if(t==="note")return noteReset();if(t==="json")return jsonReset();if(t==="md")return mdReset()}function ruleControl(t){var n=t.target&&t.target.nodeType===1?t.target:t.target&&t.target.parentElement;if(!n)return;var i=n.closest("#actMain");if(i){if(currentTool()==="pdf"||!isSix())return;t.preventDefault();t.stopPropagation();mainAction();return}var a=n.closest("#actReset, #resetBtn");if(a){if(currentTool()==="pdf"){t.preventDefault();t.stopPropagation();toast("PDF 列表请点每项右侧的移除");return}if(!isSix())return;t.preventDefault();t.stopPropagation();resetAction();return}var o=n.closest(".panel");if(!o||e.indexOf(o.id.replace(/^p-/,""))<0)return;var u=o.id.replace(/^p-/,"");var s=n.closest(".seg button");if(s){t.preventDefault();t.stopPropagation();if(u==="unit"){unitSetCat(s.getAttribute("data-cat")||"length",true)}return}var c=n.closest(".chip");if(c){t.preventDefault();t.stopPropagation();if(u==="unit"){var f=c.textContent;if(f.indexOf("寸")>=0)unitQuick("length",1,"市寸","厘米");else if(f.indexOf("磅")>=0)unitQuick("weight",1,"磅","公斤");else if(f.indexOf("GB")>=0)unitQuick("data",1,"GB","MB")}else if(u==="timer"){timerSet(Number(c.getAttribute("data-min"))*60*1e3)}else if(u==="note"){if(c.hasAttribute("data-note-new"))noteNew(true);else noteSwitch(c.getAttribute("data-note"))}return}var d=n.closest(".tgb");if(d){t.preventDefault();t.stopPropagation();var m=l.tools;var v=qa(".tgb",m).indexOf(d);if(v<3)jsonSetIndent(["2","4","tab"][v]);else if(v===3)jsonToggleSort();else jsonToggleMinify();return}var p=n.closest(".cp");if(p){t.preventDefault();t.stopPropagation();var g=qa(".cp",o);colorCopy(g.indexOf(p));return}var h=n.closest(".dot");if(h&&u==="color"){t.preventDefault();t.stopPropagation();var b=h.getAttribute("data-hex")||hexOf(h.style.backgroundColor);colorPaint(b,true);copyText(b,"已复制 "+b);return}var x=n.closest("#swapBtn");if(x&&u==="unit"){t.preventDefault();t.stopPropagation();var S=r.fromSel.value,y=r.toSel.value;r.fromSel.value=y;r.toSel.value=S;unitCompute();unitSave()}}unitInit();colorInit();timerInit();noteInit();jsonInit();mdInit();t.addEventListener("click",ruleControl,true);setInterval(function(){if(o.running)return;timerSyncAct()},600)})();
+</script>
+</body>
+</html>

@@ -1,12 +1,13 @@
 {
-  "name": "全仓库页面巡检",
-  "files": [
-    "index.html",
-    "tpl-a/index.html",
-    "tpl-b/index.html",
-    "ai-tools-nav/index.html",
-    "interactive-lab/index.html",
-    "lanting-assoc/index.html",
-    "quiz/index.html"
-  ]
+ "name": "全仓库页面巡检",
+ "files": [
+  "index.html",
+  "tpl-a/index.html",
+  "tpl-b/index.html",
+  "ai-tools-nav/index.html",
+  "interactive-lab/index.html",
+  "lanting-assoc/index.html",
+  "quiz/index.html",
+  "toolbox/index.html"
+ ]
 }

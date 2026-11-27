@@ -32,6 +32,7 @@ git add -A && git commit -m "改了什么" && git push origin main
 ## 改之前
 
 - 从零新建一个站 → 看 `开工包/START_HERE.md` 的 5 步（总入口）；开工前同时读 `开工包/docs/00_做网页的规矩_总纲.md`
+- **要加交互效果 → 先查 `开工包/reference/INTERACTIONS.md`**（场景速查表 + 86 项详情）；想要现成可跑的实现，看 `interactive-lab/index.html` 的 86 项本地演示，复制 `reg()` 定义即可复用
 - 改完跑门禁与巡检，全绿再推：
   ```bash
   python3 开工包/tools/验收门禁.py <页面.html> --kind static|app

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-验收门禁 · 判断一份外部AI产出的HTML能不能放进仓库
+验收门禁 · 格式体检（不含交互 / 真实尺寸 / 安全）
 --------------------------------------------------
 设计目的：把"该不该放进去"从某个AI的主观判断，变成任何AI/任何人跑一下
 都得到同样结果的机械检查。换会话、换AI、上下文满了，都不影响结论。
+
+⚠ 它只是"格式体检"，不是"可用性验收"：
+   · 不点按钮，证明不了交互跑通
+   · 不量真实尺寸，证明不了 44px 真的达标
+   · 不做安全审计，证明不了没有 XSS
+  15/15 只说明"没有常见的结构性低级错误"，不等于页面能用。
 
 站型分组（v2）：
   · app    —— 多页应用（有路由表/切场引擎的特征），要求 ROUTES/切场/三态
@@ -17,7 +23,7 @@
 
 用法：
     python3 tools/验收门禁.py <html文件路径> [--kind static|app] [--json]
-输出：逐项 PASS/FAIL + 站型 + 结论（可进仓库 / 打回重做）
+输出：逐项 PASS/WARN/FAIL + 站型 + 结论（格式项全过 / 有 FAIL 需处理）
 退出码：0=可进仓库，1=有FAIL需打回，2=用法/文件错误（脚本本身问题）
 """
 import sys, os, re, json, shutil, subprocess, tempfile
@@ -41,7 +47,7 @@ SKELETON_APP = {
 }
 SKELETON_STATIC = {
     "设计令牌:root": r':root\s*\{',
-    "唯一主标题h1": r'<h1[\s>]',
+    "主标题h1": r'<h1[\s>]',
     "键盘焦点可见": r':focus-visible|:focus\s*\{|:focus\b',
 }
 
@@ -57,7 +63,13 @@ def check(path, kind_override=None):
     scripts=re.findall(r"<script[^>]*>(.*?)</script>",src,re.S)
     js="\n".join(s for s in scripts if s.strip())
     kind, why = detect_kind(js, kind_override)
-    add("文件存在且非空", len(src.strip())>500, f"{len(src)}字符")
+    # 可见文字：去掉 script/style 与所有标签。空壳页能堆关键字，但堆不出正文
+    _t=re.sub(r"<(script|style)\b[^>]*>.*?</\1>"," ",src,flags=re.S|re.I)
+    _t=re.sub(r"<[^>]+>"," ",_t)
+    visible=re.sub(r"\s+","",_t)
+    add("有效内容(非空壳)", len(src.strip())>500 and len(visible)>=50,
+        f"{len(src)}字符 / 可见文字{len(visible)}字"
+        + ("" if len(visible)>=50 else "（可见文字<50，疑似空壳页）"))
 
     # 1. HTML 基本结构
     add("HTML文档声明", "<!DOCTYPE html" in src[:200], "开头有 <!DOCTYPE html>")
@@ -116,14 +128,43 @@ def check(path, kind_override=None):
             add("骨架·"+name, ok, "存在" if ok else "缺失")
     else:
         for name,pat in SKELETON_STATIC.items():
+            if name=="主标题h1":
+                # 既然查主标题就数个数：0 个是空壳/结构缺失的强信号；
+                # 多于 1 个只告警不判死（在用页面一刀切变红，人就再也不看门禁了）
+                n=len(re.findall(r'<h1[\s>]',src,re.I))
+                if n==1:
+                    add("骨架·主标题h1", True, "1 个 h1")
+                elif n==0:
+                    add("骨架·主标题h1", False, "0 个 h1（主标题缺失：空壳页/结构缺失的强信号）")
+                else:
+                    add("骨架·主标题h1", True, f"{n} 个 h1（应只保留 1 个，其余降为 h2）", warn=True)
+                continue
             ok=bool(re.search(pat,src,re.I))
             add("骨架·"+name, ok, "存在" if ok else "缺失")
         # 触控目标：没有交互元素的页面 N/A，不硬判（仿图片 alt 的 N/A 逻辑）
         has_ui=bool(re.search(r'<(?:button|a|input|select|textarea)\b|data-act\s*=',src,re.I))
         tap_ok=bool(re.search(r'44px|--tap\s*:',src,re.I))
-        add("骨架·触控目标44px",
-            (not has_ui) or tap_ok,
-            "无交互元素（N/A）" if not has_ui else ("存在" if tap_ok else "有交互元素但未声明 44px/--tap"))
+        # 声明了 44px ≠ 每个按钮真有 44px：静态扫一遍按钮类选择器里的固定小尺寸，
+        # 纯静态做不精确（calc/继承/媒体查询会漏），所以只报 WARN，不判死
+        small=[]
+        if has_ui and tap_ok:
+            for sel,body in re.findall(r'([^{}]{1,120})\{([^{}]*)\}',src):
+                if '::' in sel: continue                      # 伪元素不是可点区域
+                if re.search(r'(?:svg|img|\.n)\s*$',sel.strip(),re.I): continue  # 图标/角标数字
+                if not re.search(r'btn|button|close|clear|dot|tab|act|star|icon|tool',sel,re.I): continue
+                for m in re.finditer(r'(?:^|;)\s*(?:width|height|min-width|min-height)\s*:\s*(\d{1,2})px',body):
+                    if int(m.group(1))<40:
+                        small.append(f"{sel.strip()[-26:]}:{m.group(1)}px")
+        small=list(dict.fromkeys(small))
+        if not has_ui:
+            add("骨架·触控目标44px", True, "无交互元素（N/A）")
+        elif not tap_ok:
+            add("骨架·触控目标44px", False, "有交互元素但未声明 44px/--tap")
+        elif small:
+            add("骨架·触控目标44px", True,
+                "已声明；静态扫到疑似小尺寸（WARN，需浏览器实测）: "+"; ".join(small[:4]), warn=True)
+        else:
+            add("骨架·触控目标44px", True, "已声明，未扫到明显小尺寸")
         # 静态站第 5 项：图片必须都有 alt（无图片则 N/A 通过）
         imgs=re.findall(r'<img\b[^>]*>',src,re.I)
         noalt=[t[:60] for t in imgs if not re.search(r'\balt\s*=',t,re.I)]
@@ -135,8 +176,21 @@ def check(path, kind_override=None):
     # eval / new Function：按"标识符边界"判断，但允许点号前缀——
     # window.eval( / obj["x"].eval( 是真实的动态执行，不能因为前面有 . 就放过；
     # retrieval( / interval( 这类函数名仍要排除。
-    evals=re.findall(r'(?<![A-Za-z0-9_$])(?:eval|Function)\s*\(',src)
-    add("无eval动态执行", not evals, "无 eval/new Function" if not evals else f"含 {len(evals)} 处动态执行（eval/new Function）需人工确认")
+    # 另外三类同样能执行任意代码，必须一起查：
+    #   constructor.constructor("...")()  —— 不出现 eval/Function 字样，旧正则会漏
+    #   setTimeout("代码", 0) / setInterval("代码", 0) —— 字符串参数会被当代码解析
+    dyn=[]
+    for pat,label in [
+        (r'(?<![A-Za-z0-9_$])(?:eval|Function)\s*\(', 'eval/Function'),
+        (r'constructor\s*\.\s*constructor', 'constructor.constructor'),
+        (r'setTimeout\s*\(\s*[\'"`]', 'setTimeout(字符串)'),
+        (r'setInterval\s*\(\s*[\'"`]', 'setInterval(字符串)'),
+    ]:
+        n=len(re.findall(pat,src))
+        if n: dyn.append(f"{label}×{n}")
+    add("无动态代码执行(eval/Function)", not dyn,
+        "无 eval/Function/constructor.constructor/字符串定时器" if not dyn
+        else "命中: "+"、".join(dyn)+"（可执行任意代码，需人工确认或移除）")
     token_ok=not bool(re.search(r'(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,})',src))
     # demo 站常见：mock 登录 + 明文密码种子。不算失败，但要在结论里提醒人工确认
     mock_pw=bool(kind=="app"
@@ -150,7 +204,7 @@ def check(path, kind_override=None):
     passed=sum(1 for r in results if r["ok"]); total=len(results)
     warns=sum(1 for r in results if r.get("warn"))
     green = passed==total
-    return {"verdict":"可进仓库(GREEN)" if green else "打回重做(RED)",
+    return {"verdict":"格式项全过(GREEN) · 仍需实测" if green else "有 FAIL 需处理(RED)",
             "green":green,"passed":passed,"total":total,"warnings":warns,
             "kind":kind,"kind_reason":why,
             "node": shutil.which("node") or "",
@@ -175,7 +229,8 @@ def main():
     else:
         KINDNAME={"static":"单页静态站","app":"多页应用"}
         print("\n"+"="*58)
-        print("  验收门禁 · "+os.path.basename(path))
+        print("  验收门禁 · 格式体检（不含交互 / 真实尺寸 / 安全）")
+        print("  文件："+os.path.basename(path))
         print(f"  站型：{KINDNAME[report['kind']]}（{report['kind_reason']}）")
         print(f"  环境：node {'可用' if report['node'] else '缺失（JS 语法项会 FAIL，装好再跑）'}")
         print("="*58)
@@ -189,7 +244,7 @@ def main():
         print("="*58+"\n")
         if not report["green"]:
             print("  ⚠ 有 FAIL 项：把这份结果发给制作方打回重做，不要放进仓库。")
-        print("  ⚠ 本脚本只做静态关键词检查，不代表功能可用；全绿后仍需浏览器实测关键交互。\n")
+        print("  ⚠ 格式项全过 ≠ 页面可用：交互、真实尺寸、安全都必须浏览器/人眼实测。\n")
     sys.exit(0 if report["green"] else 1)
 
 if __name__=="__main__":

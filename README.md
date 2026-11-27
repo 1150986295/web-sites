@@ -8,7 +8,7 @@
 
 | 路径 | 是什么 |
 |---|---|
-| `index.html` | 门面作品集，11 张卡片 |
+| `index.html` | 门面作品集，12 张卡片 |
 | `quiz/` | 城轨运营刷题台：应急处置 + 客运英语，可自建题库 |
 | `lanting-assoc/` | 兰亭书画协会展示页（活动照、碑帖灯箱） |
 | `tpl-a/` `tpl-b/` | 单页静态站 / 多页应用两套模板（模板 B 含路由、三态、后台） |
@@ -36,6 +36,7 @@ git add -A && git commit -m "改了什么" && git push origin main
   python3 开工包/tools/验收门禁.py <页面.html> --kind static|app
   python3 开工包/tools/网页巡检.py --config 开工包/tools/巡检配置_全仓库.json
   ```
+  **门禁是"格式体检"，不是"可用性验收"**：它只做静态关键词与结构检查，不点按钮、不量真实尺寸、不做安全审计。**15/15 ≠ 页面能用**，交互与视觉仍要浏览器实测。巡检用 `discover` 自动扫全仓库 `index.html`（新页面不会被漏掉），`jingmo` 是登记在案的快照页，失败属预期。
 - 题库页有跨对话维护的历史，动它之前先看 `quiz/README.md`
 
 ## 许可

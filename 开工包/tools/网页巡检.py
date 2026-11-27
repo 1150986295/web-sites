@@ -22,15 +22,22 @@
 配置格式（JSON）：
 {
   "name": "模板B · 阶段2（身份系统）",
-  "files": ["tpl-b/index.html"],
-  "base_url": "http://127.0.0.1:8791"     // 可选，命令行 --base-url 优先
+  "files": ["tpl-b/index.html"],              // 手写清单（可留空）
+  "discover": {                              // 目录扫描：新增页面自动纳入，不再漏
+    "include": ["**/index.html"],
+    "exclude": ["开工包/**", "screenshots/**"]
+  },
+  "known_fail": {"jingmo/index.html": "前端快照，后端已剥离，78 处接口 404 属预期"},
+  "base_url": "http://127.0.0.1:8791"        // 可选，命令行 --base-url 优先
 }
+known_fail 里的页面**仍然会跑、仍然打印失败项**，只是不计入"意外失败"和退出码——
+它是"登记在案的已知问题"，不是"跳过检查"。
 
-退出码：0=全部通过，1=有 FAIL，2=用法/配置错误
+退出码：0=无意外失败（known_fail 里登记的已知问题不算），1=有意外 FAIL，2=用法/配置错误
 能力边界：静态层是文本分析，证明不了"交互跑通"；线上层只证明"能取到"，证明不了"长得对"。
 """
 
-import sys, os, re, json, argparse, urllib.parse, urllib.request
+import sys, os, re, json, argparse, glob, fnmatch, urllib.parse, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))   # 开工包/tools -> 仓库根
@@ -107,12 +114,30 @@ def main():
         sys.exit(2)
 
     base_url = a.base_url
+    known = {}
     if a.config:
         if not os.path.isfile(a.config):
             print(f"配置不存在: {a.config}"); sys.exit(2)
         cfg = json.load(open(a.config, encoding='utf-8'))
         name = cfg.get('name') or os.path.basename(a.config)
-        files = cfg.get('files') or []
+        files = list(cfg.get('files') or [])
+        known = cfg.get('known_fail') or {}
+        # 目录扫描：把 include 命中的页面并进 files，再按 exclude 剔除。
+        # 白名单会永远漏掉新页面，glob 不会。
+        disc = cfg.get('discover')
+        if disc:
+            inc = disc.get('include') or ['**/index.html']
+            ex = disc.get('exclude') or []
+            found = []
+            for pat in inc:
+                found += glob.glob(os.path.join(REPO, pat), recursive=True)
+            def _excluded(rel):
+                rel = rel.replace(os.sep, '/')
+                return any(fnmatch.fnmatch(rel, p.replace(os.sep, '/')) for p in ex)
+            for p in sorted(set(found)):
+                rel = os.path.relpath(p, REPO).replace(os.sep, '/')
+                if rel not in files and not _excluded(rel):
+                    files.append(rel)
         base_url = base_url or cfg.get('base_url')
     else:
         name = '全仓库'
@@ -140,6 +165,7 @@ def main():
                 "gate": {"green": g["green"], "passed": g["passed"], "total": g["total"],
                          "fails": [c["name"] + (" | " + c["detail"] if c["detail"] else "") for c in g["checks"] if not c["ok"]]},
                 "refs": refs}
+        if rel in known: page["known_issue"] = known[rel]
         if refs["missing"] or refs["dead_links"]:
             page["ref_broken"] = True; fail_pages.append(rel)
         if not g["green"]:
@@ -157,8 +183,13 @@ def main():
             if h["status"] != 200: fail_pages.append(h["url"])
 
     fail_pages = sorted(set(fail_pages))
+    # known_fail 里的页面照跑照打印，只从"意外失败"里摘出去；退出码只看意外失败
+    known_failed = [p for p in fail_pages if p in known]
+    unexpected = [p for p in fail_pages if p not in known]
     report["summary"] = {"pages": len(files), "fail_pages": fail_pages,
-                         "verdict": "ALL GREEN" if not fail_pages else "有 FAIL",
+                         "known_failed": known_failed, "unexpected": unexpected,
+                         "verdict": ("ALL GREEN" if not unexpected else "有 FAIL")
+                                    + (f"（另有 {len(known_failed)} 个已登记问题页）" if known_failed else ""),
                          "note": "静态检查只能证明文件与引用没坏，交互是否跑通必须浏览器实测"}
 
     os.makedirs(a.out, exist_ok=True)
@@ -172,8 +203,10 @@ def main():
         if not pg.get("exists"):
             L.append(f"## ❌ {pg['file']}（文件不存在）"); continue
         g = pg["gate"]
-        mark = "✅" if g["green"] else "❌"
+        mark = "✅" if (g["green"] and not pg.get("ref_broken")) else ("⚠️" if pg.get("known_issue") else "❌")
         L.append(f"## {mark} {pg['file']}（{pg['kind']}）")
+        if pg.get("known_issue"):
+            L.append(f"- 已知问题（登记在案，不计意外失败）：{pg['known_issue']}")
         L.append(f"- 门禁：{g['passed']}/{g['total']}" + ("" if g["green"] else " → 缺：" + "；".join(g["fails"])))
         r = pg["refs"]
         L.append(f"- 站内引用：{r['ok_refs']} 个正常，{len(r['missing'])} 个缺失，{len(r['dead_links'])} 个死链")
@@ -199,9 +232,11 @@ def main():
         if not pg.get("exists"):
             print(f"  [MISS] {pg['file']}"); continue
         g = pg["gate"]; r = pg["refs"]
-        tag = "PASS" if g["green"] and not r["missing"] and not r["dead_links"] else "FAIL"
+        bad = (not g["green"]) or bool(r["missing"]) or bool(r["dead_links"])
+        tag = ("KNOWN" if pg.get("known_issue") else "FAIL") if bad else "PASS"
         print(f"  [{tag}] {pg['file']}  门禁{g['passed']}/{g['total']}  "
               f"缺文件{len(r['missing'])} 死链{len(r['dead_links'])}")
+        if pg.get("known_issue"): print(f"         已知: {pg['known_issue']}")
         for f in g["fails"][:3]: print(f"         门禁缺: {f}")
         for m in r["missing"][:3]: print(f"         缺文件: {m['expect']}")
     if "http" in report:
@@ -209,10 +244,12 @@ def main():
         print(f"  线上 HTTP：{len(report['http'])} 个地址，" + (f"{len(bad)} 个非 200" if bad else "全部 200"))
     print("=" * 58)
     print(f"  结论：{report['summary']['verdict']}")
+    if report["summary"]["unexpected"]:
+        print(f"  意外失败：{', '.join(report['summary']['unexpected'])}")
     print(f"  报告：{json_path}")
     print(f"        {md_path}")
     print("=" * 58 + "\n")
-    sys.exit(0 if not fail_pages else 1)
+    sys.exit(0 if not report["summary"]["unexpected"] else 1)
 
 if __name__ == "__main__":
     main()

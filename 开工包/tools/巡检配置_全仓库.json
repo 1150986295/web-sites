@@ -1,13 +1,10 @@
 {
  "name": "全仓库页面巡检",
- "files": [
-  "index.html",
-  "tpl-a/index.html",
-  "tpl-b/index.html",
-  "ai-tools-nav/index.html",
-  "interactive-lab/index.html",
-  "lanting-assoc/index.html",
-  "quiz/index.html",
-  "toolbox/index.html"
- ]
+ "discover": {
+  "include": ["**/index.html"],
+  "exclude": ["开工包/**", "screenshots/**", "node_modules/**"]
+ },
+ "known_fail": {
+  "jingmo/index.html": "前端快照：后端已剥离，78 处接口调用 404 属设计，不是回归"
+ }
 }

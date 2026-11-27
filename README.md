@@ -10,6 +10,7 @@
 |---|---|
 | `index.html` | 门面作品集，12 张卡片 |
 | `quiz/` | 城轨运营刷题台：应急处置 + 客运英语，可自建题库 |
+| `toolbox/` | 小工具集合页 |
 | `lanting-assoc/` | 兰亭书画协会展示页（活动照、碑帖灯箱） |
 | `tpl-a/` `tpl-b/` | 单页静态站 / 多页应用两套模板（模板 B 含路由、三态、后台） |
 | `ai-tools-nav/` `interactive-lab/` | AI 工具导航、交互实验室 |
@@ -30,7 +31,7 @@ git add -A && git commit -m "改了什么" && git push origin main
 
 ## 改之前
 
-- 先读 `开工包/START_HERE.md`（总入口）和 `开工包/docs/00_做网页的规矩_总纲.md`
+- 从零新建一个站 → 看 `开工包/START_HERE.md` 的 5 步（总入口）；开工前同时读 `开工包/docs/00_做网页的规矩_总纲.md`
 - 改完跑门禁与巡检，全绿再推：
   ```bash
   python3 开工包/tools/验收门禁.py <页面.html> --kind static|app

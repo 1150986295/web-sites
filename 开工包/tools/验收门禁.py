@@ -162,9 +162,10 @@ def check(path, kind_override=None):
             add("骨架·触控目标44px", False, "有交互元素但未声明 44px/--tap")
         elif small:
             add("骨架·触控目标44px", True,
-                "已声明；静态扫到疑似小尺寸（WARN，需浏览器实测）: "+"; ".join(small[:4]), warn=True)
+                "仅检测到 44px/--tap 声明，未验证真实尺寸；静态扫到疑似小尺寸（WARN，需浏览器实测）: "
+                +"; ".join(small[:4]), warn=True)
         else:
-            add("骨架·触控目标44px", True, "已声明，未扫到明显小尺寸")
+            add("骨架·触控目标44px", True, "仅检测到 44px/--tap 声明，未验证真实尺寸；未扫到明显小尺寸")
         # 静态站第 5 项：图片必须都有 alt（无图片则 N/A 通过）
         imgs=re.findall(r'<img\b[^>]*>',src,re.I)
         noalt=[t[:60] for t in imgs if not re.search(r'\balt\s*=',t,re.I)]

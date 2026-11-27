@@ -2,7 +2,7 @@
  "name": "全仓库页面巡检",
  "discover": {
   "include": ["**/index.html"],
-  "exclude": ["开工包/**", "screenshots/**", "node_modules/**"]
+  "exclude": ["screenshots/**", "node_modules/**"]
  },
  "known_fail": {
   "jingmo/index.html": "前端快照：后端已剥离，78 处接口调用 404 属设计，不是回归"

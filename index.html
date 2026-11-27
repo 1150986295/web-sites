@@ -25,9 +25,14 @@ h1{font-size:22px;margin:0 0 4px;letter-spacing:1px}
 .sub{font-size:13px;color:var(--sub);margin-bottom:26px}
 .card{display:block;text-decoration:none;color:inherit;background:var(--card);
   border-radius:18px;padding:14px 14px 16px;margin-bottom:16px;
-  min-height:var(--tap);
+  min-height:var(--tap);position:relative;
   box-shadow:6px 6px 14px var(--shadow-dk),-6px -6px 14px var(--shadow-lt);
   transition:transform .15s}
+/* 状态角标：贴在封面上，说明这张卡不是"完整可用"而是快照/演示 */
+.snap{position:absolute;top:22px;left:22px;z-index:2;pointer-events:none;
+  font-size:10.5px;font-weight:800;letter-spacing:.5px;color:#fff;
+  background:rgba(46,42,36,.82);padding:3px 9px;border-radius:999px}
+@media (prefers-color-scheme: dark){ .snap{background:rgba(234,228,216,.88);color:#1D1A16} }
 .card:active{transform:scale(.98)}
 /* 键盘可达：Tab 到卡片时必须看得见焦点，否则键盘用户完全失去位置感 */
 :focus-visible{outline:2px solid var(--zhu); outline-offset:3px; border-radius:6px}
@@ -79,10 +84,11 @@ footer{margin-top:24px;font-size:11px;color:var(--sub);text-align:center}
   </a>
 
   <a class="card" href="./jingmo/">
+    <span class="snap">前端快照 · 接口已停</span>
     <img class="cover" src="./screenshots/jingmo.jpg" alt="竞墨赛事平台截图" loading="lazy">
     <div class="card-hd"><span class="seal">竞</span><span class="t">兰亭·竞墨 赛事平台</span><span class="go">进入 ›</span></div>
-    <div class="d">书画协会赛事投稿与作品展示 · 投稿通道 · 作品画廊 · 报名系统</div>
-    <div class="tags"><span class="tag">单页站</span><span class="tag">协会真实在用</span></div>
+    <div class="d">书画协会赛事投稿与作品展示 · 前端快照：后端已剥离，投稿/报名/登录接口不可用，仅供看页面</div>
+    <div class="tags"><span class="tag">单页站</span><span class="tag">前端快照</span></div>
   </a>
 
   <a class="card" href="./ziliao-tpl/">

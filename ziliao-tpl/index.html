@@ -93,7 +93,8 @@ mark.s-hi{background:rgba(176,58,46,.28); color:inherit; padding:0 1px; border-r
 /* ========== 红点（仓库专属键） ========== */
 #errDot{position:fixed;right:16px;bottom:20px;z-index:9990;width:44px;height:44px;border-radius:50%;
   background:var(--accent);color:#FFF;display:none;align-items:center;justify-content:center;
-  font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(46,42,36,.35);border:2px solid rgba(255,255,255,.7)}
+  font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(46,42,36,.35);border:2px solid rgba(255,255,255,.7);
+  padding:0;font-family:inherit}
 #errDot .n{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;border-radius:9px;
   background:var(--accent);border:1.5px solid var(--paper);color:#FFF;font-size:11px;line-height:16px;
   text-align:center;padding:0 3px}
@@ -1999,7 +2000,10 @@ if __name__ == &quot;__main__&quot;:
     var a=load(),n=a.length,dot=document.getElementById('errDot');
     if(!n){if(dot){dot.style.display='none'}return}
     if(!dot){
-      dot=document.createElement('div');dot.id='errDot';dot.innerHTML='&#9888;<span class="n"></span>';
+      /* 原生 button：键盘 Tab 可达、Enter/Space 可触发 */
+      dot=document.createElement('button');dot.type='button';dot.id='errDot';
+      dot.setAttribute('aria-label','查看页面错误记录');
+      dot.innerHTML='&#9888;<span class="n"></span>';
       dot.onclick=function(){
         var p=document.getElementById('errPanel');
         if(p.style.display==='block'){p.style.display='none';return}

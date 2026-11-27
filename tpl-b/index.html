@@ -565,8 +565,8 @@ function api(name, body){
 function env(code,message,data){return {code,message,traceId:"t"+Date.now().toString(36),data}}
 function mock(name,b){
   const users=loadJSON(USERS_KEY,null), first=loadJSON(TOKENS_KEY,null);
-  if(users===null && first===null){         /* 全新站点：内置一个演示管理员 admin/123456（上线前删除；删除后首个注册自动成为管理员） */
-    saveJSON(USERS_KEY,[{id:"admin",name:"演示管理员",pwd:"123456",isAdmin:true,pwdInit:true}]);
+  if(users===null && first===null){         /* 全新站点：不预置任何账号（没有明文默认密码）；首个注册的账号自动成为管理员 */
+    saveJSON(USERS_KEY,[]);
     saveJSON(TOKENS_KEY,{});
   }
   const users2=loadJSON(USERS_KEY,[]), tokens=loadJSON(TOKENS_KEY,{});
@@ -576,7 +576,7 @@ function mock(name,b){
     if(!/^\d{4,12}$/.test(id)) fail(400,"学号需为 4-12 位数字");
     if(!b.pwd||b.pwd.length<6) fail(400,"密码至少 6 位");
     if(users2.some(u=>u.id===id)) fail(409,"这个学号已注册过，请直接登录");
-    /* 兜底：账号表为空（删掉演示账号后的真实站点）→ 首个注册自动 isAdmin，防止后台永远进不去且无提示 */
+    /* 兜底：账号表为空（全新站点还没注册过）→ 首个注册自动 isAdmin，防止后台永远进不去且无提示 */
     const u={id,name:b.name.trim(),pwd:b.pwd,isAdmin:users2.length===0,pwdInit:false};
     users2.push(u); saveJSON(USERS_KEY,users2);
     return loginCore(users2,u);
@@ -782,12 +782,16 @@ function openAuth(mode, next){
   if(mode==="change" && !WHO.token){ openAuth("login"); return; }
   authMode=mode; authNext=next||authNext;
   const m=AUTH_MODES[mode];
-  document.getElementById("authTitle").textContent=m.title;
-  document.getElementById("authSubmit").textContent=m.btn;
+  /* 全新站点（账号表为空）：没有预置演示账号，第一个注册的人自动当管理员，标题与引导跟着改 */
+  const firstRun=loadJSON(USERS_KEY,[]).length===0;
+  document.getElementById("authTitle").textContent=(mode==="register"&&firstRun)?"创建管理员":m.title;
+  document.getElementById("authSubmit").textContent=(mode==="register"&&firstRun)?"创建并登录":m.btn;
   document.getElementById("fName").style.display=m.name?"":"none";
   document.getElementById("fId").style.display=m.id?"":"none";
   document.getElementById("fPwd2").style.display=m.pwd2?"":"none";
-  document.getElementById("authSwap").innerHTML=m.swap;
+  document.getElementById("authSwap").innerHTML=(mode==="login"&&firstRun)
+    ?'本站还没有账号：<b data-mode="register">注册第一个（自动成为管理员）</b>'
+    :m.swap;
   showMsg("","");
   document.getElementById("authMask").classList.add("on");
   document.getElementById("authSheet").classList.add("on");

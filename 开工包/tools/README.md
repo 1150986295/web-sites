@@ -118,6 +118,6 @@ python3 开工包/tools/网页巡检.py --config 开工包/tools/巡检配置_�
 | 部署后确认没裂图、没死链 | 网页巡检 + `--base-url` |
 | 只想看某一项为什么 FAIL | 验收门禁，看逐项 PASS/FAIL 那几行 |
 
-CI 工作流（`.github/workflows/gate.yml`）已写好，但**尚未上线**：当前 token 缺 GitHub 的 Workflows 权限，文件只存在本地 `ci-gate` 分支。上线后会在 push `main` 时逐页跑门禁，红叉只是"看得见"，不阻断合并。
+CI 工作流（`.github/workflows/gate.yml`）已接入：push 到 `main` 且 HTML、`开工包/tools/**` 或工作流本身变化时，会自动按巡检配置跑全仓检查，也可在 Actions 手动触发。报告以 `patrol-report` artifact 上传。红叉只是"看得见"，不阻断合并；实际运行状态以 Actions 页面为准。
 
 > 顺序上，**先把门禁本身补可信，再上 CI**——门禁能被空壳骗过时，CI 只是把不可信的绿灯自动化。

@@ -202,6 +202,19 @@ def check(path, kind_override=None):
         + ("；WARN: mock 登录含明文密码种子，仅限演示，上线前须替换" if mock_pw else ""),
         warn=mock_pw)
 
+    # 数据导出提醒：刻意不计入 15 项。展示型页面不需要导出，硬判成 FAIL 会误伤；
+    # 但「存了用户数据却没有导出口」是真实的数据丢失风险，必须让人看见。
+    # 只查 <script> 内的真实调用：资料类页面常在 <code> 里贴代码示例，扫全文会误报。
+    setn=len(re.findall(r'localStorage\.setItem', js))
+    has_export=bool(re.search(r'new\s+Blob|createObjectURL|\bdownload\s*=', js, re.I))
+    advisories=[]
+    # 只提醒 ≥2 处：单处写入基本是内置的错误红点或主题偏好等基础设施，不值得每次刷屏。
+    if setn>=2 and not has_export:
+        advisories.append(
+            f"有 {setn} 处 localStorage 写入，但全页未见导出实现（Blob/download）。"
+            "若存的是用户数据（答题记录/名单/自建内容/草稿），必须补导出+导入，"
+            "现成实现抄 interactive-lab/index.html 第 87 项 ix_backup")
+
     passed=sum(1 for r in results if r["ok"]); total=len(results)
     warns=sum(1 for r in results if r.get("warn"))
     green = passed==total
@@ -209,6 +222,7 @@ def check(path, kind_override=None):
             "green":green,"passed":passed,"total":total,"warnings":warns,
             "kind":kind,"kind_reason":why,
             "node": shutil.which("node") or "",
+            "advisories":advisories,
             "checks":results}, None
 
 def main():
@@ -242,6 +256,8 @@ def main():
         print(f"  {report['passed']}/{report['total']} 通过 → {report['verdict']}")
         if report.get("warnings"):
             print(f"  另有 {report['warnings']} 项 WARN：需人工确认上下文，不计失败")
+        for a in report.get("advisories",[]):
+            print(f"  [提示] {a}")
         print("="*58+"\n")
         if not report["green"]:
             print("  ⚠ 有 FAIL 项：把这份结果发给制作方打回重做，不要放进仓库。")

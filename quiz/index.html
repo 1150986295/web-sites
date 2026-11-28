@@ -1969,7 +1969,7 @@ function htmlChoice(q, idx){
   var multi = !!q.multi;
   var opts = q.opts.map(function(o, j){
     return '<button type="button" class="opt' + (multi ? ' multi' : '') + '" data-act="pick" data-q="' + q.id + '" data-i="' + j + '" aria-pressed="false">'
-      + '<span class="key">' + 'ABCD'[j] + '</span><span class="txt">' + zhPhrase(o) + '</span></button>';
+      + '<span class="key">' + 'ABCDEFGH'[j] + '</span><span class="txt">' + zhPhrase(o) + '</span></button>';
   }).join('');
   /* 多选不能点一下就判，给一个明确的提交动作 */
   var act = multi
@@ -2122,7 +2122,7 @@ function fbChoice(q){
   var r = rec(q.id);
   var judged = !!(r && (r.ok === true || r.ok === false));
   if(!judged){ box.hidden = true; box.innerHTML = ''; return; }
-  var L = function(i){ return 'ABCD'[i]; };
+  var L = function(i){ return 'ABCDEFGH'[i]; };
   var ansLine, title = r.ok ? '回答正确' : '回答错误';
   if(q.multi){
     var right = q.as.slice().sort(function(a,b){ return a-b; }).map(L).join('、');
@@ -2572,8 +2572,8 @@ function submitMulti(qid){
     var miss = as.filter(function(i){ return sel.indexOf(i) < 0; });
     var extra = sel.filter(function(i){ return as.indexOf(i) < 0; });
     var bits = [];
-    if(miss.length) bits.push('还差 ' + miss.map(function(i){ return 'ABCD'[i]; }).join('、'));
-    if(extra.length) bits.push('多了 ' + extra.map(function(i){ return 'ABCD'[i]; }).join('、'));
+    if(miss.length) bits.push('还差 ' + miss.map(function(i){ return 'ABCDEFGH'[i]; }).join('、'));
+    if(extra.length) bits.push('多了 ' + extra.map(function(i){ return 'ABCDEFGH'[i]; }).join('、'));
     toast(bits.join('，') || '答案不完整');
   }
 }
@@ -3540,7 +3540,7 @@ function qeToggleMulti(on){
   var s = document.getElementById('qeA'), m = document.getElementById('qeAm');
   if(!s || !m) return;
   if(on){
-    if(!m.value) m.value = 'ABCD'[Number(s.value) || 0];
+    if(!m.value) m.value = 'ABCDEFGH'[Number(s.value) || 0];
     s.hidden = true; m.hidden = false;
     m.focus({preventScroll:true});
   }else{
@@ -3586,7 +3586,7 @@ function qeRenderBody(type, q){
   if(type === 'choice'){
     var isM = !!(q && q.multi);
     var opts = (q && q.opts && q.opts.length) ? q.opts.slice() : ['', '', '', ''];
-    var mTxt = isM ? q.as.slice().sort(function(a,b){ return a-b; }).map(function(i){ return 'ABCD'[i]; }).join('') : '';
+    var mTxt = isM ? q.as.slice().sort(function(a,b){ return a-b; }).map(function(i){ return 'ABCDEFGH'[i]; }).join('') : '';
     box.innerHTML = '<div class="imp-field"><span>选项（至少 2 个）</span>'
       + '<div id="qeOpts">' + opts.map(qeOptRow).join('') + '</div>'
       + '<button class="qe-addopt" type="button" data-act="qeAddOpt">＋ 选项</button></div>'

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>城轨运营刷题台 · 期末考试题库</title>
-<meta name="description" content="城市轨道交通运营管理期末考试题库：应急处置（含运营安全）、客运英语、员工素养三科，含单选多选、判断、填空、名词解释，即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。">
+<meta name="description" content="城市轨道交通运营管理题库：应急处置（含运营安全）、客运英语、员工素养三科，含单选多选、判断、填空、名词解释、案例分析，即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。">
 <meta name="theme-color" content="#F1EEE5">
 <script>
 /* 主题在解析 CSS 之前定好，避免先闪一下浅色/深色。默认浅色（宣纸），用户点过才记 */
@@ -204,14 +204,19 @@ input{font-family:inherit}
 .bank .plus{font-size:16px; font-weight:400; line-height:1; opacity:.75; transform:translateY(-1px)}
 .bank-add{color:var(--ink-3); padding:0 13px}
 .bank-add:hover{color:var(--primary)}
-.hd{padding:calc(var(--sp-4) + env(safe-area-inset-top) + 10px) var(--sp-2) var(--sp-3); text-align:center; position:relative}
+/* 顶部留出一行给右上角工具按钮，副标题不再被按钮压住 */
+.hd{padding:calc(var(--sp-4) + 24px + env(safe-area-inset-top) + 10px) var(--sp-2) var(--sp-3); text-align:center; position:relative}
 .hd::before{content:''; position:absolute; left:50%; top:-40px; transform:translateX(-50%);
   width:min(420px,92vw); height:260px; border-radius:50%; pointer-events:none; z-index:-1;
   background:radial-gradient(closest-side, var(--glow-a), transparent 72%)}
 .hd::after{display:none}
-/* 深浅色开关：右上角一枚，44px 触控，点一下记住 */
-.theme-toggle{
+/* 右上角工具区：主题 + 更多两枚，避免三枚挤在一起、齿轮压住副标题 */
+.hd-tools{
   position:absolute; right:var(--sp-2); top:calc(env(safe-area-inset-top) + 10px);
+  display:flex; align-items:center; gap:8px;
+}
+.theme-toggle{
+  position:relative; right:auto; top:auto;
   width:var(--tap); height:var(--tap); border-radius:50%;
   display:grid; place-items:center; color:var(--ink-2);
   background:var(--card); box-shadow:var(--nm-out-sm);
@@ -223,9 +228,85 @@ input{font-family:inherit}
 .theme-toggle .i-moon{display:none}
 :root[data-theme="dark"] .theme-toggle .i-sun{display:none}
 :root[data-theme="dark"] .theme-toggle .i-moon{display:block}
-/* 编辑开关：贴在主题按钮左边，开的时候实心，一眼能看出还在编辑态 */
-.edit-toggle{right:calc(var(--sp-2) + var(--tap) + 8px)}
-.edit-toggle[aria-pressed="true"]{color:var(--paper); background:var(--primary); box-shadow:var(--nm-in-sm)}
+/* 更多按钮：低频的设置/编辑收进这里；编辑态用角标提示 */
+.more-toggle{position:relative; right:auto; top:auto}
+.more-badge{
+  position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%;
+  background:var(--primary); box-shadow:0 0 0 2px var(--card);
+}
+.more-badge[hidden]{display:none}
+/* 更多下拉菜单：贴右对齐，新拟态浮层，键盘可达 */
+.more-menu{
+  position:absolute; right:0; top:calc(100% + 8px); z-index:60;
+  min-width:172px; padding:6px; border-radius:16px;
+  background:var(--card); box-shadow:var(--nm-out);
+  transform-origin:top right; transition:opacity .16s, transform .16s;
+}
+.more-menu[hidden]{display:none}
+.more-menu button{
+  display:flex; align-items:center; gap:11px; width:100%; min-height:44px;
+  padding:0 13px; border:0; border-radius:12px; background:transparent;
+  color:var(--ink-2); font-size:14px; font-weight:600; text-align:left; cursor:pointer;
+}
+.more-menu button + button{margin-top:2px}
+.more-menu button:hover,.more-menu button:focus-visible{background:var(--well); color:var(--primary)}
+.more-menu button:focus-visible{outline:2px solid var(--hi); outline-offset:-2px}
+.more-menu button svg{width:18px; height:18px; flex:none; fill:none; stroke:currentColor;
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.more-menu button[aria-pressed="true"]{color:var(--primary)}
+@media (prefers-reduced-motion:reduce){ .more-menu{transition:none} }
+/* 归档态横幅：告诉用户题库只是收起来了，随时能恢复 */
+.archive-note{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin:2px 0 12px; padding:11px 14px; border-radius:14px;
+  font-size:12.5px; line-height:1.55; color:var(--ink-2);
+  background:var(--primary-soft); box-shadow:var(--nm-in-sm);
+}
+.archive-note[hidden]{display:none}
+.archive-note .an-ico{flex:0 0 auto; color:var(--primary); display:grid; place-items:center}
+.archive-note .an-ico svg{width:20px; height:20px; fill:none; stroke:currentColor;
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.archive-note .an-txt{flex:1; min-width:160px}
+.archive-note .an-txt b{color:var(--primary)}
+.archive-note button{
+  min-height:34px; padding:0 13px; border-radius:10px; font-size:12.5px; font-family:inherit;
+  font-weight:700; color:var(--paper); background:var(--primary); box-shadow:var(--nm-out-sm)
+}
+.archive-note button:active{box-shadow:var(--nm-in-sm)}
+/* 归档空态：题目区中央的引导卡 */
+.archived-empty{
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;
+  padding:44px 22px; border-radius:20px; background:var(--card); box-shadow:var(--nm-out);
+}
+.archived-empty[hidden]{display:none}
+.archived-empty .ae-ico{
+  width:64px; height:64px; border-radius:50%; display:grid; place-items:center;
+  color:var(--primary); background:var(--well); box-shadow:var(--nm-in-sm)
+}
+.archived-empty .ae-ico svg{width:30px; height:30px; fill:none; stroke:currentColor;
+  stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.archived-empty h2{font-size:19px; font-weight:800; color:var(--ink)}
+.archived-empty p{font-size:13px; line-height:1.7; color:var(--ink-2); max-width:340px}
+.archived-empty .ae-btns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px}
+.archived-empty .ae-btns button{
+  min-height:42px; padding:0 16px; border-radius:12px; font-family:inherit; font-size:13.5px; font-weight:700
+}
+.archived-empty .ae-btns .ae-restore{color:var(--paper); background:var(--primary); box-shadow:var(--nm-out-sm)}
+.archived-empty .ae-btns .ae-import{color:var(--ink); background:var(--card); box-shadow:var(--nm-out-sm)}
+/* 设置弹层里的分区与归档信息 */
+.set-sec{margin-bottom:16px}
+.set-sec h3{font-size:13px; font-weight:800; color:var(--primary); margin:0 0 8px}
+.set-info{font-size:12.5px; line-height:1.7; color:var(--ink-2);
+  padding:12px 14px; border-radius:12px; background:var(--well); box-shadow:var(--nm-in-sm)}
+.set-info b{color:var(--ink)}
+/* 获取 Key 的三步教程：紧凑、只留动作，不堆解释 */
+.key-how{padding:12px 14px 10px}
+.key-how>b{display:block; margin-bottom:6px}
+.key-steps{margin:0; padding-left:19px; font-size:12.5px; line-height:1.7; color:var(--ink-2)}
+.key-steps li{margin:2px 0}
+.key-steps a{color:var(--primary); text-decoration:underline; text-underline-offset:2px}
+.key-note{margin:8px 0 0; font-size:11.5px; color:var(--ink-3)}
+.set-arc-list{font-size:12.5px; line-height:1.8; color:var(--ink-2); margin:8px 0 0; padding-left:18px}
 .edit-note{
   display:flex; align-items:center; gap:10px; flex-wrap:wrap;
   margin:2px 0 12px; padding:9px 13px; border-radius:12px;
@@ -257,6 +338,7 @@ h1{font-size:var(--fs-hero); font-weight:700; letter-spacing:.10em; line-height:
   background:var(--card); box-shadow:var(--nm-out);
   display:flex; align-items:center; gap:18px;
 }
+.dash[hidden],.tabs-wrap[hidden],.act-bar[hidden],.ft[hidden]{display:none}
 .ring-wrap{position:relative; flex:0 0 auto; width:92px; height:92px; border-radius:50%;
   background:var(--card); box-shadow:var(--nm-in); display:grid; place-items:center}
 .ring-wrap svg{position:absolute; inset:8px; width:76px; height:76px; transform:rotate(-90deg)}
@@ -312,18 +394,51 @@ h1{font-size:var(--fs-hero); font-weight:700; letter-spacing:.10em; line-height:
 .tabs-wrap::after{content:''; position:absolute; left:0; right:0; bottom:-16px; height:16px;
   background:linear-gradient(to bottom, var(--bar-b), rgba(0,0,0,0)); pointer-events:none}
 .tabs{
+  position:relative;
   display:grid; grid-template-columns:repeat(4,1fr); gap:5px; padding:5px;
   border-radius:20px; background:var(--well); box-shadow:var(--nm-in);
 }
+/* 果冻指示器：绝对定位脱离 grid，位置/宽度走一条带过冲的弹簧曲线，
+   内层再做一次横向拉伸回弹 —— 目光跟着"拖过去"的那一下走。 */
+.tab-jelly{
+  position:absolute; top:5px; left:0; height:calc(100% - 10px); width:0;
+  pointer-events:none; z-index:0; will-change:transform,width;
+  border-radius:15px;   /* 与 .tab 一致：内层 border-radius:inherit 才有胶囊形，否则继承 0 变方块 */
+  transition:transform .58s cubic-bezier(.22,1.02,.36,1), width .58s cubic-bezier(.22,1.02,.36,1);
+}
+.tab-jelly-in{
+  display:block; width:100%; height:100%; border-radius:inherit;
+  background:var(--card); box-shadow:var(--nm-out-sm), 0 0 0 1px var(--hi) inset;
+}
+/* 水滴：横向轻微摊开、纵向轻微收窄，再带着表面张力收回来 —— 不弹过头 */
+.tab-jelly.is-stretch .tab-jelly-in{animation:waterDrop .58s cubic-bezier(.2,.85,.3,1)}
+@keyframes waterDrop{
+  0%{transform:scale(1,1)} 30%{transform:scale(1.055,.955)}
+  58%{transform:scale(.985,1.02)} 80%{transform:scale(1.008,.996)}
+  100%{transform:scale(1,1)}
+}
 .tab{
+  position:relative; z-index:1;
   min-height:var(--tap); border-radius:15px; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:1px; color:var(--ink-2);
-  font-size:14.5px; font-weight:600; letter-spacing:.02em; transition:box-shadow .2s, color .2s;
+  font-size:14.5px; font-weight:600; letter-spacing:.02em; transition:color .2s;
 }
+.tab .tl{white-space:nowrap}
 .tab .cnt{font-size:11px; font-weight:600; color:var(--ink-3); font-variant-numeric:tabular-nums}
-.tab[aria-selected="true"]{background:var(--card); box-shadow:var(--nm-out-sm), 0 0 0 1px var(--hi) inset; color:var(--primary)}
+/* 员工素养有 5 个题型，窄屏收一档字号，避免「名词解释 / 案例分析」折行 */
+.tabs.five{gap:3px; padding:4px}
+.tabs.five .tab{font-size:12px; border-radius:13px}
+.tabs.five .tab .cnt{font-size:10px}
+.tabs.five .tab-jelly{top:4px; height:calc(100% - 8px); border-radius:13px}
+.tab[aria-selected="true"]{color:var(--primary); background:transparent; box-shadow:none}
 .tab[aria-selected="true"] .cnt{color:var(--primary); opacity:.8}
 .tab[hidden]{display:none}
+/* 按下去像水滴落纸：轻轻摊一下就收回，没有大幅过冲 */
+.tab.jelly-press{animation:waterPress .46s cubic-bezier(.22,1.02,.36,1)}
+@keyframes waterPress{
+  0%{transform:scale(1,1)} 32%{transform:scale(1.04,.965)}
+  62%{transform:scale(.992,1.018)} 100%{transform:scale(1,1)}
+}
 
 /* ============================================================
    五、题目卡片
@@ -441,6 +556,31 @@ h1{font-size:var(--fs-hero); font-weight:700; letter-spacing:.10em; line-height:
 @media (max-width:360px){ .blk{width:calc(var(--n,3) * .78em + 1.3em)} }
 .blank-act{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap}
 
+/* 案例题：长材料放进固定高度、框内滚动的窗格；作答区宽屏固定、手机端紧跟其后 */
+.q.case-q{padding:18px 16px}
+.case-grid{display:grid; grid-template-columns:minmax(0,1fr); gap:14px}
+.case-read{
+  max-height:min(46vh, 430px); overflow-y:auto; overscroll-behavior:contain;
+  padding:12px 14px 14px; border-radius:14px; background:var(--field);
+  box-shadow:var(--nm-in-sm); scrollbar-width:thin;
+  scrollbar-color:var(--primary-soft) transparent;
+}
+.case-read::-webkit-scrollbar{width:6px}
+.case-read::-webkit-scrollbar-thumb{background:var(--primary-soft); border-radius:6px}
+.case-read-hd{
+  margin-bottom:9px; padding-bottom:7px; border-bottom:1px solid var(--line);
+  font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--primary);
+}
+.case-read .stem{font-size:15.5px; line-height:1.75}
+.case-read .ask{margin-top:8px; font-size:14.5px; line-height:1.75}
+.case-read .ask p{margin-top:7px}
+.case-ans .ta{margin-top:0; min-height:132px}
+@media (min-width:820px){
+  .case-grid{grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); align-items:start}
+  .case-read{max-height:min(66vh, 640px)}
+  .case-ans{position:sticky; top:88px}
+}
+
 /* 反馈 / 解析区：同色凹陷面板，靠细线与留白分层，不整块染色 */
 .fb{margin-top:18px; border-radius:18px; background:var(--card);
   box-shadow:var(--nm-in); overflow:hidden}
@@ -496,6 +636,81 @@ h1{font-size:var(--fs-hero); font-weight:700; letter-spacing:.10em; line-height:
 .fb-src i::after{content:'·'; margin:0 7px; opacity:.6; letter-spacing:0}
 .fb-foot .mini{margin-left:auto; flex:0 0 auto; min-height:32px; padding:4px 13px;
   font-size:12.5px; letter-spacing:.02em}
+
+/* ============================================================
+   四·二、揭晓答案：3D 翻面卡片
+   透视只在场景容器上；两面 absolute 叠放，卡片高度由脚本过渡到当前面，
+   所以不同尺寸下中心稳定、不位移不裁切。祖先不要加 overflow / opacity /
+   filter —— 它们会把 3D 空间压平。隐藏面 visibility:hidden + inert 退出焦点。
+   ============================================================ */
+.flip-scene{perspective:1200px; perspective-origin:50% 50%}
+.flip-card{
+  position:relative; transform-style:preserve-3d;
+  transition:transform var(--flip-ms,520ms) cubic-bezier(.45,.05,.55,.95),
+             height .34s cubic-bezier(.45,.05,.55,.95);
+  will-change:transform,height;
+}
+.flip-face{
+  position:absolute; inset:0; min-width:0;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+}
+.flip-back{transform:rotateY(180deg); visibility:hidden}
+.flip-scene.is-flipped .flip-card{transform:rotateY(180deg)}
+/* 可见性由脚本在翻面结束时切换：动画中两面都留着，靠 backface 交换可见性；
+   这样键盘焦点能立刻落到刚翻上来的那一面，不用等动画走完。 */
+/* 答案面沿用原来的凹陷卡片观感；overflow 只放在面上，不放在场景/卡片上 */
+.ans-scene,.fb-scene{border-radius:18px; background:var(--card); box-shadow:var(--nm-in-sm)}
+.ans-scene .flip-card,.fb-scene .flip-card{border-radius:18px}
+.ans-face,.fb-face{border-radius:18px; overflow:hidden}
+/* 正面沿用 details 语义（历史脚本与展开态都认它），只把它当成一个面 */
+details.ans.flip-front{margin-top:0; background:transparent; box-shadow:none}
+.fb-face.fb{margin-top:0; box-shadow:none; background:transparent}
+/* 触发器用 button 而不是 summary：键盘与触屏行为一致，命中区稳定 */
+.ans-toggle{
+  width:100%; min-height:var(--tap); padding:13px 16px; cursor:pointer; border:0;
+  display:flex; align-items:center; gap:8px; text-align:left; background:transparent;
+  box-shadow:none; font-family:inherit; font-size:14px; font-weight:700;
+  letter-spacing:.02em; color:var(--primary);
+}
+.ans-toggle .chev{margin-left:auto; transition:transform .25s}
+.ans-toggle-back .chev{transform:rotate(180deg)}
+.ans-toggle svg{width:17px; height:17px; flex:0 0 auto; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.fb-face .blank-act{padding:0 16px 14px}
+.flip-hd{display:flex; align-items:center; gap:8px; padding:13px 0 4px;
+  font-size:14px; font-weight:800; color:var(--primary)}
+.flip-hd svg{width:17px; height:17px; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.fb-face .fb-fix{padding-left:16px; padding-right:16px}
+
+/* 整卡翻转：题目卡本身就是场景，题目与参考答案是同一张纸的两面 */
+.q.essay-flip-scene,.q.blank-flip-scene{
+  perspective:1400px; perspective-origin:50% 50%;
+  padding:0; background:transparent; box-shadow:none;
+}
+.qflip-card{
+  border-radius:var(--r-l);
+  transition:transform .62s cubic-bezier(.45,.05,.55,.95),
+             height .4s cubic-bezier(.3,.9,.3,1);
+}
+.qflip-face{
+  padding:22px 18px 20px; border-radius:var(--r-l); overflow:hidden;
+  background:var(--card); box-shadow:var(--nm-out);
+}
+.qflip-trigger{
+  width:100%; min-height:var(--tap); margin-top:14px; padding:12px 16px; border:0;
+  display:flex; align-items:center; gap:8px; text-align:left; cursor:pointer;
+  border-radius:14px; background:var(--well); box-shadow:var(--nm-in-sm);
+  font-family:inherit; font-size:14px; font-weight:700; color:var(--primary);
+}
+.qflip-trigger .chev{margin-left:auto; transition:transform .25s}
+.qflip-trigger svg{width:17px; height:17px; flex:0 0 auto; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.qflip-back .qflip-trigger{background:var(--primary-soft); box-shadow:none}
+.qflip-back .qflip-trigger .chev{transform:rotate(180deg)}
+.qflip-back .q-hd{margin-bottom:14px}
+.qflip-back .stem{font-size:15px; font-weight:600; color:var(--ink-2); margin-bottom:12px}
+.qflip-back .ans-body{padding:12px 0 0}
 
 /* 小按钮 */
 .mini{
@@ -604,6 +819,33 @@ details[open] .ans-body{animation:fadeUp .26s ease-out both}
 .sheet-bd{padding:14px var(--sp-2) 18px; overflow-y:auto; -webkit-overflow-scrolling:touch}
 .sheet-tip{font-size:13px; line-height:1.7; color:var(--ink-2); margin-bottom:12px}
 .sheet-tip b{color:var(--primary)}
+/* 导入方式切换：AI 生成 / 粘贴文本 */
+.imp-modes{
+  display:flex; gap:4px; padding:4px; margin-bottom:14px;
+  border-radius:14px; background:var(--well); box-shadow:var(--nm-in);
+}
+.imp-mode{
+  flex:1; min-height:38px; border:0; border-radius:11px; cursor:pointer;
+  color:var(--ink-2); background:transparent; font-size:13.5px; font-weight:700;
+  transition:color .2s, box-shadow .2s, background .2s;
+}
+.imp-mode[aria-selected="true"]{color:var(--primary); background:var(--card); box-shadow:var(--nm-out-sm)}
+.imp-pane[hidden]{display:none}
+.ai-opts{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.ai-opts .imp-field{margin-top:12px}
+.ai-opts select{
+  width:100%; min-height:var(--tap); padding:0 12px; border:0; border-radius:12px;
+  font-size:14px; color:var(--ink); background:var(--field);
+  box-shadow:inset 1px 1px 3px var(--field-in), inset -1px -1px 2px var(--field-hi);
+}
+#aiTopic{min-height:132px; margin-top:0}
+/* 导入引导：一句话 + 可识别题型 chip，别堆长篇说明 */
+.imp-lead{font-size:13px; line-height:1.65; color:var(--ink-2); margin:0 0 11px}
+.imp-types{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:13px}
+.imp-types span{
+  padding:5px 11px; border-radius:999px; font-size:12px; font-weight:600;
+  color:var(--primary); background:var(--well); box-shadow:var(--nm-in-sm);
+}
 .imp-ta{min-height:180px; margin-top:0; font-size:15px; line-height:1.65}
 .imp-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
 .imp-row>*{flex:1; min-width:130px}
@@ -850,15 +1092,28 @@ body::before{
 <div class="wrap">
   <!-- ① 头部 -->
   <header class="hd">
-    <button class="theme-toggle edit-toggle" id="editToggle" data-act="editMode" type="button"
-            aria-label="编辑题库" aria-pressed="false" title="编辑题库">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.12 2.12 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l4 4"/></svg>
-    </button>
-    <button class="theme-toggle" id="themeToggle" data-act="theme" type="button"
-            aria-label="切换到深色模式" aria-pressed="false" title="切换到深色模式">
-      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2M12 18.8v2M3.2 12h2M18.8 12h2M5.8 5.8l1.4 1.4M16.8 16.8l1.4 1.4M18.2 5.8l-1.4 1.4M7.2 16.8l-1.4 1.4"/></svg>
-      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4z"/></svg>
-    </button>
+    <div class="hd-tools">
+      <button class="theme-toggle more-toggle" id="moreToggle" data-act="moreMenu" type="button"
+              aria-label="更多操作" aria-haspopup="true" aria-expanded="false" aria-controls="moreMenu" title="更多操作">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+        <span class="more-badge" id="moreBadge" hidden></span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" data-act="theme" type="button"
+              aria-label="切换到深色模式" aria-pressed="false" title="切换到深色模式">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2M12 18.8v2M3.2 12h2M18.8 12h2M5.8 5.8l1.4 1.4M16.8 16.8l1.4 1.4M18.2 5.8l-1.4 1.4M7.2 16.8l-1.4 1.4"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4z"/></svg>
+      </button>
+      <div class="more-menu" id="moreMenu" role="menu" aria-label="更多操作" hidden>
+        <button type="button" role="menuitem" id="setToggle" data-act="settingsOpen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.87-1.2l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3.5 13.5a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 10.4 3.5a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.87 1.2l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87 2 2 0 1 1 0 4z"/></svg>
+          <span>设置与归档</span>
+        </button>
+        <button type="button" role="menuitem" id="editToggle" data-act="editMode" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.12 2.12 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l4 4"/></svg>
+          <span id="editMenuLabel">编辑题库</span>
+        </button>
+      </div>
+    </div>
     <p class="kicker" id="kicker">城轨运营刷题台 · 应急处置</p>
     <h1 id="pageTitle">应急处置 · 刷题台</h1>
     <p class="sub" id="subText">依据课件整理 · 四类题型共 <b id="totalA">34</b> 题<br>答题记录只存本机，换设备不同步</p>
@@ -868,6 +1123,12 @@ body::before{
   <p class="edit-note" id="editNote" hidden>
     <span>编辑中 · 右上角改题 · 底部加题</span>
     <button type="button" id="restoreBankBtn" data-act="restoreBank">恢复默认</button>
+  </p>
+
+  <p class="archive-note" id="archiveNote" hidden>
+    <span class="an-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v10h14V10M10 14h4"/></svg></span>
+    <span class="an-txt" id="archiveNoteTxt"></span>
+    <button type="button" data-act="settingsOpen">管理归档</button>
   </p>
 
   <!-- ② 仪表盘 -->
@@ -903,6 +1164,7 @@ body::before{
 <div class="tabs-wrap">
   <div class="wrap">
     <div class="tabs" role="tablist" aria-label="题型切换">
+      <span class="tab-jelly" aria-hidden="true"><span class="tab-jelly-in"></span></span>
       <button class="tab" role="tab" data-act="tab" data-k="choice" aria-selected="true" aria-controls="panel-choice" id="tab-choice">
         <span class="tl">选择题</span><span class="cnt" data-cnt="choice">0/10</span>
       </button>
@@ -915,16 +1177,29 @@ body::before{
       <button class="tab" role="tab" data-act="tab" data-k="essay" aria-selected="false" aria-controls="panel-essay" id="tab-essay">
         <span class="tl">应用题</span><span class="cnt" data-cnt="essay">0/6</span>
       </button>
+      <button class="tab" role="tab" data-act="tab" data-k="case" aria-selected="false" aria-controls="panel-case" id="tab-case" hidden>
+        <span class="tl">案例分析</span><span class="cnt" data-cnt="case">0/4</span>
+      </button>
     </div>
   </div>
 </div>
 
 <!-- ④ 题目区 -->
 <main class="wrap" id="panelWrap">
+  <div class="archived-empty" id="archivedEmpty" hidden>
+    <div class="ae-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v10h14V10M10 14h4"/></svg></div>
+    <h2>题库已归档</h2>
+    <p>题目和答题记录都原样保存在本机，只是暂时收起来了。你可以导入新题继续用这个框架，也可以随时把旧题库恢复回来。</p>
+    <div class="ae-btns">
+      <button type="button" class="ae-restore" data-act="arcRestore">恢复题库</button>
+      <button type="button" class="ae-import" data-act="impOpen">＋ 导入新题</button>
+    </div>
+  </div>
   <section class="panel" id="panel-choice" role="tabpanel" aria-labelledby="tab-choice" data-k="choice"></section>
   <section class="panel" id="panel-judge" role="tabpanel" aria-labelledby="tab-judge" data-k="judge" hidden></section>
   <section class="panel" id="panel-blank" role="tabpanel" aria-labelledby="tab-blank" data-k="blank" hidden></section>
   <section class="panel" id="panel-essay" role="tabpanel" aria-labelledby="tab-essay" data-k="essay" hidden></section>
+  <section class="panel" id="panel-case" role="tabpanel" aria-labelledby="tab-case" data-k="case" hidden></section>
 
   <footer class="ft">
     <span id="footText">题目与答案要点依据课件《应急处置》整理，现场处置以本单位现行预案为准</span><br>
@@ -960,6 +1235,7 @@ body::before{
           <option value="judge">判断</option>
           <option value="blank">填空</option>
           <option value="essay">简答</option>
+          <option value="case">案例分析</option>
         </select>
       </label>
       <label class="imp-field"><span>题干</span>
@@ -986,13 +1262,53 @@ body::before{
     </div>
     <div class="sheet-bd">
       <div id="impStep1">
-        <p class="sheet-tip">把题目整段粘进来，自动认题号、题干、选项、答案和解析；<b>选择题、判断题、填空题、应用题</b>都能认。识别完可以在预览里改题型、改答案、删掉不要的题。</p>
-        <textarea id="impText" class="ta imp-ta" rows="9" spellcheck="false"
-          placeholder="1. 车站大客流组织的影响因素不包括？&#10;A. 站厅面积与站台面积&#10;B. 楼梯与通道的通过能力&#10;C. 自动售检票设备的通过能力&#10;D. 车站商业广告位的数量&#10;答案：D&#10;解析：影响因素共 6 项……&#10;&#10;2. 列车在区间发生火灾时，邻线列车可以照常放行。（ ）&#10;答案：错&#10;&#10;3. 大客流情况下，行车方面的应对措施包括及时使用______、合理组织空客车。&#10;答案：备用车"></textarea>
-        <p class="sheet-tip" id="impMsg" hidden></p>
-        <div class="imp-row">
-          <button class="btn-main" type="button" data-act="impParse">识别题目</button>
-          <button class="ghost" type="button" data-act="impSample">填入示例</button>
+        <div class="imp-modes" role="tablist" aria-label="录入方式">
+          <button type="button" class="imp-mode" data-act="impMode" data-m="ai" aria-selected="true">AI 生成</button>
+          <button type="button" class="imp-mode" data-act="impMode" data-m="paste" aria-selected="false">粘贴文本</button>
+        </div>
+
+        <div class="imp-pane" id="impPaneAi">
+          <p class="imp-lead">把课件里的知识点、一段讲义或考试范围贴进来，选好题型，AI 直接生成题目，认完就能存进题库。</p>
+          <label class="imp-field"><span>知识点 / 主题</span>
+            <textarea id="aiTopic" class="ta" rows="6" spellcheck="false"
+              placeholder="例如：城市轨道交通车站大客流组织——影响因素、客流特点、限流措施、疏散流程……"></textarea></label>
+          <div class="ai-opts">
+            <label class="imp-field"><span>题型</span>
+              <select id="aiType" aria-label="生成哪种题型">
+                <option value="mix">混合（推荐）</option>
+                <option value="choice">选择题</option>
+                <option value="judge">判断题</option>
+                <option value="blank">填空题</option>
+                <option value="essay">应用题 / 翻译</option>
+                <option value="case">案例分析</option>
+              </select></label>
+            <label class="imp-field"><span>题数</span>
+              <select id="aiCount" aria-label="生成几道题">
+                <option value="5">5 题</option>
+                <option value="10" selected>10 题</option>
+                <option value="15">15 题</option>
+                <option value="20">20 题</option>
+              </select></label>
+          </div>
+          <p class="sheet-tip" id="aiGenMsg" hidden></p>
+          <div class="imp-row">
+            <button class="btn-main" type="button" id="aiGenBtn" data-act="aiGenerate">生成题目</button>
+            <button class="ghost" type="button" data-act="aiConfig">设置接口</button>
+          </div>
+        </div>
+
+        <div class="imp-pane" id="impPanePaste" hidden>
+          <p class="imp-lead">把已经整理好的题目整段粘贴进来，自动识别题号、题干、选项和答案。</p>
+          <div class="imp-types" aria-label="可识别题型">
+            <span>选择题</span><span>判断题</span><span>填空题</span><span>应用题 / 翻译</span><span>案例分析</span>
+          </div>
+          <textarea id="impText" class="ta imp-ta" rows="9" spellcheck="false"
+            placeholder="1. 车站大客流组织的影响因素不包括？&#10;A. 站厅面积与站台面积&#10;B. 楼梯与通道的通过能力&#10;C. 自动售检票设备的通过能力&#10;D. 车站商业广告位的数量&#10;答案：D&#10;解析：影响因素共 6 项……&#10;&#10;2. 列车在区间发生火灾时，邻线列车可以照常放行。（ ）&#10;答案：错&#10;&#10;3. 大客流情况下，行车方面的应对措施包括及时使用______、合理组织空客车。&#10;答案：备用车"></textarea>
+          <p class="sheet-tip" id="impMsg" hidden></p>
+          <div class="imp-row">
+            <button class="btn-main" type="button" data-act="impParse">识别题目</button>
+            <button class="ghost" type="button" data-act="impSample">填入示例</button>
+          </div>
         </div>
       </div>
 
@@ -1013,6 +1329,57 @@ body::before{
       </div>
 
       <div class="imp-mine" id="impMine"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 设置与归档 -->
+<div class="sheet-mask" id="setMask" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="sheet-hd">
+      <h2 id="setTitle">设置与归档</h2>
+      <button class="sheet-x" type="button" data-act="setClose" aria-label="关闭">&#10005;</button>
+    </div>
+    <div class="sheet-bd">
+      <div class="set-sec">
+        <h3>题库归档</h3>
+        <p class="set-info" id="setArcInfo"></p>
+        <ul class="set-arc-list" id="setArcList"></ul>
+        <div class="imp-row">
+          <button class="btn-main" type="button" id="setArcBtn" data-act="arcToggle"></button>
+        </div>
+        <p class="sheet-tip" id="setTip"></p>
+      </div>
+      <div class="set-sec">
+        <h3>AI 生成题目</h3>
+        <div class="set-info key-how">
+          <b>获取 DeepSeek API Key（3 步）：</b>
+          <ol class="key-steps">
+            <li>打开 platform.deepseek.com，注册登录</li>
+            <li>右上角「API Keys」→ 创建，复制 sk- 开头的 Key（只显示一次）</li>
+            <li>充值后把 Key 粘到下方，点「保存设置」</li>
+          </ol>
+          <p class="key-note">Key 只存本机；生成消耗走你自己的账号。</p>
+        </div>
+        <label class="imp-field"><span>接口地址</span>
+          <input id="aiUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://api.deepseek.com/chat/completions"></label>
+        <label class="imp-field"><span>模型</span>
+          <input id="aiModel" spellcheck="false" autocomplete="off" placeholder="deepseek-flash"></label>
+        <label class="imp-field"><span>API Key</span>
+          <input id="aiKey" type="password" spellcheck="false" autocomplete="off" placeholder="sk-..."></label>
+        <div class="imp-row">
+          <button class="btn-main" type="button" data-act="aiSave">保存设置</button>
+          <button class="ghost" type="button" data-act="aiClear">清空 Key</button>
+        </div>
+        <p class="sheet-tip" id="aiTip"></p>
+      </div>
+      <div class="set-sec">
+        <h3>关于归档</h3>
+        <p class="set-info">
+          归档只是把题库<b>暂时收起来</b>，题目、答题进度、自建题和追加的题都原样保存在本机，不会删除。<br>
+          收起后这个刷题框架还在，可以导入其他题目的题库来练；想找回旧题时，点「恢复归档」即可，一切照旧。
+        </p>
+      </div>
     </div>
   </div>
 </div>
@@ -1501,10 +1868,10 @@ var BANK_STAFF = {
   id:'staff', name:'员工素养', lang:'zh', storeKey:'staff_2026',
   kicker:'城轨运营刷题台 · 员工素养',
   title:'员工素养 · 刷题台',
-  sub:'名词解释 · 单选 · 多选 · 填空 · 判断 · 共 <b id="totalA">61</b> 题<br>答题记录只存本机，换设备不同步',
-  foot:'题目与答案要点依据《员工素养题库（城市轨道交通方向）》整理，答题以本单位现行规定为准',
+  sub:'名词解释 · 单选 · 多选 · 填空 · 判断 · 案例分析 · 共 <b id="totalA">65</b> 题<br>答题记录只存本机，换设备不同步',
+  foot:'题目与答案要点依据《员工素养题库（城市轨道交通方向）》与《城市轨道交通员工职业素养实训指导书》整理，答题以本单位现行规定为准',
   srcLabel:'题库依据',
-  typeNames:{choice:'选择题', judge:'判断题', blank:'填空题', essay:'名词解释'},
+  typeNames:{choice:'选择题', judge:'判断题', blank:'填空题', essay:'名词解释', case:'案例分析'},
   q:{
   choice: [
     {id:'st1', from:'员工素养 · 单选', stem:"下列属于职业“个人功能”的是( )。",
@@ -1629,11 +1996,40 @@ var BANK_STAFF = {
   }
 };
 
+var BANK_CASE = {
+  id:'case', name:'案例分析', lang:'zh', storeKey:'case_2026',
+  kicker:'城轨运营刷题台 · 案例分析',
+  title:'案例分析 · 刷题台',
+  sub:'职业素养实训指导书 · 情境分析作答 · 共 <b id="totalA">4</b> 个案例<br>答题记录只存本机，换设备不同步',
+  foot:'案例与参考要点依据《城市轨道交通员工职业素养实训指导书》整理，现场处置以本单位现行预案为准',
+  srcLabel:'实训指导书',
+  typeNames:{essay:'案例分析'},
+  q:{ choice:[], judge:[], blank:[], essay:[
+    {id:"cs1", from:"实训指导书 · 案例一",
+     stem:"“新手”到“骨干”的蜕变——站务员小李的成长三部曲",
+     ask:["【实训目标】知识理解：准确识别并阐述城市轨道服务员职业化素养中职业道德、职业意识与职业心态三大核心维度的具体内涵与表现；能力分析：剖析小李在不同情境下的行为，理解三者如何从“被动遵循规则”到“主动创造价值”层层递进、相互支撑；素养内化：以小李的成长为镜，反思自身，树立正确的职业价值观。","【案例背景】小李是地铁线路的一名新入职站务员，她充满热情但经验尚浅。在半年工作中，她经历了三次关键事件，这三重考验让她对职业化素养有了深刻而完整的理解，逐步完成了从“新手”到“骨干”的蜕变。","第一部·规则的温度——票务纠纷的考验（对应：职业道德）：一位乘客持票卡出站时显示异常无法出站，情绪激动，声称机器故障，拒绝补交费用，并大声抱怨“你们这是什么规定！我明明在里面多待了一会儿，凭什么收钱！”小李核查后发现票卡确实超时，需补交费用。她没有争辩，而是耐心倾听、微笑解释：先理解乘客心情，说明超时规定主要是为保障票务系统公平、防止票卡不当使用，确实给乘客带来不便，代表车站向乘客致歉；随后侧身指向《票务规则公示牌》，清晰说明依据；最后提出“我现在就为您快速办理，不会耽误您太久”的便捷方案。乘客最终理解并补缴了费用。","第二部·遗失的视野——遗失的“救命药”（对应：职业意识）：小李在巡视站台时，发现一个座位上有个不起眼的塑料袋，里面是几盒处方药。她没有当作普通失物轻率处理，而是敏锐意识到药品对失主可能至关重要。她立即上报车控室，详细汇报（药品名称、发现的地点和时间，注意保护隐私），请其通过广播寻找失主；同时主动调阅该区域监控，大致锁定失主上车的时间段和方向。等待期间她将药品妥善保管；一小时后一位老人焦急赶来寻找，确认是急需的“救命药”，小李核实后归还，并提醒老人将重要物品放在固定包装内。老人的千恩万谢让小李感受到前所未有的价值感。","第三部·压力下的定力——高峰期的“连环考”（对应：职业心态）：早高峰突发大客流，站台瞬间拥堵，乘客催促声、抱怨声四起，有乘客摔倒。小李被安排到核心区域疏导，瞬间面临三重压力：拥堵（应对大客流压力）、突发（乘客摔倒）、情绪（被抱怨）。心态调整：她深呼吸，告诉自己“我是专业的，慌乱解决不了问题”，迅速冷静下来。高效行动：用简洁口令和明确手势引导乘客，高效协同同事分工。共情沟通：面对抱怨，她统一诚恳回应“非常抱歉给大家带来不便，我们正在全力抢修，请大家听从指引，感谢您的配合！”沉着处置：发现乘客摔倒，立即用身体隔开人流、呼叫支援，忙而不乱。危机顺利解除，她的沉着表现赢得同事和值班站长赞许。","问题1：在“票务纠纷”中，小李的“耐心倾听”和“微笑解释”体现了职业道德中哪些具体规范？她如何做到既“坚守原则”又“柔性执行”？","问题2：对比“票务纠纷”和“遗失药品”事件，小李的服务主动性发生了怎样的变化？这种从“被动”到“主动”的转变，关键在于哪种职业意识的觉醒？","问题3：在“高峰期考验”中，小李面临的多重压力可能引发哪些负面情绪？她的“心态调整”和“沉着处置”体现了哪些积极职业心态的关键要素？"],
+     points:["<b>问题1</b>：文明服务、尊重乘客、耐心友善、礼貌待客。小李没有放任情绪和乘客争吵，先耐心倾听安抚乘客情绪、共情理解乘客；同时出示票务公示规则，不放松制度底线，坚持超时补票规定，再给出便捷办理方案。","<b>问题2</b>：变化——票务纠纷属于被动应付，是乘客产生问题之后小李才上前处置；从“等乘客来找我”变成“主动发现、主动服务”。关键在于：岗位责任意识、乘客安全意识。","<b>问题3</b>：负面情绪——紧张焦虑、慌乱急躁、压力大、烦躁。积极职业心态关键要素——自我情绪调控能力、沉着冷静、责任担当、理性专业抗压心态、临危不乱。"]},
+    {id:"cs2", from:"实训指导书 · 案例二",
+     stem:"形象与规范：站务员小张的“第一印象”危机",
+     ask:["【实训目标】知识理解：准确说出城市轨道交通员工职业化行为规范的核心组成（职业礼仪、着装规定、行为习惯、仪容修饰）及其基本要求；能力分析：能够形成“班前自查仪容仪表、检查设备、班后清理岗位”的标准化工作习惯；素养内化：深刻理解个人形象即企业形象，将维护统一、专业的职业形象内化为自觉行为。","【案例背景】小张是地铁站新入职的实习生，今天是第一次独立在站厅服务台顶岗，他怀着既兴奋又紧张的心情开始了工作。","场景一·匆忙的清晨与“被忽略”的细节：临近到点，小张一路小跑进站，一路想着别迟到，没顾上仔细整理。换上制服后，他发现领带有些歪，但想到时间紧迫没有仔细整理；衬衣因出汗有些泛黄，工牌也随意别在口袋边缘。值班站长班前检查时皱了皱眉，但未当场指出。","场景二·服务台的“被动”与礼仪疏忽：一位外地游客来到服务台前，犹豫地看着线路图。小张正低头整理文件，没有主动问候。乘客询问“你好，去博物馆应该在哪站下？”小张头也不抬，单手指着宣传册推过去，简短回答“这上面有，自己看”。乘客愣了一下，拿着册子疑惑地离开。整个过程中小张没有露出微笑，也没有使用“请”“您”等敬语。","场景三·闸机口的“标准”之争：一位携带大件行李的乘客在宽闸机前操作困难，行李卡住了闸门。小张通过对讲机得知后前往处理，严格按照规章要求乘客补票（因闸机误触）。乘客解释是因设备问题，情绪有些激动。小张坚持说“规定就是这样，请您配合”。双方僵持不下，导致后方短时拥堵。最后值班站长赶来，首先安抚乘客情绪，协助其通过，并解释了相关规定，乘客表示理解后离开。站长事后对小张说：“规定要执行，但方式要灵活，服务之心应优先于纠错之责。”","场景四·交班时的“习惯”：下班时，小张感到身心俱疲，直接将制服外套脱下搭在椅背上，个人水杯和杂物也留在了服务台内，未及时清理工作区域，便匆匆离开。","问题1：在场景一中，小张的着装和个人形象存在哪些具体问题？这违背了员工着装规定的哪些基本原则？除着装外，职业礼仪的概念还包含哪些主要内容？小张在场景中哪些行为不符合职业礼仪的要求？","问题2：在场景三中，小张的行为是否符合“服务优先”的原则？值班站长与小张的处理方式有何不同？这体现了怎样的服务智慧？如果你是小张，如何在坚持原则（按规定补票）的同时，又能体现服务的灵活性、化解矛盾？","问题3：在场景四中，小张的下班行为反映出他缺乏哪些良好的职业习惯？","问题4：如果你是小张的同班同学，你会如何根据职业礼仪的培养途径，为他设计一个简单的“形象与礼仪提升计划”？"],
+     points:["<b>问题1</b>：①着装形象具体问题——领带歪斜、没有整理平整，衬衣泛黄，工牌佩戴位置不规范。②遵循的着装原则——整洁、统一、规范、庄重原则。③职业礼仪除着装外还包含——仪容礼仪、举止礼仪、语言礼仪、接待服务礼仪、沟通礼仪。④不符合职业礼仪的行为——没有主动向乘客问候、被动服务、单手递送宣传册、动作失礼、语言生硬、全程没有微笑、态度冷淡。","<b>问题2</b>：小张不符合“服务优先”原则。不同——小张机械执行规定、直接要求补票、激化矛盾；值班站长先安抚情绪、优先疏导、再解释规定。服务智慧——坚守制度底线，优先做好乘客服务，兼顾沟通。我的做法——先协助乘客搬运行李、疏导客流、安抚情绪；倾听情况后礼貌说明购票规定，依规处理，避免拥堵。","<b>问题3</b>：缺少岗位整理习惯、规范交接班习惯、岗位收尾责任意识；离岗未清理岗位物品，随意放置制服。","<b>问题4</b>：形象礼仪提升计划——1.班前自查：仪容、工装、工牌；2.日常练习：坚持微笑、文明用语、规范手势；3.观摩学习：向优秀员工学习服务礼仪；4.每日复盘：总结服务礼仪问题；5.情景模拟：演练问询、纠纷处置，锻炼沟通礼仪。"]},
+    {id:"cs3", from:"实训指导书 · 案例三",
+     stem:"职业生涯启航——我的职业蓝图规划",
+     ask:["【实训背景】你是一名刚入职某地铁公司的站务员。公司为帮助新员工成长，要求每位新人提交一份《个人短期职业发展规划书》，引导大家树立职业目标、明确发展路径。","任务1·理论回顾：复习教材中职业生涯规划的概念、原则与步骤。","任务2·SWOT 分析：在一张 A4 纸上绘制四象限图，分别列出自身的优势（S）、劣势（W）、机会（O）与威胁（T）。","任务3·目标设定：基于 SWOT 分析，设定一个清晰的 1–2 年短期职业目标（例如：成为服务台骨干、竞聘年度服务之星、熟练掌握突发事件处置流程等）。","任务4·行动计划：围绕目标制定具体、可衡量的行动方案，例如——每月学习一章《客运服务标准》，三个月内通过考核；半年内跟岗学习并掌握大型客流疏导技巧；一年内考取“初级急救员”证书。","任务5·形成规划书：将以上内容整理成一份结构完整的《个人短期职业发展规划书》。"],
+     points:["<b>优势 S</b>：热爱轨道交通行业、服务态度端正、有耐心；具备客运组织、应急处置等理论基础；学习接受能力较强，愿意主动向老师傅请教。","<b>劣势 W</b>：现场实操经验不足；对车站设备和规章流程不够熟练；大客流疏导与应急沟通能力有待提升。","<b>机会 O</b>：公司提供师带教与岗位培训；可考取初级应急救援员证书；优秀站务员有机会成为服务骨干。","<b>威胁 T</b>：倒班与夜班压力较大；可能面临乘客不理解与投诉；岗位考核严格、规章记忆要求高。","<b>规划书范例</b>：我计划在入职后的 1–2 年内，熟练掌握地铁站务员的全岗位技能，成为车站服务骨干，并争取获评年度服务之星。从自身情况看，我热爱轨道行业、服务态度端正，具备一定的客运组织、应急处置和服务礼仪基础，也愿意主动学习。我将按计划加强学习：每月学习客运规章和应急手册，3 个月内熟练掌握基础票务与设备处理流程，半年内提升大客流疏导和纠纷沟通能力，1 年内完成急救培训，第 2 年争取参与评优，向值班站长和优秀站务员看齐。我会坚持班前自查仪容仪表和岗位规范，工作中做到微笑服务、耐心沟通，下班后及时复盘问题，并通过情景模拟提升服务礼仪和应急处置能力；每季度检查目标完成情况，根据实际工作进度灵活调整，确保自己从一名新手逐步成长为合格、专业的地铁站务员。"]},
+    {id:"cs4", from:"实训指导书 · 案例四",
+     stem:"运用鱼刺图进行“站台门故障”质量分析",
+     ask:["【实训背景】早高峰期间，你所在的车站发生一起因单个站台门故障无法关闭引发的服务事件。尽管故障最终排除，但处置过程暴露诸多问题：初期响应迟缓、信息传递混乱，导致列车晚点 3 分钟，站台出现乘客短时聚集和拥堵，更有乘客因焦急试图手动强行开门，造成了严重的安全隐患。事件虽已平息，但车站管理层高度重视，决定成立由你们组成的“深度分析质量改进小组”。小组的核心任务是：运用“鱼刺图”这一专业的质量分析工具，对“站台门故障处置不当”问题进行根本原因分析，为后续制定精准的改进措施提供科学依据。","任务·完成一张高质量的《“站台门故障处置”问题分析鱼刺图》，并提交分析报告。","第一步·从“六大维度”（人、机、料、法、环、测）分析，核心是“站台门故障处置不当导致服务中断与安全风险”。","第二步·采用“头脑风暴法”，围绕六大维度展开全面、深入的原因剖析——人：从职业角色（站务员、值班站长等）的技能、心态、协作入手（如故障识别能力不足、应急处置心理紧张、跨岗位沟通不畅）；机：分析涉及的所有设备设施（如站台门控制系统固有缺陷、对讲机信号干扰、监控摄像头视角存在盲区）；料：分析使用的物料与信息（如故障警示牌取用不便、对乘客的广播信息不准确、不及时）；法：审视流程、规章与制度（如应急预案流程繁琐、信息上报程序不清晰、岗位协作职责界定模糊）；环：考虑外部环境因素（如早高峰大客流加剧疏导难度、站台照明或广播环境嘈杂）；测：评估监督与考核机制（如缺乏常态化的应急演练考核、无清晰的处置效率评估标准）。","第三步·绘制与精炼鱼刺图：将讨论出的所有原因按其归属维度系统地绘制在鱼刺图上，要求结构清晰、因果关系明确；从所有末梢原因中共同筛选出 2–3 个最根本、影响最大的原因，在鱼刺图上对这些根本原因进行醒目标注，并简要陈述选择的理由。"],
+     points:["<b>鱼刺图六维（参考）</b>：人——值班站长现场指挥力度不足、培训不到位、站务员故障处置能力不足；机——站台门控制系统固有缺陷、监控摄像头视角存在盲区；料——维修工具不行、广播话术不标准；法——应急预案繁琐、岗位职责界定模糊；环——极端天气、高峰期大客流；测——缺少应急演练、监督机制不完善。","<b>分析报告①</b>：应急预案流程繁琐——流程复杂会拉长处置时间，人员紧张时易出错，降低处置效率。","<b>分析报告②</b>：站台门控制系统固有缺陷——设备本身存在问题，是故障发生的源头，修复周期长。","<b>分析报告③</b>：缺少常态化应急演练考核——员工对处置流程不熟练，实战能力不足，增大安全隐患。"]},
+  ]}
+};
+
 var TYPES = [
   {k:'choice', name:'选择题'},
   {k:'judge',  name:'判断题'},
   {k:'blank',  name:'填空题'},
-  {k:'essay',  name:'应用题'}
+  {k:'essay',  name:'应用题'},
+  {k:'case',   name:'案例分析'}
 ];
 /* 题型名可随题库改（英语库把 essay 叫“翻译练习”），没有覆盖就用默认 */
 function typeName(k){
@@ -1648,9 +2044,67 @@ function typeName(k){
 ['choice', 'judge', 'blank', 'essay'].forEach(function(k){
   BANK_YINGJI.q[k] = BANK_YINGJI.q[k].concat(BANK_SAFE.q[k] || []);
 });
+/* ---------- 案例题并入「员工素养」：同属一门课，作为独立题型，不再单列题库 ----------
+   4 个案例来自《城市轨道交通员工职业素养实训指导书》，与职业素养同科目。
+   复用 essay 的文本作答 + 采分点渲染，只是题型键叫 case、标签叫「案例分析」。 */
+BANK_STAFF.q.case = BANK_CASE.q.essay;
 var BANKS = { yingji: BANK_YINGJI, english: BANK_ENGLISH, staff: BANK_STAFF };
 var BANK_ORDER = ['yingji', 'english', 'staff'];
 var CUSTOM_KEY = 'yjcz_banks_v1';       /* 自建题库整库存这里 */
+
+/* ---------- AI 生成：接口配置只存本机，不上传任何服务器 ----------
+   默认 DeepSeek（OpenAI 兼容格式，国内可直连）。用户可改地址/模型，
+   也能填任意 OpenAI 兼容服务。Key 仅在本机 fetch 时放进请求头。 */
+var AI_KEY = 'yjcz_ai_v1';
+var AI_DEFAULT = { url:'https://api.deepseek.com/chat/completions', model:'deepseek-flash', key:'' };
+var AI = { mode:'ai', busy:false, ctrl:null };
+function readAI(){
+  var o = {};
+  try{ o = JSON.parse(localStorage.getItem(AI_KEY) || '{}') || {}; }catch(e){}
+  return {
+    url: (typeof o.url === 'string' && o.url) ? o.url : AI_DEFAULT.url,
+    model: (typeof o.model === 'string' && o.model) ? o.model : AI_DEFAULT.model,
+    key: (typeof o.key === 'string') ? o.key : ''
+  };
+}
+function writeAI(o){
+  var c = readAI();
+  if(typeof o.url === 'string') c.url = o.url.trim();
+  if(typeof o.model === 'string') c.model = o.model.trim();
+  if(typeof o.key === 'string') c.key = o.key.trim();
+  try{ localStorage.setItem(AI_KEY, JSON.stringify(c)); return true; }
+  catch(e){ return false; }
+}
+
+/* ---------- 题库归档：只记「收起了哪些库」，数据一律不删 ----------
+   归档是可回退的收纳，不是删除。内置库常量、自建库存档、各库进度、
+   追加与快照全都原样留在 localStorage；恢复时只是把隐藏标记去掉。
+   归档态下框架照常可用，导入的新库不在隐藏名单里，自然会出现。 */
+var ARC_KEY = 'yjcz_archive_v1';
+function isBankHidden(id){
+  try{
+    var o = JSON.parse(localStorage.getItem(ARC_KEY) || '{}');
+    return !!(o && Array.isArray(o.hidden) && o.hidden.indexOf(id) >= 0);
+  }catch(e){ return false; }
+}
+function readArchive(){
+  try{
+    var o = JSON.parse(localStorage.getItem(ARC_KEY) || '{}');
+    return (o && typeof o === 'object') ? o : {};
+  }catch(e){ return {}; }
+}
+function writeArchive(o){
+  try{ localStorage.setItem(ARC_KEY, JSON.stringify(o)); return true; }
+  catch(e){ return false; }
+}
+function activeBankIds(){
+  return BANK_ORDER.filter(function(id){ return !isBankHidden(id); });
+}
+/* 当前可见题库列表；归档后为空，就进空框架态 */
+function bankTotalQ(id){
+  var b = BANKS[id];
+  return b ? countQ(b.q) : 0;
+}
 
 /* ---------- 自建题库：读本机存档 ---------- */
 function readCustomBanks(){
@@ -1675,7 +2129,7 @@ function loadCustomBanks(){
 
 /* ---------- 追加到已有题库：内置库不能改源码，追加的题单独存一份 ---------- */
 var EXTRA_KEY = 'yjcz_extra_v1';
-var QK = ['choice', 'judge', 'blank', 'essay'];
+var QK = ['choice', 'judge', 'blank', 'essay', 'case'];
 function readExtras(){
   try{
     var o = JSON.parse(localStorage.getItem(EXTRA_KEY) || '{}');
@@ -1749,7 +2203,7 @@ function restoreBank(){
 function appendToBank(id, q){
   var b = BANKS[id];
   if(!b) return false;
-  var added = { choice: [], judge: [], blank: [], essay: [] };
+  var added = { choice: [], judge: [], blank: [], essay: [], case: [] };
   QK.forEach(function(k){
     if(q[k] && q[k].length) added[k] = q[k];
   });
@@ -1792,7 +2246,7 @@ function dropExtras(id){
 function renderBanks(){
   var nav = document.getElementById('bankNav');
   if(!nav) return;
-  nav.innerHTML = BANK_ORDER.map(function(id){
+  nav.innerHTML = activeBankIds().map(function(id){
     var b = BANKS[id];
     if(!b) return '';
     return '<button class="bank" type="button" role="tab" data-act="bank" data-b="' + id
@@ -1819,6 +2273,15 @@ loadCustomBanks();
 loadSnaps();
 loadExtras();
 
+/* 空框架库：全部题库归档后用它占位，题目区显示归档引导，题型与框架照常保留 */
+var EMPTY_BANK = {
+  id:'__empty__', name:'题库已归档', lang:'zh', custom:true, storeKey:'__empty__',
+  kicker:'城轨运营刷题台', title:'刷题台 · 题库已归档',
+  sub:'题库已归档 · 可导入新题或到设置里恢复',
+  foot:'题库已归档：题目与进度原样保存在本机', srcLabel:'来源',
+  q:{choice:[], judge:[], blank:[], essay:[], case:[]}
+};
+BANKS.__empty__ = EMPTY_BANK;
 var bank = 'yingji';
 var BANK_LAST = 'yjcz_bank_v1';
 /* 记住上次在哪个题库：刷新后别把人甩回应急处置 */
@@ -1828,14 +2291,23 @@ try{
 }catch(e){}
 /* 分享链接可带 ?bank=english：优先级高于「上次停留」，别人点开就是你分享的那一科。
    参数无效、或指向分享者本机的自建题库时，静默回落到上面算出的题库。 */
+var wantCaseTab = false;   /* 旧分享链接 ?bank=case：案例已并入员工素养，落到该科的「案例分析」tab */
 try{
   var wantBank = new URLSearchParams(location.search).get('bank');
+  if(wantBank === 'case'){ wantBank = 'staff'; wantCaseTab = true; }
   if(wantBank && BANKS[wantBank]) bank = wantBank;
 }catch(e){}
+/* 归档态：目标库被收起就回落到第一个还在的库；一个都没剩 → 空框架 */
+function settleBank(){
+  var vis = activeBankIds();
+  if(!vis.length){ bank = '__empty__'; return; }
+  if(vis.indexOf(bank) < 0) bank = vis[0];
+}
+settleBank();
 var KEY_BASE = 'yjcz_quiz_v1';
 var Q = BANKS[bank].q;
 function countQ(q){
-  return q.choice.length + q.judge.length + q.blank.length + q.essay.length;
+  return q.choice.length + q.judge.length + q.blank.length + q.essay.length + (q.case || []).length;
 }
 var TOTAL = countQ(Q);
 /* 进度按题库分开存，切题库不串数据 */
@@ -2026,7 +2498,9 @@ function htmlBlank(q, idx){
       + 'aria-label="第 ' + idx + ' 题第 ' + (n + 1) + ' 空" placeholder=" ">';
     return '<span class="nb">' + input + m[2] + '</span>';
   }).join('');
-  return '<article class="q" id="q-' + q.id + '">'
+  return '<article class="q blank-flip-scene flip-scene" id="q-' + q.id + '" data-scene="q-' + q.id + '">'
+    + '<div class="flip-card qflip-card">'
+    + '<div class="flip-face qflip-face flip-front">'
     + '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">填空 · ' + q.blanks.length + ' 空</span>'
     + '<span class="q-state" id="st-' + q.id + '">未答</span></div>'
     + '<p class="stem">' + body + '</p>'
@@ -2034,12 +2508,19 @@ function htmlBlank(q, idx){
     + '<button type="button" class="mini solid" data-act="checkBlank" data-q="' + q.id + '">检查本题</button>'
     + '<button type="button" class="mini" data-act="hintBlank" data-q="' + q.id + '">提示</button>'
     + '</div>'
-    + '<div class="fb" id="fb-' + q.id + '" aria-live="polite" hidden></div>'
-    + '</article>';
+    + '<div id="fb-' + q.id + '" aria-live="polite"></div>'
+    + '</div>'
+    + '<div class="flip-face qflip-face flip-back qflip-back">'
+    + '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">填空 · 判分</span></div>'
+    + '<div id="fbb-' + q.id + '"></div>'
+    + '<button type="button" class="qflip-trigger ans-toggle" data-act="flipAns" data-scene="q-' + q.id + '" aria-expanded="true">'
+    + ICON.chev + '返回题目与作答</button>'
+    + '</div></div></article>';
 }
 
 /* ---------- 渲染：应用题 / 翻译练习 ---------- */
-function htmlEssay(q, idx){
+function htmlEssay(q, idx, k){
+  var tn = typeName(k || 'essay');
   var ask = (q.ask || []).map(function(s){ return '<p>' + zhPhrase(s) + '</p>'; }).join('');
   var isTr = !!q.ans && !q.ansLabel;          /* 有 ans 且没自定义标签 → 翻译题 */
   var ansLabel = q.ansLabel || '参考译文';
@@ -2048,31 +2529,69 @@ function htmlEssay(q, idx){
     ? '<div class="ans-tr' + (q.ansPlain ? ' plain' : '') + '"><span class="ans-tr-k">' + ansLabel
       + '</span><p class="ans-tr-v">' + zhPhrase(q.ans) + '</p></div>'
     : '';
-  var isTerm = !!q.ans && !isTr && /名词|术语|概念/.test(typeName('essay'));
+  var isTerm = !!q.ans && !isTr && /名词|术语|概念/.test(tn);
+  var isCase = /案例/.test(tn);   /* 案例分析：长情境 + 多道分析小题 */
   var ph = isTr
     ? '先写下你的译文，再展开参考译文对照（内容只存在本机）'
-    : (isTerm
-      ? '先写下你对这个名词的解释，再展开参考答案对照（内容只存在本机）'
-      : '先在这里写下你的答案要点，再展开参考答案对照（内容只存在本机）');
+    : (isCase
+      ? '按各小题逐条写下你的分析，再展开参考要点对照（内容只存在本机）'
+      : (isTerm
+        ? '先写下你对这个名词的解释，再展开参考答案对照（内容只存在本机）'
+        : '先在这里写下你的答案要点，再展开参考答案对照（内容只存在本机）'));
   var hint = isTr
     ? '提示：先自己译一遍，不查词；展开后对照参考译文，重点看动词搭配和介词。'
-    : (isTerm
-      ? '提示：按采分点写全定义的关键要素，再展开参考答案逐条对照，缺哪条补哪条。'
-      : '提示：先列关键词（原则 / 顺序 / 联动岗位），再展开参考答案逐条对照，缺哪条补哪条。');
-  /* 卡片标签优先用题库自定义题型名（员工素养=名词解释、英语=翻译练习、应急=应用题），没有再回退 */
-  var essayTag = typeName('essay') || (q.ans ? (isTr ? '翻译' : '简答') : '应用');
-  return '<article class="q" id="q-' + q.id + '">'
-    + '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">' + essayTag + '</span>'
-    + '<span class="q-state" id="st-' + q.id + '">未掌握</span></div>'
+    : (isCase
+      ? '提示：逐题回应——先摆出情境中的具体行为，再对应到职业道德 / 意识 / 心态等要点，最后展开参考要点查漏补缺。'
+      : (isTerm
+        ? '提示：按采分点写全定义的关键要素，再展开参考答案逐条对照，缺哪条补哪条。'
+        : '提示：先列关键词（原则 / 顺序 / 联动岗位），再展开参考答案逐条对照，缺哪条补哪条。'));
+  /* 卡片标签优先用题库自定义题型名（员工素养=名词解释/案例分析、英语=翻译练习、应急=应用题），没有再回退 */
+  var essayTag = tn || (q.ans ? (isTr ? '翻译' : '简答') : '应用');
+  var head = '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">' + essayTag + '</span>'
+    + '<span class="q-state" id="st-' + q.id + '">未掌握</span></div>';
+  var read = '<p class="stem">' + zhPhrase(q.stem) + '</p>'
+    + (ask ? '<div class="ask">' + ask + '</div>' : '');
+  var ansTitle = isTr ? '展开参考译文与关键表达' : (isCase ? '展开参考要点与采分点'
+    : (isTerm ? '展开参考答案与采分点' : (q.ans ? '展开参考答案与解析' : '展开参考答案与采分点')));
+  var sid = 'q-' + q.id;
+  var write = '<textarea class="ta" data-act="ta" data-q="' + q.id + '" rows="4" placeholder="' + ph + '"></textarea>'
+    + '<p class="ta-hint">' + hint + '</p>';
+  var front = head + read + write
+    + '<button type="button" class="qflip-trigger ans-toggle" data-act="flipAns" data-scene="' + sid + '" aria-expanded="false">'
+    + ICON.book + ansTitle + ICON.chev + '</button>'
+    + '<div class="blank-act"><button type="button" class="mini" data-act="master" data-q="' + q.id + '">标记已掌握</button></div>';
+  var back = '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span>'
+    + '<span class="q-tag">' + essayTag + ' · 参考答案</span></div>'
     + '<p class="stem">' + zhPhrase(q.stem) + '</p>'
-    + (ask ? '<div class="ask">' + ask + '</div>' : '')
-    + '<textarea class="ta" data-act="ta" data-q="' + q.id + '" rows="4" placeholder="' + ph + '"></textarea>'
-    + '<p class="ta-hint">' + hint + '</p>'
-    + '<details class="ans"><summary>' + ICON.book + (isTr ? '展开参考译文与关键表达' : (isTerm ? '展开参考答案与采分点' : (q.ans ? '展开参考答案与解析' : '展开参考答案与采分点'))) + ICON.chev + '</summary>'
     + '<div class="ans-body">' + ansBlock + (pts ? '<ul class="pts">' + pts + '</ul>' : '')
-    + '<p class="src">' + srcLabel() + ' · ' + esc(q.from) + '</p></div></details>'
-    + '<div class="blank-act"><button type="button" class="mini" data-act="master" data-q="' + q.id + '">标记已掌握</button></div>'
-    + '</article>';
+    + '<p class="src">' + srcLabel() + ' · ' + esc(q.from) + '</p></div>'
+    + '<button type="button" class="qflip-trigger ans-toggle" data-act="flipAns" data-scene="' + sid + '" aria-expanded="true">'
+    + ICON.chev + '返回题目与作答</button>';
+  /* 案例题：长材料放进固定高度、框内滚动的阅读窗格；宽屏作答区 sticky 固定，手机端紧跟窗格 */
+  if(k === 'case'){
+    var caseWrite = write
+      + '<div class="ans-scene flip-scene" id="ansScene-' + q.id + '">'
+      + '<div class="flip-card">'
+      + '<details class="ans flip-face flip-front ans-face" id="ans-' + q.id + '">'
+      + '<summary class="ans-toggle" data-act="flipAns" data-scene="ansScene-' + q.id + '" aria-expanded="false">'
+      + ICON.book + ansTitle + ICON.chev + '</summary></details>'
+      + '<div class="flip-face flip-back ans-face" aria-label="' + ansTitle + '">'
+      + '<button type="button" class="ans-toggle ans-toggle-back" data-act="flipAns" data-scene="ansScene-' + q.id + '" aria-expanded="true">'
+      + ICON.chev + '收起参考答案</button>'
+      + '<div class="ans-body">' + ansBlock + (pts ? '<ul class="pts">' + pts + '</ul>' : '')
+      + '<p class="src">' + srcLabel() + ' · ' + esc(q.from) + '</p></div></div></div></div>'
+      + '<div class="blank-act"><button type="button" class="mini" data-act="master" data-q="' + q.id + '">标记已掌握</button></div>';
+    return '<article class="q case-q" id="q-' + q.id + '">' + head
+      + '<div class="case-grid">'
+      + '<div class="case-read"><div class="case-read-hd">案例材料 · 框内滚动阅读</div>' + read + '</div>'
+      + '<div class="case-ans">' + caseWrite + '</div>'
+      + '</div></article>';
+  }
+  return '<article class="q essay-flip-scene flip-scene" id="' + sid + '" data-scene="' + sid + '">'
+    + '<div class="flip-card qflip-card">'
+    + '<div class="flip-face qflip-face flip-front">' + front + '</div>'
+    + '<div class="flip-face qflip-face flip-back qflip-back">' + back + '</div>'
+    + '</div></article>';
 }
 
 /* ---------- 反馈 ---------- */
@@ -2163,13 +2682,12 @@ function fbJudge(q){
     ansLine, '', r.ok ? '' : 'retry');
 }
 function fbBlank(q){
-  var box = document.getElementById('fb-' + q.id);
-  if(!box) return;
+  var box = document.getElementById('fbb-' + q.id);
+  var card = document.getElementById('q-' + q.id);
+  if(!box || !card) return;
   var r = rec(q.id);
-  if(!r){ box.hidden = true; box.innerHTML = ''; return; }
+  if(!r){ box.innerHTML = ''; return; }
   var hit = r.hits || 0, all = q.blanks.length;
-  box.hidden = false;
-  box.className = 'fb ' + (r.ok ? 'ok' : 'bad');
   var ansLine = '答对 <b class="' + (r.ok ? 'g' : (hit ? '' : 'r')) + '">' + hit + '</b> / ' + all + ' 空';
   var extra = '';
   if(!r.ok){
@@ -2188,6 +2706,7 @@ function fbBlank(q){
   box.innerHTML = fbShell(q, r.ok ? 'ok' : 'bad',
     r.ok ? '全部填对' : '还有 ' + leftN + ' 空要改',
     ansLine, extra, r.ok ? '' : 'retryBlank');
+  if(card.dataset.flipped === '1') applyFlip(card, true, false, true);  /* 重绘后停在背面 */
 }
 function wrongList(q, r){
   var out = [];
@@ -2346,7 +2865,7 @@ function updateAll(){
   else { gl.textContent = '重做错题'; }
 
   TYPES.forEach(function(t){
-    var items = Q[t.k];
+    var items = Q[t.k] || [];   /* 案例题只在员工素养里有，其它库这个键是空的 */
     /* tab 上的数字跟"做没做过"走，答错也算做过；掌握程度看顶部大环 */
     var n = items.filter(function(q){ return isAnswered(q.id); }).length;
     var el = document.querySelector('[data-cnt="' + t.k + '"]');
@@ -2593,12 +3112,7 @@ function checkBlank(qid){
   }
   if(empty){
     var fbe = document.getElementById('fb-' + qid);
-    if(fbe){
-      fbe.hidden = false;
-      fbe.className = 'fb';
-      fbe.innerHTML = '<div class="fb-hd" style="color:var(--primary)">' + ICON.info
-        + '还有 ' + empty + ' 空没填</div><p>填完再检查，答案才会记进进度。</p>';
-    }
+    if(fbe) showFlipNote(fbe, '还有 ' + empty + ' 空没填', '填完再检查，答案才会记进进度。');
     if(firstEmpty) firstEmpty.focus();
     return;
   }
@@ -2610,8 +3124,12 @@ function checkBlank(qid){
     var list = q.blanks[i] || [];
     if(!list.length || list.some(function(x){ return norm(x) === v; })) hits++;
   }
+  var card = document.getElementById('q-' + qid);
+  var wasBack = card && card.dataset.flipped === '1';
   S.a[qid] = {vals:vals, hits:hits, ok:(hits === q.blanks.length)};
   saveState(); paintBlank(q); updateAll(); flash(qid, hits === q.blanks.length);
+  /* 点「检查本题」= 整张题卡翻面：正面题目，背面判分与答案 */
+  if(card && !wasBack) applyFlip(card, true, false);
 }
 function retry(qid){
   delete S.a[qid]; saveState();
@@ -2625,6 +3143,8 @@ function retryBlank(qid){
   delete S.a[qid]; saveState();
   var q = Q.blank.filter(function(x){ return x.id === qid; })[0];
   if(q){ paintBlank(q); }
+  var card = document.getElementById('q-' + qid);
+  if(card) applyFlip(card, false, false, true);
   updateAll();
 }
 function master(qid){
@@ -2637,7 +3157,8 @@ function master(qid){
     S.a[qid] = r;
   }
   saveState();
-  var q = Q.essay.filter(function(x){ return x.id === qid; })[0];
+  var q = Q.essay.filter(function(x){ return x.id === qid; })[0]
+       || (Q.case || []).filter(function(x){ return x.id === qid; })[0];
   if(q) paintEssay(q);
   updateAll();
 }
@@ -2664,16 +3185,183 @@ function nudgeCard(qid){
   q.classList.add('nudge');
   setTimeout(function(){ q.classList.remove('nudge'); }, 380);
 }
+
+/* ---------- 揭晓答案：3D 翻面 ----------
+   透视在场景容器，两面 absolute 同格叠放；卡片高度由脚本过渡到当前面，
+   所以任何尺寸下旋转中心都在卡片正中，不位移、不裁切。
+   隐藏面同时 inert + aria-hidden，控件退出焦点顺序；翻面后焦点落在目标面的切换按钮。 */
+function prefersReduce(){
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function flipCardEl(scene){
+  return (scene && scene.classList && scene.classList.contains('flip-scene'))
+    ? scene.querySelector('.flip-card') : null;
+}
+function setFaceA11y(face, active){
+  if(!face) return;
+  if(active){
+    face.removeAttribute('inert'); face.removeAttribute('aria-hidden');
+    var kept = face.querySelectorAll('[data-flip-tab]');
+    for(var i=0;i<kept.length;i++){
+      var v = kept[i].getAttribute('data-flip-tab');
+      if(v === null || v === '') kept[i].removeAttribute('tabindex');
+      else kept[i].setAttribute('tabindex', v);
+      kept[i].removeAttribute('data-flip-tab');
+    }
+  }else{
+    face.setAttribute('inert',''); face.setAttribute('aria-hidden','true');
+    var f = face.querySelectorAll('button,input,textarea,select,a[href],[tabindex]');
+    for(var j=0;j<f.length;j++){
+      if(!f[j].hasAttribute('data-flip-tab'))
+        f[j].setAttribute('data-flip-tab', f[j].getAttribute('tabindex') || '');
+      f[j].setAttribute('tabindex','-1');
+    }
+  }
+}
+/* 两面 absolute 叠放，面会被卡片当前高度撑开；scrollHeight 至少等于元素高度，
+   所以卡片停在背面（高）时读正面会拿到被撑大的值 → 翻回去不回缩。
+   测量前先把卡片高度收到 0，让面回落到内容本身的高度，读完再恢复。 */
+function faceNaturalHeight(card, face){
+  var prevH = card.style.height;
+  var prevT = card.style.transition;
+  card.style.transition = 'none';
+  card.style.height = '0px';
+  var h = Math.max(1, face.scrollHeight);
+  card.style.height = prevH;
+  void card.offsetHeight;
+  card.style.transition = prevT;
+  return h;
+}
+function refreshFlipHeight(scene, instant){
+  var card = flipCardEl(scene);
+  if(!card) return;
+  var face = scene.classList.contains('is-flipped')
+    ? scene.querySelector('.flip-back') : scene.querySelector('.flip-front');
+  if(!face) return;
+  var hard = !!(instant || prefersReduce());
+  if(hard) card.style.transition = 'none';
+  card.style.height = faceNaturalHeight(card, face) + 'px';
+  if(hard){ void card.offsetHeight; card.style.transition = ''; }
+}
+function initFlips(){
+  var scenes = document.querySelectorAll('.flip-scene');
+  for(var i=0;i<scenes.length;i++){
+    var s = scenes[i];
+    var front = s.querySelector('.flip-front'), back = s.querySelector('.flip-back');
+    if(front && back){
+      var toBack = s.classList.contains('is-flipped');
+      setFaceA11y(front, !toBack); setFaceA11y(back, toBack);
+      front.style.visibility = toBack ? 'hidden' : 'visible';
+      back.style.visibility = toBack ? 'visible' : 'hidden';
+    }
+    if(!s.hidden) refreshFlipHeight(s, true);
+  }
+}
+function applyFlip(scene, toBack, focus, instant){
+  var card = flipCardEl(scene);
+  if(!card) return;
+  var front = scene.querySelector('.flip-front'), back = scene.querySelector('.flip-back');
+  if(!front || !back) return;
+  var hard = !!(instant || prefersReduce());
+  var curH = card.getBoundingClientRect().height;
+  var target = toBack ? back : front, other = toBack ? front : back;
+  /* 高度从当前插值走到目标面：快速连点也只是反向，不留中间状态或计时 */
+  if(hard) card.style.transition = 'none';
+  if(curH > 0) card.style.height = curH + 'px';
+  void card.offsetHeight;
+  card.style.height = faceNaturalHeight(card, target) + 'px';
+  scene.classList.toggle('is-flipped', toBack);
+  scene.dataset.flipped = toBack ? '1' : '0';
+  scene.dataset.flipReady = '1';
+  var det = scene.querySelector('details.ans');
+  if(det) det.open = toBack;      /* 展开态与翻面态同步，键盘/历史脚本都认 */
+  setFaceA11y(target, true);
+  setFaceA11y(other, false);
+  /* 目标面立刻可见 → 焦点可马上落上去；源面等旋转结束再隐藏。
+     连点会先撤掉上一次的收尾监听，不残留中间态。 */
+  target.style.visibility = 'visible';
+  other.style.visibility = 'visible';
+  var prevClean = scene.__flipClean;
+  if(prevClean){ card.removeEventListener('transitionend', prevClean); scene.__flipClean = null; }
+  function hideSource(e){
+    if(e && (e.target !== card || e.propertyName !== 'transform')) return;
+    card.removeEventListener('transitionend', hideSource);
+    scene.__flipClean = null;
+    other.style.visibility = 'hidden';
+  }
+  if(hard) hideSource();
+  else { scene.__flipClean = hideSource; card.addEventListener('transitionend', hideSource); }
+  var btns = scene.querySelectorAll('[data-act="flipAns"],[data-act="flipToggle"]');
+  for(var b=0;b<btns.length;b++){
+    var inBack = !!(btns[b].closest && btns[b].closest('.flip-back'));
+    btns[b].setAttribute('aria-expanded', inBack === toBack ? 'true' : 'false');
+  }
+  var t = target.querySelector('.ans-toggle, [data-act="flipToggle"]');
+  if(focus && t) t.focus({preventScroll:true});
+  if(hard){ void card.offsetHeight; card.style.transition = ''; }
+}
+function showFlipNote(box, title, html, sub){
+  if(!box) return;
+  box.innerHTML = '<div class="flip-hd">' + ICON.info + title + '</div>'
+    + '<div class="ans-body"><p>' + html + '</p>'
+    + (sub ? '<p class="src">' + sub + '</p>' : '') + '</div>';
+  var card = box.closest('.flip-scene');
+  if(!card) return;
+  /* 提示塞进正面后内容变高：卡片高度是写死在 .flip-card 上的，
+     不重算就会被 .qflip-face 的 overflow:hidden 截断（翻面态同理）。 */
+  if(card.classList.contains('is-flipped')) applyFlip(card, false, false, true);
+  else refreshFlipHeight(card, false);
+}
+/* 果冻指示器：位置/宽度跟随选中项；按下去先压扁再回弹，和横向拉伸合成 Q 弹 */
+function moveJelly(k, animate){
+  var wrap = document.querySelector('.tabs');
+  var jelly = wrap && wrap.querySelector('.tab-jelly');
+  if(!jelly) return;
+  if(!jelly.__bound){
+    jelly.__bound = true;
+    jelly.addEventListener('animationend', function(){ jelly.classList.remove('is-stretch'); });
+  }
+  var btn = document.querySelector('[data-act="tab"][data-k="' + k + '"]');
+  if(!btn || btn.hidden) return;
+  jelly.style.width = btn.offsetWidth + 'px';
+  jelly.style.transform = 'translateX(' + btn.offsetLeft + 'px)';
+  if(animate && !prefersReduce()){
+    jelly.classList.remove('is-stretch');
+    void jelly.offsetWidth;
+    jelly.classList.add('is-stretch');
+  }
+}
+function pressJelly(btn){
+  if(!btn || prefersReduce()) return;
+  btn.classList.remove('jelly-press');
+  void btn.offsetWidth;
+  btn.classList.add('jelly-press');
+  btn.addEventListener('animationend', function h(){
+    btn.classList.remove('jelly-press');
+    btn.removeEventListener('animationend', h);
+  });
+}
 function setTab(k, scroll){
   if(!(Q[k] || []).length) k = firstTabWithItems();
   cur = k;
   var tabs = document.querySelectorAll('.tab');
+  var target = null;
   for(var i = 0; i < tabs.length; i++){
-    tabs[i].setAttribute('aria-selected', tabs[i].dataset.k === k ? 'true' : 'false');
+    var on = tabs[i].dataset.k === k;
+    tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    if(on) target = tabs[i];
   }
+  moveJelly(k, !!scroll);
+  if(scroll && target) pressJelly(target);
   var panels = document.querySelectorAll('.panel');
   for(var j = 0; j < panels.length; j++){
     panels[j].hidden = panels[j].dataset.k !== k;
+  }
+  /* 面板刚显形：此时才量得到翻面卡片的真实高度（hidden 面板里量会是 0） */
+  var nowPanel = document.getElementById('panel-' + k);
+  if(nowPanel){
+    var fs = nowPanel.querySelectorAll('.flip-scene');
+    for(var f=0;f<fs.length;f++) refreshFlipHeight(fs[f], true);
   }
   if(scroll){
     /* 切 tab 直接瞬移到位，再算按钮文案。
@@ -2736,9 +3424,11 @@ function renderAll(){
   document.getElementById('panel-choice').innerHTML = Q.choice.map(function(q, i){ return htmlChoice(q, i + 1); }).join('');
   document.getElementById('panel-judge').innerHTML = Q.judge.map(function(q, i){ return htmlJudge(q, i + 1); }).join('');
   document.getElementById('panel-blank').innerHTML = Q.blank.map(function(q, i){ return htmlBlank(q, i + 1); }).join('');
-  document.getElementById('panel-essay').innerHTML = Q.essay.map(function(q, i){ return htmlEssay(q, i + 1); }).join('');
+  document.getElementById('panel-essay').innerHTML = Q.essay.map(function(q, i){ return htmlEssay(q, i + 1, 'essay'); }).join('');
+  document.getElementById('panel-case').innerHTML = (Q.case || []).map(function(q, i){ return htmlEssay(q, i + 1, 'case'); }).join('');
   repaintAll();
   paintEditTools();
+  initFlips();          /* 两面 absolute 叠放，先给每张卡定一个初始高度 */
 }
 function syncTotals(){
   ['totalA','totalB','totalC'].forEach(function(id){
@@ -2757,8 +3447,162 @@ function applyBankMeta(){
   document.title = b.name + ' · 城轨运营刷题台';
   syncBankNav();
   syncTabs();
+  syncArchiveUI();
 }
-window.addEventListener('resize', function(){ syncBankFade(); });
+
+/* ---------- 归档 / 恢复：数据零删除，只切换可见性 ---------- */
+function isArchived(){
+  var a = readArchive();
+  return !!(a && Array.isArray(a.hidden) && a.hidden.length > 0);
+}
+function syncArchiveUI(){
+  var archived = isArchived();
+  var note = document.getElementById('archiveNote');
+  var empty = document.getElementById('archivedEmpty');
+  var inEmpty = bank === '__empty__';
+  if(note){
+    note.hidden = !archived;
+    var a = readArchive();
+    var n = (a.hidden || []).filter(function(id){ return BANKS[id] && id !== '__empty__'; }).length;
+    var t = document.getElementById('archiveNoteTxt');
+    if(t) t.innerHTML = '已归档 <b>' + n + '</b> 套题库，题目与答题记录都原样保存在本机。' +
+      (a.at ? '（' + new Date(a.at).toLocaleDateString('zh-CN') + ' 归档）' : '');
+  }
+  if(empty) empty.hidden = !inEmpty;
+  /* 空框架态：收起题型栏、进度环与底部行动条，只留归档引导 */
+  var tw = document.querySelector('.tabs-wrap');
+  if(tw) tw.hidden = inEmpty;
+  var dash = document.querySelector('.dash');
+  if(dash) dash.hidden = inEmpty;
+  var bar = document.querySelector('.act-bar');
+  if(bar) bar.hidden = inEmpty;
+  var ft = document.querySelector('.ft');
+  if(ft) ft.hidden = inEmpty;
+  syncSetPanel();
+}
+/* 归档：把当前所有可见题库收起。题库、进度、追加、快照一律不动。 */
+function archiveAll(){
+  var ids = activeBankIds();
+  var real = ids.filter(function(id){ return id !== '__empty__'; });
+  if(!real.length){ toast('没有可归档的题库'); return; }
+  var names = real.map(function(id){ return BANKS[id].name; });
+  var total = real.reduce(function(n, id){ return n + bankTotalQ(id); }, 0);
+  if(!writeArchive({ hidden: real, at: Date.now(), names: names, total: total })){
+    toast('归档失败：浏览器本地存储不可用'); return;
+  }
+  try{ localStorage.removeItem(BANK_LAST); }catch(e){}
+  location.reload();
+}
+/* 恢复：清空隐藏标记，所有题库原样回来 */
+function restoreArchive(){
+  if(!writeArchive({ hidden: [], at: Date.now() })){ toast('恢复失败：本地存储不可用'); return; }
+  location.reload();
+}
+/* 更多菜单：开合、点外部/Esc 关闭、键盘上下切项 */
+function moreOpen(focus){
+  var m = document.getElementById('moreMenu'), b = document.getElementById('moreToggle');
+  if(!m || !b) return;
+  m.hidden = false;
+  b.setAttribute('aria-expanded', 'true');
+  if(focus){
+    var first = m.querySelector('button');
+    if(first) first.focus({preventScroll:true});
+  }
+}
+function moreClose(focus){
+  var m = document.getElementById('moreMenu'), b = document.getElementById('moreToggle');
+  if(!m) return;
+  if(m.hidden) return;
+  m.hidden = true;
+  b.setAttribute('aria-expanded', 'false');
+  if(focus) b.focus({preventScroll:true});
+}
+function moreToggle(){
+  var m = document.getElementById('moreMenu');
+  if(!m) return;
+  if(m.hidden) moreOpen(true); else moreClose(true);
+}
+/* 点菜单外部、Esc 时收起 */
+document.addEventListener('click', function(e){
+  var m = document.getElementById('moreMenu');
+  if(!m || m.hidden) return;
+  if(e.target.closest && e.target.closest('.hd-tools')) return;
+  moreClose(false);
+});
+document.addEventListener('keydown', function(e){
+  var m = document.getElementById('moreMenu');
+  if(!m || m.hidden) return;
+  var items = [].slice.call(m.querySelectorAll('button'));
+  if(e.key === 'Escape'){ e.preventDefault(); moreClose(true); return; }
+  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    var i = items.indexOf(document.activeElement);
+    var d = e.key === 'ArrowDown' ? 1 : -1;
+    items[(i + d + items.length) % items.length].focus({preventScroll:true});
+  }
+});
+function openSettings(){
+  moreClose(false);
+  syncSetPanel();
+  var m = document.getElementById('setMask');
+  if(m){ m.hidden = false; document.body.classList.add('lock'); }
+}
+function closeSettings(){
+  var m = document.getElementById('setMask');
+  if(m) m.hidden = true;
+  document.body.classList.remove('lock');
+}
+function syncSetPanel(){
+  var btn = document.getElementById('setArcBtn');
+  var info = document.getElementById('setArcInfo');
+  var list = document.getElementById('setArcList');
+  var tip = document.getElementById('setTip');
+  if(!btn || !info) return;
+  var a = readArchive();
+  var hidden = (a && Array.isArray(a.hidden)) ? a.hidden.filter(function(id){ return BANKS[id] && id !== '__empty__'; }) : [];
+  if(hidden.length){
+    btn.dataset.act = 'arcRestore';
+    btn.textContent = '恢复全部题库（' + hidden.length + ' 套）';
+    info.innerHTML = '当前有 <b>' + hidden.length + '</b> 套题库已归档，共 <b>' +
+      (a.total || hidden.reduce(function(n,id){ return n + bankTotalQ(id); }, 0)) + '</b> 题。<br>' +
+      '题目与进度都在本机原样保存，恢复后可继续使用。';
+    if(list) list.innerHTML = hidden.map(function(id){
+      return '<li>' + esc(BANKS[id].name || id) + ' · ' + bankTotalQ(id) + ' 题</li>';
+    }).join('');
+    if(tip) tip.textContent = '恢复后，归档期间新建的题库也会一起保留。';
+  }else{
+    var vis = activeBankIds().filter(function(id){ return id !== '__empty__'; });
+    btn.dataset.act = 'arcArchive';
+    btn.textContent = '归档全部题库（' + vis.length + ' 套）';
+    btn.disabled = vis.length === 0;
+    info.innerHTML = '当前有 <b>' + vis.length + '</b> 套题库在用，共 <b>' +
+      vis.reduce(function(n,id){ return n + bankTotalQ(id); }, 0) + '</b> 题。<br>' +
+      '归档会把它们暂时收起来，框架清空后可录入其他题目的题库。';
+    if(list) list.innerHTML = vis.map(function(id){
+      return '<li>' + esc(BANKS[id].name || id) + ' · ' + bankTotalQ(id) + ' 题</li>';
+    }).join('');
+    if(tip) tip.textContent = '归档不删除任何数据，随时可以一键恢复。';
+  }
+  syncAIFields();
+}
+/* 把本机 AI 配置回填到设置表单 */
+function syncAIFields(){
+  var c = readAI();
+  var u = document.getElementById('aiUrl'), m = document.getElementById('aiModel'), k = document.getElementById('aiKey');
+  var tip = document.getElementById('aiTip');
+  if(u) u.value = c.url;
+  if(m) m.value = c.model;
+  if(k) k.value = c.key;
+  if(tip) tip.textContent = c.key ? '已保存 API Key（本机）' : '还没填 Key，填了才能在导入弹窗里用 AI 生成。';
+}
+window.addEventListener('resize', function(){
+  syncBankFade();
+  moveJelly(cur, false);
+  var scenes = document.querySelectorAll('.flip-scene');
+  for(var i=0;i<scenes.length;i++){
+    if(!scenes[i].hidden) refreshFlipHeight(scenes[i], true);
+  }
+});
 
 /* 题型标签：名字随题库换，0 题的题型整个收起来，不留空位 */
 function syncTabs(){
@@ -2776,10 +3620,15 @@ function syncTabs(){
     if(items.length) shown++;
   });
   var wrap = document.querySelector('.tabs');
-  if(wrap) wrap.style.gridTemplateColumns = 'repeat(' + Math.max(1, shown) + ',1fr)';
+  if(wrap){
+    wrap.style.gridTemplateColumns = 'repeat(' + Math.max(1, shown) + ',1fr)';
+    wrap.classList.toggle('five', shown >= 5);
+  }
+  moveJelly(cur, false);
 }
 function switchBank(id){
   if(!BANKS[id] || id === bank) return;
+  if(isBankHidden(id)) return;   /* 归档的库不能再切进去 */
   bank = id;
   try{ localStorage.setItem(BANK_LAST, id); }catch(e){}
   Q = BANKS[bank].q;
@@ -2818,6 +3667,7 @@ function repaintAll(){
   Q.judge.forEach(paintJudge);
   Q.blank.forEach(paintBlank);
   Q.essay.forEach(paintEssay);
+  (Q.case || []).forEach(paintEssay);
   updateAll();
 }
 
@@ -2834,8 +3684,43 @@ document.addEventListener('click', function(e){
     ripple(t, e.clientX, e.clientY);
   }
 
+  /* ---- 头部更多菜单 ---- */
+  if(act === 'moreMenu'){ moreToggle(); return; }
+
+  /* ---- 设置与归档 ---- */
+  if(act === 'settingsOpen'){ openSettings(); return; }
+  if(act === 'setClose'){ closeSettings(); return; }
+  if(act === 'aiSave'){
+    var u = document.getElementById('aiUrl'), m = document.getElementById('aiModel'), k = document.getElementById('aiKey');
+    if(!writeAI({
+      url: u ? u.value : '', model: m ? m.value : '', key: k ? k.value : ''
+    })){ toast('保存失败：本地存储不可用'); return; }
+    syncAIFields();
+    toast('AI 设置已保存到本机');
+    return;
+  }
+  if(act === 'aiClear'){
+    arm(t, '再点一次', function(){
+      writeAI({ key:'' });
+      var k = document.getElementById('aiKey'); if(k) k.value = '';
+      syncAIFields(); toast('API Key 已清空');
+    });
+    return;
+  }
+  if(act === 'arcArchive'){
+    arm(t, '确认归档', function(){ closeSettings(); archiveAll(); });
+    return;
+  }
+  if(act === 'arcRestore'){
+    arm(t, '确认恢复', function(){ closeSettings(); restoreArchive(); });
+    return;
+  }
+
   if(act === 'impOpen'){ impOpen(); return; }
   if(act === 'impClose'){ impClose(); return; }
+  if(act === 'impMode'){ impMode(t.dataset.m); return; }
+  if(act === 'aiGenerate'){ aiGenerate(); return; }
+  if(act === 'aiConfig'){ impClose(); openSettings(); return; }
   if(act === 'impParse'){ impStep(2); return; }
   if(act === 'impSample'){ impSample(); return; }
   if(act === 'impBack'){ impMsg(''); impStep(1); return; }
@@ -2846,7 +3731,7 @@ document.addEventListener('click', function(e){
   if(act === 'impExtraDrop'){ arm(t, '再点一次', function(){ dropMineExtra(t.dataset.b); }); return; }
 
   /* ---- 题目编辑 ---- */
-  if(act === 'editMode'){ setEditing(!editing); return; }
+  if(act === 'editMode'){ moreClose(false); setEditing(!editing); return; }
   if(act === 'qEdit'){ qeOpen('edit', t.dataset.q); return; }
   if(act === 'qDel'){ arm(t, '再点一次', function(){ delQ(t.dataset.q); }); return; }
   if(act === 'qeClose'){ qeClose(); return; }
@@ -2858,6 +3743,12 @@ document.addEventListener('click', function(e){
   if(act === 'theme'){ switchTheme(e); return; }
   if(act === 'bank'){ switchBank(t.dataset.b); return; }
   if(act === 'tab'){ setTab(t.dataset.k, true); return; }
+  if(act === 'flipAns' || act === 'flipToggle'){
+    if(t.tagName === 'SUMMARY') e.preventDefault();  /* 不让 details 自己 toggle，翻面统一由这里管 */
+    var scene = document.getElementById(t.dataset.scene);
+    if(scene) applyFlip(scene, !scene.classList.contains('is-flipped'), true);
+    return;
+  }
   if(act === 'pick'){ pick(qid, Number(t.dataset.i)); return; }
   if(act === 'submitMulti'){ submitMulti(qid); return; }
   if(act === 'judge'){ judge(qid, t.dataset.v === '1'); return; }
@@ -2867,14 +3758,7 @@ document.addEventListener('click', function(e){
   if(act === 'master'){ master(qid); return; }
   if(act === 'hintBlank'){
     var q = Q.blank.filter(function(x){ return x.id === qid; })[0];
-    if(q){
-      var box = document.getElementById('fb-' + qid);
-      box.hidden = false;
-      box.className = 'fb';
-      box.innerHTML = '<div class="fb-hd" style="color:var(--primary)">' + ICON.info + '提示</div>'
-        + '<p>' + esc(q.tip) + '</p>'
-        + '<p class="src">先自己填，再点"检查本题"核对。</p>';
-    }
+    if(q) showFlipNote(document.getElementById('fb-' + qid), '提示', esc(q.tip), '先自己填，再点“检查本题”核对。');
     return;
   }
   if(act === 'redoWrong'){
@@ -3125,7 +4009,7 @@ function themeByWipe(to, dark, p){
         解析：x；题干多行续写；对/错 与 √/× 两种判断写法
    ============================================================ */
 var IMP = { items: [], step: 1 };
-var IMP_TYPE_LABEL = { choice:'选择题', judge:'判断题', blank:'填空题', essay:'应用题' };
+var IMP_TYPE_LABEL = { choice:'选择题', judge:'判断题', blank:'填空题', essay:'应用题', case:'案例分析' };
 
 /* 中文「答案：」「【答案】」与英文「Answer:」都认；英文必须带冒号，
    避免把题干里的 Answer the question 当成答案行 */
@@ -3466,6 +4350,11 @@ function impToQuestion(it, idx){
     return { k:'blank', q:{ id:id, from:from, stem:r.body, blanks:blanks,
       tip: tip || ('参考答案：' + (parts.join('；') || '（未填答案）')) } };
   }
+  if(it.type === 'case'){
+    /* 案例分析：情境与分析小题留在题干里，解析拆成参考要点，不塞假参考答案 */
+    var pts = (it.exp || '').split(/[\n；;]/).map(function(s){ return esc(s.trim()); }).filter(Boolean);
+    return { k:'case', q:{ id:id, from:from, stem:it.stem, points:pts, tip:tip } };
+  }
   return { k:'essay', q:{ id:id, from:from, stem:it.stem,
     ans: it.ansText || '（未填写参考答案）', ansLabel:'参考答案', ansPlain:true,
     points: it.exp ? [esc(it.exp)] : [] } };
@@ -3521,6 +4410,10 @@ function setEditing(v){
     b.title = editing ? '退出编辑' : '编辑题库';
     b.setAttribute('aria-label', b.title);
   }
+  var lbl = document.getElementById('editMenuLabel');
+  if(lbl) lbl.textContent = editing ? '退出编辑' : '编辑题库';
+  var badge = document.getElementById('moreBadge');
+  if(badge) badge.hidden = !editing;
   var note = document.getElementById('editNote');
   if(note) note.hidden = !editing;
   syncRestoreBtn();
@@ -3606,6 +4499,10 @@ function qeRenderBody(type, q){
     box.innerHTML = '<label class="imp-field"><span>答案（用 ； 分空，同一空多个写法用 |）</span>'
       + '<input id="qeBlanks" type="text" value="' + esc(q ? blanksToText(q) : '') + '" placeholder="备用车|备用列车；AFC" autocomplete="off"></label>'
       + '<p class="sheet-tip">题干里要挖空的地方写 <b>______</b>，保存时按答案个数对齐空位。</p>';
+  }else if(type === 'case'){
+    box.innerHTML = '<label class="imp-field"><span>参考要点（一行一条）</span>'
+      + '<textarea id="qePoints" rows="3" placeholder="一条一行">' + esc(q && q.points ? q.points.join('\n') : '') + '</textarea></label>'
+      + '<p class="sheet-tip">案例情境与分析小题保留在原题干里，这里只改参考要点。</p>';
   }else{
     box.innerHTML = '<label class="imp-field"><span>参考答案</span>'
       + '<textarea id="qeAns" rows="3" placeholder="参考答案">' + esc(q ? (q.ans || '') : '') + '</textarea></label>'
@@ -3706,9 +4603,14 @@ function qeSave(){
     var ans = (document.getElementById('qeAns') || {}).value || '';
     var ptsRaw = (document.getElementById('qePoints') || {}).value || '';
     obj = { id: id, from: '', stem: stem,
-      ans: ans.trim() || '（未填写参考答案）', ansLabel: '参考答案', ansPlain: true,
       points: ptsRaw.split('\n').map(function(s){ return esc(s.trim()); }).filter(Boolean),
       tip: tip };
+    /* 案例题只用 points，不塞一个假的「未填写参考答案」进去 */
+    if(type !== 'case'){
+      obj.ans = ans.trim() || '（未填写参考答案）';
+      obj.ansLabel = '参考答案';
+      obj.ansPlain = true;
+    }
   }
 
   var hit = QE.id ? findQ(QE.id) : null;
@@ -3764,6 +4666,106 @@ function impMsg(text){
   el.hidden = !text;
   el.style.color = 'var(--bad)';
 }
+function aiMsg(text, busy){
+  var el = document.getElementById('aiGenMsg');
+  if(!el) return;
+  el.textContent = text || '';
+  el.hidden = !text;
+  el.style.color = busy ? 'var(--primary)' : 'var(--bad)';
+}
+/* 导入方式切换：AI 生成 / 粘贴文本，两栏互斥 */
+function impMode(m){
+  AI.mode = (m === 'paste') ? 'paste' : 'ai';
+  var ai = document.getElementById('impPaneAi'), paste = document.getElementById('impPanePaste');
+  if(ai) ai.hidden = AI.mode !== 'ai';
+  if(paste) paste.hidden = AI.mode !== 'paste';
+  var tabs = document.querySelectorAll('.imp-mode');
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].setAttribute('aria-selected', tabs[i].dataset.m === AI.mode ? 'true' : 'false');
+  }
+}
+/* 给模型的硬性格式约定：输出能被 impAnalyze 直接识别的题目纯文本 */
+function aiPrompt(topic, type, n){
+  var typeRule = type === 'mix'
+    ? '题型混合：在选择题、判断题、填空题、应用题之间合理搭配。'
+    : ({ choice:'全部出选择题。', judge:'全部出判断题。', blank:'全部出填空题。',
+        essay:'全部出应用题/翻译题。', case:'全部出案例分析题。' })[type] || '题型混合。';
+  var format = [
+    '严格按下面格式输出 ' + n + ' 道题，不要输出任何额外说明、标题或 Markdown 代码块：',
+    '每道题以题号开头，形如「1. 题干」。',
+    '选择题：题干后逐行给 A. B. C. D. 四个选项，再写「答案：X」（多选写「答案：AD」）。',
+    '判断题：题干末尾写（ ），答案写「答案：对」或「答案：错」。',
+    '填空题：把要挖掉的词在题干里写成 ______（下划线），答案写「答案：词1；词2」，空与答案按顺序一一对应。',
+    '应用题/翻译题：写「答案：」给出参考要点或译文。',
+    '案例分析：题干写完整案例情境和若干分析小题，答案写「答案：」给出参考要点。',
+    '每道题可加一行「解析：……」，不要加可不要加。',
+    '题与题之间空一行。'
+  ].join('\n');
+  return '你是一位出题老师。请根据下面的知识点出题。\n\n' + typeRule + '\n' + format
+    + '\n\n知识点：\n' + topic;
+}
+/* 调用 OpenAI 兼容的 chat/completions，把生成文本塞回原解析流程 */
+function aiGenerate(){
+  var cfg = readAI();
+  var btn = document.getElementById('aiGenBtn');
+  var topicEl = document.getElementById('aiTopic');
+  var type = (document.getElementById('aiType') || {}).value || 'mix';
+  var n = parseInt((document.getElementById('aiCount') || {}).value, 10) || 10;
+  var topic = topicEl ? topicEl.value.trim() : '';
+  if(!topic){ aiMsg('先填知识点或主题，再生成。'); return; }
+  if(!cfg.key){ aiMsg('还没填 API Key。点右侧「设置接口」填好再生成。'); return; }
+  if(!/^https?:\/\//i.test(cfg.url)){ aiMsg('接口地址不合法，请到「设置接口」检查。'); return; }
+  if(AI.busy) return;
+  AI.busy = true;
+  if(btn){ btn.disabled = true; btn.textContent = '生成中…'; }
+  aiMsg('正在调用 AI 生成 ' + n + ' 道题，请稍候…', true);
+
+  var ctrl = ('AbortController' in window) ? new AbortController() : null;
+  AI.ctrl = ctrl;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 60000) : null;
+
+  fetch(cfg.url, {
+    method:'POST', signal: ctrl ? ctrl.signal : undefined,
+    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + cfg.key },
+    body: JSON.stringify({
+      model: cfg.model,
+      messages:[
+        { role:'system', content:'你是一个严谨的出题助手，只输出题目文本，不输出解释或客套话。' },
+        { role:'user', content: aiPrompt(topic, type, n) }
+      ],
+      temperature: 0.7, stream: false
+    })
+  }).then(function(resp){
+    if(!resp.ok){
+      return resp.text().then(function(txt){
+        var detail = '';
+        try{ var j = JSON.parse(txt); detail = (j.error && (j.error.message || j.error.type)) || ''; }catch(e){}
+        throw new Error('HTTP ' + resp.status + (detail ? ' · ' + detail : ''));
+      });
+    }
+    return resp.json();
+  }).then(function(data){
+    var content = data && data.choices && data.choices[0] && data.choices[0].message
+      ? data.choices[0].message.content : '';
+    if(!content || !content.trim()) throw new Error('模型没有返回内容');
+    /* 去掉模型偶尔套上的 ``` 代码块围栏 */
+    content = String(content).trim().replace(/^```[a-zA-Z]*\s*/, '').replace(/\s*```$/, '').trim();
+    var ta = document.getElementById('impText');
+    if(ta) ta.value = content;
+    aiMsg('');
+    /* 直接进既有解析流程：识别→预览校对→存库 */
+    impStep(2);
+    toast('已生成，请校对后保存');
+  }).catch(function(err){
+    var msg = err && err.name === 'AbortError' ? '生成超时，请重试或减少题数' : ('生成失败：' + ((err && err.message) || '网络错误'));
+    aiMsg(msg);
+  }).then(function(){
+    if(timer) clearTimeout(timer);
+    AI.busy = false;
+    AI.ctrl = null;
+    if(btn){ btn.disabled = false; btn.textContent = '生成题目'; }
+  });
+}
 function toast(msg){
   var el = document.getElementById('toast');
   if(!el){
@@ -3811,7 +4813,9 @@ function impStep(n){
     IMP.items = impAnalyze(IMP.raw);
     if(!IMP.items.length){
       impStep(1);
-      impMsg('没认出题目。试试每题以「1.」「1、」开头，答案写成「答案：A」。');
+      var noFmt = '没认出题目。试试每题以「1.」「1、」开头，答案写成「答案：A」。';
+      if(AI.mode === 'ai') aiMsg('AI 返回的内容没认出题目，可切到「粘贴文本」手动整理，或再生成一次。' + noFmt);
+      else impMsg(noFmt);
       return;
     }
     var nameEl = document.getElementById('impName');
@@ -3828,17 +4832,24 @@ function impOpen(){
   m.hidden = false;
   document.body.classList.add('lock');
   impMsg('');
+  aiMsg('');
   renderMine();
+  impMode('ai');          /* 每次打开默认落在 AI 生成，粘贴作备选 */
   impStep(1);
   setTimeout(function(){
-    var ta = document.getElementById('impText');
-    if(ta) ta.focus({preventScroll:true});
+    var el = (AI.mode === 'ai') ? document.getElementById('aiTopic') : document.getElementById('impText');
+    if(el) el.focus({preventScroll:true});
   }, 240);
 }
 function impClose(){
   var m = document.getElementById('impMask');
   if(m) m.hidden = true;
   document.body.classList.remove('lock');
+  /* 关弹窗时中断在途生成，不留后台请求 */
+  if(AI.ctrl){ try{ AI.ctrl.abort(); }catch(e){} AI.ctrl = null; }
+  AI.busy = false;
+  var btn = document.getElementById('aiGenBtn');
+  if(btn){ btn.disabled = false; btn.textContent = '生成题目'; }
 }
 function impSample(){
   var ta = document.getElementById('impText');
@@ -3863,7 +4874,7 @@ function impSample(){
   ta.focus();
 }
 function impTypeOptions(cur){
-  return ['choice', 'judge', 'blank', 'essay'].map(function(k){
+  return ['choice', 'judge', 'blank', 'essay', 'case'].map(function(k){
     return '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + IMP_TYPE_LABEL[k] + '</option>';
   }).join('');
 }
@@ -3875,7 +4886,7 @@ function impGrow(t){
 function renderImpList(){
   var box = document.getElementById('impList');
   if(!box) return;
-  var count = {choice:0, judge:0, blank:0, essay:0}, warn = 0;
+  var count = {choice:0, judge:0, blank:0, essay:0, case:0}, warn = 0;
   box.innerHTML = IMP.items.map(function(it, i){
     count[it.type]++;
     var w = impWarn(it);
@@ -3911,7 +4922,7 @@ function renderImpList(){
   var stat = document.getElementById('impStat');
   if(stat){
     var bits = [];
-    ['choice', 'judge', 'blank', 'essay'].forEach(function(k){
+    ['choice', 'judge', 'blank', 'essay', 'case'].forEach(function(k){
       if(count[k]) bits.push(IMP_TYPE_LABEL[k] + ' ' + count[k]);
     });
     stat.innerHTML = '识别到 <b>' + IMP.items.length + '</b> 题：' + bits.join(' · ')
@@ -3941,13 +4952,14 @@ function impSave(){
   var to = sel ? sel.value : '';
   var nameEl = document.getElementById('impName');
   var name = ((nameEl && nameEl.value) || '').trim().slice(0, 20) || '我的题库';
-  var q = {choice: [], judge: [], blank: [], essay: []};
+  var q = {choice: [], judge: [], blank: [], essay: [], case: []};
   IMP.items.forEach(function(it, i){
     if(!it.stem && !it.ansText) return;
     var r = impToQuestion(it, i + 1);
+    if(!q[r.k]) q[r.k] = [];
     q[r.k].push(r.q);
   });
-  var total = q.choice.length + q.judge.length + q.blank.length + q.essay.length;
+  var total = q.choice.length + q.judge.length + q.blank.length + q.essay.length + q.case.length;
   if(!total){ impMsg('没有可保存的题目'); return; }
 
   /* 追加到已有题库（内置库、之前导入的库都行） */
@@ -4138,17 +5150,48 @@ document.addEventListener('keydown', function(e){
       localStorage.removeItem(KEY_BASE + '::safe_2026');
     }
   }catch(e){}
+  /* 案例题并入员工素养：旧 case 题库的进度搬过来，题号 cs1–cs4 不冲突 */
+  try{
+    var caseRaw = localStorage.getItem(KEY_BASE + '::case_2026');
+    if(caseRaw){
+      var caseObj = JSON.parse(caseRaw);
+      var stKey = KEY_BASE + '::staff_2026';
+      var stObj = JSON.parse(localStorage.getItem(stKey) || '{"a":{}}');
+      if(caseObj && caseObj.a && stObj && stObj.a){
+        Object.keys(caseObj.a).forEach(function(id){
+          if(!stObj.a[id]) stObj.a[id] = caseObj.a[id];
+        });
+        localStorage.setItem(stKey, JSON.stringify(stObj));
+      }
+      localStorage.removeItem(KEY_BASE + '::case_2026');
+    }
+  }catch(e){}
   applyTheme(currentTheme(), false);
   /* 英语题库 2026-11 整库换新：旧的示例题进度 id 会和新题撞名，直接清掉 */
   try{ localStorage.removeItem(KEY_BASE + '::english'); }catch(e){}
-  /* 上次停在已下线的 safe 题库：回到应急处置 */
-  try{ if(localStorage.getItem(BANK_LAST) === 'safe') localStorage.setItem(BANK_LAST, 'yingji'); }catch(e){}
+  /* 上次停在已下线的题库：回到对应科目 */
+  try{
+    var last = localStorage.getItem(BANK_LAST);
+    if(last === 'safe') localStorage.setItem(BANK_LAST, 'yingji');
+    if(last === 'case') localStorage.setItem(BANK_LAST, 'staff');
+  }catch(e){}
   renderBanks();
   S = loadState();
   applyBankMeta();
   syncTotals();
   renderAll();
-  setTab('choice', false);
+  if(wantCaseTab && !isBankHidden('staff')){
+    bank = 'staff';
+    Q = BANKS.staff.q;
+    TOTAL = countQ(Q);
+    KEY = KEY_BASE + '::staff_2026';
+    S = loadState();
+    applyBankMeta();
+    syncTotals();
+    renderAll();
+    syncUrlBank('staff');      /* 地址栏从 ?bank=case 改成 ?bank=staff */
+  }
+  setTab(wantCaseTab ? 'case' : 'choice', false);
 })();
 
 /* ---------- 涟漪（参考库：Ripple） ---------- */

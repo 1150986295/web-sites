@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>城轨运营刷题台 · 多科目题库练习</title>
-<meta name="description" content="城市轨道交通运营管理多科目题库：应急处置、客运英语，含单选多选、判断、填空、应用题，即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。">
+<title>城轨运营刷题台 · 期末考试题库</title>
+<meta name="description" content="城市轨道交通运营管理期末考试题库：应急处置（含运营安全）、客运英语、员工素养三科，含单选多选、判断、填空、名词解释，即时判分、错题重做，支持粘贴文本自建题库，进度只存本机。">
 <meta name="theme-color" content="#F1EEE5">
 <script>
 /* 主题在解析 CSS 之前定好，避免先闪一下浅色/深色。默认浅色（宣纸），用户点过才记 */
@@ -106,6 +106,31 @@
   --chip:rgba(255,252,240,.055);
   --track:rgba(0,0,0,.40);
 }
+/* ============================================================
+   一·二、深浅色切换：850ms 圆形扩散 / 收缩
+   - 切暗色：墨从按钮点向外扩，铺满整屏（圆心就是点击位置）
+   - 切浅色：整屏墨向按钮点收缩，宣纸从四周往中心露出来
+   优先 View Transitions（圆内是真实页面，边缘不带色块）；
+   不支持的浏览器退到同色墨层 + clip-path，观感一致
+   ============================================================ */
+::view-transition{ pointer-events:none; background:transparent }
+::view-transition-old(root),
+::view-transition-new(root){ animation:none; mix-blend-mode:normal }
+::view-transition-image-pair(root){ isolation:auto }
+::view-transition-old(root){ z-index:1 }
+::view-transition-new(root){ z-index:2 }
+/* 切浅色时把旧画面（暗）抬到上层，让它向按钮收缩，露出下面新的浅色 */
+html.vt-back::view-transition-old(root){ z-index:3 }
+html.vt-back::view-transition-new(root){ z-index:2 }
+
+/* 降级用的墨层：#1A1A17 与 [data-theme="dark"] 的 --paper 同一块墨，切换那一刻看不出接缝 */
+.theme-wipe{
+  position:fixed; inset:0; z-index:99998; pointer-events:none;
+  background:#1A1A17;
+  will-change:clip-path, opacity;
+  backface-visibility:hidden;
+}
+
 /* 无障碍：用户开了"减弱动态效果"→ 所有动画归零（参考库硬规矩） */
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important; transition:none !important; scroll-behavior:auto !important}
@@ -1472,6 +1497,138 @@ var BANK_SAFE = {
   }
 };
 
+var BANK_STAFF = {
+  id:'staff', name:'员工素养', lang:'zh', storeKey:'staff_2026',
+  kicker:'城轨运营刷题台 · 员工素养',
+  title:'员工素养 · 刷题台',
+  sub:'名词解释 · 单选 · 多选 · 填空 · 判断 · 共 <b id="totalA">61</b> 题<br>答题记录只存本机，换设备不同步',
+  foot:'题目与答案要点依据《员工素养题库（城市轨道交通方向）》整理，答题以本单位现行规定为准',
+  srcLabel:'题库依据',
+  typeNames:{choice:'选择题', judge:'判断题', blank:'填空题', essay:'名词解释'},
+  q:{
+  choice: [
+    {id:'st1', from:'员工素养 · 单选', stem:"下列属于职业“个人功能”的是( )。",
+     opts:["职业是社会存在的表现","职业是社会发展的动力","职业是社会控制的手段","职业是个人实现社会价值的途径"], a:3, tip:"A、B、C 三项都是从社会角度看的“社会功能”；个人功能包括维持生存的重要手段、个人发挥才能的舞台、实现社会价值的途径，故选 D。"},
+    {id:'st2', from:'员工素养 · 单选', stem:"职业化是一个( )过程。",
+     opts:["静态的","动态的","一次性完成的","与培训无关的"], a:1, tip:"职业化定义落脚在“动态过程”：要靠持续的培训和开发逐步具备专业标准要求的道德、知识、技能和文化素养，不是拿到证书就一劳永逸。"},
+    {id:'st3', from:'员工素养 · 单选', stem:"下列不属于职业化特征的是( )。",
+     opts:["长期性","知识性","广泛认可性","随意性"], a:3, tip:"职业化特征共五个：长期性、知识性、广泛认可性、自我约束性、文化性。职业化恰恰排斥“随意”，故 D 错。"},
+    {id:'st4', from:'员工素养 · 单选', stem:"下列不属于职业素养重要内容的是( )。",
+     opts:["职业道德","职业意识","职业心态","职业技能等级证书"], a:3, tip:"职业素养的重要内容是三项：职业道德、职业意识、职业心态。证书是外部评价结果，不是素养内容的构成。"},
+    {id:'st5', from:'员工素养 · 单选', stem:"职业素养的四个特征是整体性、稳定性、实践性和( )。",
+     opts:["情境性","随机性","临时性","单一性"], a:0, tip:"职业素养特征：整体性、稳定性、实践性、情境性，并附一句“显性特征是隐性特征的外在表现”。情境性指同一素养在不同场景有不同表现方式。"},
+    {id:'st6', from:'员工素养 · 单选', stem:"使从业者正确认识自己应负的道德责任和道德义务，体现的是职业道德的( )。",
+     opts:["认识功能","调节功能","教育功能","激励功能"], a:0, tip:"四个功能对号入座：认识（认清责任义务）、调节（理顺内部及与服务对象的关系）、教育（形成正确观念）、激励（提高全社会道德水平）。"},
+    {id:'st7', from:'员工素养 · 单选', stem:"客运服务工作必须贯彻的原则是( )。",
+     opts:["全面服务、重点照顾、主动热情、诚恳周到","安全第一、预防为主、综合治理","先通后复、先重后轻","以人为本、效益优先、按章收费"], a:0, tip:"这是客运服务工作的十六字原则，四句要背全。B 是安全生产方针，C 是故障处置原则，属于不同知识点，做题时看题干主体是不是“客运服务”。"},
+    {id:'st8', from:'员工素养 · 单选', stem:"下列不属于“三熟知”内容的是( )。",
+     opts:["熟知乘车注意事项","熟知岗位责任制和作业标准","熟知城市轨道交通沿线简况","熟知各线路票价折扣政策"], a:3, tip:"“三熟知”＝乘车注意事项、岗位责任制和作业标准、沿线简况。票价折扣不在其列，属于干扰项。"},
+    {id:'st9', from:'员工素养 · 单选', stem:"职业生涯规划的基本步骤中，被称为“核心”的是( )。",
+     opts:["确定志向","自我评估","确定目标","制定行动计划"], a:2, tip:"七步中三个带标注：确定志向是前提、确定目标是核心、制定行动计划是关键，其余为自我评估、生涯机会评估、执行、评估与回馈。"},
+    {id:'st10', from:'员工素养 · 单选', stem:"学习的三大内容中，被称为“学习的源泉”的是( )。",
+     opts:["注意力","记忆力","思维力","想象力"], a:0, tip:"对应关系固定：源泉—注意力，法宝—记忆力，关键—思维力。三者是“三大内容”，不是学习力三要素（动力、毅力、能力）。"},
+    {id:'st11', from:'员工素养 · 单选', stem:"PDCA 循环中“C”表示( )。",
+     opts:["计划","执行","检查","处理"], a:2, tip:"P—Plan 计划，D—Do 执行，C—Check 检查，A—Action 行动（或处理）。易错点是把 A 说成“检查”，A 是纠偏与标准化。"},
+    {id:'st12', from:'员工素养 · 单选', stem:"下列不属于七大黄金心态的是( )。",
+     opts:["空杯心态","感恩心态","竞争心态","主人翁心态"], a:2, tip:"七大黄金心态：积极、阳光、执着、共赢、空杯、主人翁、感恩。“竞争”属于职业意识里的竞争意识，被移到心态选项里就是干扰项。"},
+    {id:'st13', from:'员工素养 · 单选', stem:"职业生涯规划的基本步骤中，被称为“前提”的是( )。",
+     opts:["确定志向","自我评估","自我回馈","生涯机会评估"], a:0, tip:"七步中三处标注：确定志向是前提、确定目标是核心、制定行动计划是关键。原资料第18条。"},
+    {id:'st14', from:'员工素养 · 单选', stem:"下列不属于提高执行力方法的是( )。",
+     opts:["不拖延，马上行动","分清轻重缓急","善于授权，人人参与执行","事必躬亲"], a:3, tip:"原资料第28条列出六法：共赢法则、高效执行、不拖延马上行动、分清轻重缓急、善于授权人人参与执行、自动自发。“事必躬亲”与“善于授权”相反。"},
+    {id:'mt1', multi:true, from:'员工素养 · 多选', stem:"职业的社会功能包括( )。",
+     opts:["职业是社会存在的表现","职业是社会发展的动力","职业是社会控制的手段","职业是个人发挥才能的舞台"], as:[0,1,2], a:0, tip:"社会功能三项：社会存在的表现、社会发展的动力、社会控制的手段。D 属于个人功能（维持生存、发挥才能、实现社会价值）。"},
+    {id:'mt2', multi:true, from:'员工素养 · 多选', stem:"职业化的特征包括( )。",
+     opts:["长期性","知识性","广泛认可性","自我约束性","文化性"], as:[0,1,2,3,4], a:0, tip:"五项全对：长期性、知识性、广泛认可性、自我约束性、文化性。多选题见到“随意性”“临时性”一律排除。"},
+    {id:'mt3', multi:true, from:'员工素养 · 多选', stem:"职业道德的功能包括( )。",
+     opts:["认识功能","调节功能","教育功能","激励功能"], as:[0,1,2,3], a:0, tip:"四项齐全。调节功能的作用范围是“从业人员内部 + 从业人员与服务对象之间”，答选择题时注意题干描述落在哪一项。"},
+    {id:'mt4', multi:true, from:'员工素养 · 多选', stem:"城市轨道交通员工职业道德的基本行为规范包括( )。",
+     opts:["爱岗敬业","诚实守信","办事公道","服务群众","奉献社会","品牌维护"], as:[0,1,2,3,4,5], a:0, tip:"六项要背全，最后一项“品牌维护”是轨道交通企业特有的一条，容易被漏选。考试常给一个具体行为让你判断符合哪一条。"},
+    {id:'mt5', multi:true, from:'员工素养 · 多选', stem:"七大黄金心态包括( )。",
+     opts:["积极心态","阳光心态","执着心态","共赢心态","空杯心态","主人翁心态","感恩心态"], as:[0,1,2,3,4,5,6], a:0, tip:"七项全对：积极、阳光、执着、共赢、空杯、主人翁、感恩。空杯心态＝清空已有经验重新学习；主人翁心态＝把企业事当自己事。"},
+    {id:'mt6', multi:true, from:'员工素养 · 多选', stem:"时间的四项独特性包括( )。",
+     opts:["供给毫无弹性","无法蓄积","无法取代","无法失而复得"], as:[0,1,2,3], a:0, tip:"四项全对，这是时间管理的前提。常见干扰项“可以调节分配”“可以储存备用”均与“毫无弹性、无法蓄积”直接矛盾。"},
+    {id:'mt7', multi:true, from:'员工素养 · 多选', stem:"沟通的三大要素包括( )。",
+     opts:["一定要有一个明确的目标","达成共同的协议","沟通信息、思想和情感","单方面传达指令"], as:[0,1,2], a:0, tip:"三要素：明确目标、达成共同协议、传递信息思想情感。沟通是双向互动，D 的单向传达本身就是错误表述。"},
+    {id:'mt8', multi:true, from:'员工素养 · 多选', stem:"团队的类型包括( )。",
+     opts:["问题解决型团队","自我管理型团队","多功能型团队","行政指令型团队"], as:[0,1,2], a:0, tip:"三种类型：问题解决型、自我管理型、多功能型（跨部门）。没有“行政指令型”这一分类，属编造选项。"},
+    {id:'mt9', multi:true, from:'员工素养 · 多选', stem:"下列属于城市轨道交通企业员工应培育的职业意识的是( )。",
+     opts:["责任意识","安全意识","服务意识","细节意识","利润意识","加班意识"], as:[0,1,2,3], a:0, tip:"原资料第11条列12项职业意识，前四项均在其中；利润意识、加班意识原文未列。"},
+    {id:'mt10', multi:true, from:'员工素养 · 多选', stem:"提升职工思维力的方法包括( )。",
+     opts:["在企业内部大力倡导建立学习型组织","让企业的核心理念进一步深入人心","让员工学会正确处理时间、空间以及人与人之间的关系","进一步加强干部队伍思想作风建设","延长员工加班时间"], as:[0,1,2,3], a:0, tip:"原资料第26条四项方法，ABCD逐条对应；E不在原文。"},
+    {id:'mt11', multi:true, from:'员工素养 · 多选', stem:"鱼刺图的绘制方法包括( )。",
+     opts:["确定要分析的问题","确定造成质量问题的因素分类项目","将上述项目分别展开","将上述原因再展开，分别画小枝","注明鱼刺图的名称、绘制者、绘制时间、参加分析的人员等"], as:[0,1,2,3,4], a:0, tip:"原资料第38条五步，ABCDE逐条对应，顺序不可颠倒。"},
+  ],
+  judge: [
+    {id:'tf1', from:'员工素养 · 判断', stem:"工作、职业、事业是同一种东西。", a:false, tip:"三者递进不同：工作是具体岗位上的劳动；职业是长期从事的行业分工；事业是把职业当成终身追求并承担社会责任。讲义专门标注“不是同一种东西”。"},
+    {id:'tf2', from:'员工素养 · 判断', stem:"职业化是一个静态的、一次性完成的过程。", a:false, tip:"职业化定义明确为“动态过程”，需要持续培训和开发，随岗位、技术、标准变化不断提升。"},
+    {id:'tf3', from:'员工素养 · 判断', stem:"职业素养的显性特征是隐性特征的外在表现。", a:true, tip:"原句照搬：显性（言行表现）是隐性（修养根基）的外在表现。判断题为原句改写时通常判对。"},
+    {id:'tf4', from:'员工素养 · 判断', stem:"职业道德的激励功能有助于提高全社会的道德水平。", a:true, tip:"激励功能的表述就是“有助于提高全社会的道德水平”，这是它区别于教育功能（形成正确观念）的关键。"},
+    {id:'tf5', from:'员工素养 · 判断', stem:"职业生涯规划只需考虑个人发展，不必与组织发展相结合。", a:false, tip:"定义第一句就是“个人发展与组织发展相结合”。脱离组织需求规划，目标和路径都会落空，这是高频陷阱。"},
+    {id:'tf6', from:'员工素养 · 判断', stem:"时间的供给具有弹性，可以提前蓄积备用。", a:false, tip:"时间四项独特性首两项就是“供给毫无弹性”“无法蓄积”。每天24小时固定，不能存、不能借、不能买。"},
+    {id:'tf7', from:'员工素养 · 判断', stem:"沟通是单向传递信息的过程。", a:false, tip:"沟通一定是双向互动的过程（沟通的双向性），并且要以达成共同协议为结果。单向传达只是通知。"},
+    {id:'tf8', from:'员工素养 · 判断', stem:"执行力只是一种简单的战术。", a:false, tip:"定义明确指出“不是简单的战术”，而是一套提出问题、分析问题、采取行动的系统流程，并把战略、人员、流程三者结合。"},
+    {id:'tf9', from:'员工素养 · 判断', stem:"PDCA 循环的特点之一是大环套小环，小环保大环，推动大循环。", a:true, tip:"原句照搬。另两个特点是“不断前进，不断提高”和“阶梯式上升”（讲义写作“门路式上升”，规范表述为阶梯式上升）。"},
+    {id:'tf10', from:'员工素养 · 判断', stem:"团队仅由管理层组成。", a:false, tip:"团队定义是“由员工和管理层组成的一个共同体”，两个主体缺一不可。只有管理层那是领导班子，不是团队。"},
+  ],
+  blank: [
+    {id:'fb1', from:'员工素养 · 填空', stem:"职业是参与社会分工，利用专门的{{0}}和技能，为社会创造物质财富和精神财富，获得合理报酬，作为物质生活来源并满足精神需求的工作。",
+     blanks:[["知识"]], tip:"原定义是“利用专门的知识和技能”。只写“技能”不完整，填空按原文补“知识”。"},
+    {id:'fb2', from:'员工素养 · 填空', stem:"职业化是……并获得相应的社会专业地位的{{0}}过程。",
+     blanks:[["动态"]], tip:"落脚词是“动态过程”，强调持续培训开发、逐步达标，而不是一次性完成。"},
+    {id:'fb3', from:'员工素养 · 填空', stem:"职业素养是企业员工在从事职业时，不断形成的知识技能、个人素质、个人道德修养、行为规范等职业内在的{{0}}和要求。",
+     blanks:[["规范"]], tip:"原文为“职业内在的规范和要求”。这是与“职业能力”区分的分界句：素养是内在约束，能力是外显水平。"},
+    {id:'fb4', from:'员工素养 · 填空', stem:"职业素养的显性特征是{{0}}的外在表现。",
+     blanks:[["隐性特征"]], tip:"这句话解释了为什么素养“看得见表现、看不见根基”：外在言行（显性）是内在修养（隐性）的表现。"},
+    {id:'fb5', from:'员工素养 · 填空', stem:"“三熟知”即熟知乘车注意事项，熟知{{0}}和作业标准，熟知城市轨道交通沿线简况。",
+     blanks:[["岗位责任制"]], tip:"三句固定搭配：乘车注意事项、岗位责任制和作业标准、沿线简况。填空只填第二个核心词“岗位责任制”。"},
+    {id:'fb6', from:'员工素养 · 填空', stem:"职业生涯规划的要素是：知己 + 知彼 + {{0}}。",
+     blanks:[["抉择"]], tip:"三要素：知己（自我评估）、知彼（环境与机会评估）、抉择（定方向、定目标）。"},
+    {id:'fb7', from:'员工素养 · 填空', stem:"时间的四项独特性是：供给毫无弹性、无法蓄积、无法取代、{{0}}。",
+     blanks:[["无法失而复得"]], tip:"第四项是“无法失而复得”，强调时间不可逆，浪费即永久损失。"},
+    {id:'fb8', from:'员工素养 · 填空', stem:"学习力是把知识资源转化为{{0}}的能力。",
+     blanks:[["知识资本"]], tip:"一字之差：资源（存量知识）→资本（能产生价值的知识）。这是学习力本质的规范表述。"},
+    {id:'fb9', from:'员工素养 · 填空', stem:"沟通是为了一个设定的目标，把信息、思想和情感在个人或群体间传递并达成{{0}}的过程。",
+     blanks:[["共同协议"]], tip:"沟通的终点是“达成共同协议”。只传递不达成一致，只能叫通知或宣讲。"},
+    {id:'fb10', from:'员工素养 · 填空', stem:"精力产生的四个维度是：身体、情绪、心理、{{0}}。",
+     blanks:[["精神"]], tip:"四维度：身体、情绪、心理、精神。身体管体能，情绪管状态，心理管专注，精神管意义感。"},
+    {id:'fb11', from:'员工素养 · 填空', stem:"职业生涯规划的基本步骤中，“确定志向”是{{0}}，“制定行动计划”是{{1}}。",
+     blanks:[["前提"],["关键"]], tip:"原资料第18条红字标注：确定志向为“前提”，确定目标为“核心”，制定行动计划为“关键”。"},
+    {id:'fb12', from:'员工素养 · 填空', stem:"人际关系可分为组织内部的人际关系和{{0}}的人际关系。",
+     blanks:[["组织外部"]], tip:"原资料第21条：人际关系可分为组织内部的人际关系和组织外部的人际关系。"},
+    {id:'fb13', from:'员工素养 · 填空', stem:"学习力的三要素是动力、毅力、{{0}}。",
+     blanks:[["能力"]], tip:"原资料第23条：学习力的三要素是动力、毅力、能力，对应“学习的动力、毅力和能力的综合体现”。"},
+    {id:'fb14', from:'员工素养 · 填空', stem:"学习的三大内容中，学习的法宝是{{0}}，学习的关键是{{1}}。",
+     blanks:[["记忆力"],["思维力"]], tip:"原资料第24条：源泉—注意力、法宝—记忆力、关键—思维力。"},
+  ],
+  essay: [
+    {id:'tm1', from:'名词解释', stem:"请解释名词：职业。",
+     ans:"职业是参与社会分工，利用专门的知识和技能，为社会创造物质财富和精神财富，获得合理报酬，作为物质生活来源并满足精神需求的工作。", ansLabel:'参考答案', points:["<b>采分点：</b>抓四个关键词：社会分工、专门知识技能、创造财富并获得合理报酬、满足精神需求。缺“社会分工”或“报酬”即不完整，答题要写全这层意思。"]},
+    {id:'tm2', from:'名词解释', stem:"请解释名词：职业化。",
+     ans:"职业化是普通的非专业性的职业从业人员，通过培训和开发，具备符合专业标准的道德、知识、技能和文化等素养，并获得相应的社会专业地位的动态过程。", ansLabel:'参考答案', points:["<b>采分点：</b>注意三个采分点：对象是“普通非专业性从业人员”；手段是“培训和开发”；落脚点是“动态过程”，不是一次性完成的结果状态。"]},
+    {id:'tm3', from:'名词解释', stem:"请解释名词：职业素养。",
+     ans:"职业素养是企业员工在从事职业的时候，不断形成的知识技能、个人素质、个人道德修养、行为规范等职业内在的规范和要求。", ansLabel:'参考答案', points:["<b>采分点：</b>强调“内在的规范和要求”，包含知识技能、个人素质、道德修养、行为规范四块。与“职业能力”不同，它偏内在约束而非外显技能。"]},
+    {id:'tm4', from:'名词解释', stem:"请解释名词：职业礼仪。",
+     ans:"职业礼仪是职业活动中对人的仪容仪表和言谈举止的普遍要求；仪容仪表指个人的形象，言谈举止指一个人在职业活动中的职业表现。", ansLabel:'参考答案', points:["<b>采分点：</b>两部分必须都写：仪容仪表（形象）+ 言谈举止（职业表现）。只答“礼貌待人”属于口语化，不达采分点。"]},
+    {id:'tm5', from:'名词解释', stem:"请解释名词：职业生涯规划。",
+     ans:"职业生涯规划是指个人发展与组织发展相结合，通过对职业生涯的主客观因素分析、总结和测定，确定一个人的奋斗目标，并为实现这一目标而预先进行生涯系统安排的过程。", ansLabel:'参考答案', points:["<b>采分点：</b>采分点：个人发展与组织发展相结合（判断题常在此设陷阱）、主客观因素分析测定、确定目标、预先系统安排。"]},
+    {id:'tm6', from:'名词解释', stem:"请解释名词：人际关系。",
+     ans:"人际关系是在某个范围内人与人之间的关系，是指人们在人际交往过程中结成的心理关系、心理上的距离。", ansLabel:'参考答案', points:["<b>采分点：</b>核心是“心理关系、心理上的距离”，不是简单的“认识很多人”。按范围可分为组织内部和组织外部两类。"]},
+    {id:'tm7', from:'名词解释', stem:"请解释名词：学习力。",
+     ans:"学习力是指一个人或一个组织学习的动力、毅力和能力的综合体现；学习力是把知识资源转化为知识资本的能力。", ansLabel:'参考答案', points:["<b>采分点：</b>两句话都要答：三要素综合体现（动力、毅力、能力）+ 知识资源转化为知识资本。第二句是常考的“本质”表述。"]},
+    {id:'tm8', from:'名词解释', stem:"请解释名词：思维力。",
+     ans:"思维力是指思想的深度和力度，是通过不懈地学习、磨炼，打造出坚定的方向、高度的自觉意识和不断增强的主观能动性。", ansLabel:'参考答案', points:["<b>采分点：</b>关键词“深度和力度”，落点在坚定方向、自觉意识、主观能动性。它属于学习三大内容中的“关键”，与注意力、记忆力并列。"]},
+    {id:'tm9', from:'名词解释', stem:"请解释名词：执行力。",
+     ans:"执行力是完成执行的能力和手段，是贯彻战略意图、完成预定目标的操作能力；它不是简单的战术，而是一套通过提出问题、分析问题、采取行动的方式来实现目标的系统流程，是一门将战略、人员、运作流程相结合以实现预定目标的学问。", ansLabel:'参考答案', points:["<b>采分点：</b>答题要点：能力手段、贯彻战略意图、系统流程（提问—分析—行动）、战略+人员+流程三者结合。判断题常考“执行力就是简单战术”为错。"]},
+    {id:'tm10', from:'名词解释', stem:"请解释名词：沟通。",
+     ans:"沟通是为了一个设定的目标，把信息、思想和情感在个人或群体间传递并达成共同协议的过程。", ansLabel:'参考答案', points:["<b>采分点：</b>四要素齐全：设定的目标、传递内容（信息/思想/情感）、个人或群体、达成共同协议。缺“达成共同协议”只算传递，不算沟通。"]},
+    {id:'tm11', from:'名词解释', stem:"请解释名词：团队。",
+     ans:"团队是由员工和管理层组成的一个共同体。", ansLabel:'参考答案', points:["<b>采分点：</b>一句话定义，两个主体缺一不可：员工 + 管理层。判断题若说“团队仅由管理层组成”即为错。"]},
+    {id:'tm12', from:'名词解释', stem:"请解释名词：鱼刺图。",
+     ans:"鱼刺图是一种寻找产品质量问题产生的原因，即分析原因与结果之间关系的图解。", ansLabel:'参考答案', points:["<b>采分点：</b>也叫因果图、石川图。它只解决“找原因、理关系”，不直接给出对策；绘制时按“确定问题—分类因素—展开大枝—展开小枝—注明名称与人员”五步。"]},
+  ]
+  }
+};
+
 var TYPES = [
   {k:'choice', name:'选择题'},
   {k:'judge',  name:'判断题'},
@@ -1491,8 +1648,8 @@ function typeName(k){
 ['choice', 'judge', 'blank', 'essay'].forEach(function(k){
   BANK_YINGJI.q[k] = BANK_YINGJI.q[k].concat(BANK_SAFE.q[k] || []);
 });
-var BANKS = { yingji: BANK_YINGJI, english: BANK_ENGLISH };
-var BANK_ORDER = ['yingji', 'english'];
+var BANKS = { yingji: BANK_YINGJI, english: BANK_ENGLISH, staff: BANK_STAFF };
+var BANK_ORDER = ['yingji', 'english', 'staff'];
 var CUSTOM_KEY = 'yjcz_banks_v1';       /* 自建题库整库存这里 */
 
 /* ---------- 自建题库：读本机存档 ---------- */
@@ -1891,20 +2048,27 @@ function htmlEssay(q, idx){
     ? '<div class="ans-tr' + (q.ansPlain ? ' plain' : '') + '"><span class="ans-tr-k">' + ansLabel
       + '</span><p class="ans-tr-v">' + zhPhrase(q.ans) + '</p></div>'
     : '';
+  var isTerm = !!q.ans && !isTr && /名词|术语|概念/.test(typeName('essay'));
   var ph = isTr
     ? '先写下你的译文，再展开参考译文对照（内容只存在本机）'
-    : '先在这里写下你的答案要点，再展开参考答案对照（内容只存在本机）';
+    : (isTerm
+      ? '先写下你对这个名词的解释，再展开参考答案对照（内容只存在本机）'
+      : '先在这里写下你的答案要点，再展开参考答案对照（内容只存在本机）');
   var hint = isTr
     ? '提示：先自己译一遍，不查词；展开后对照参考译文，重点看动词搭配和介词。'
-    : '提示：先列关键词（原则 / 顺序 / 联动岗位），再展开参考答案逐条对照，缺哪条补哪条。';
+    : (isTerm
+      ? '提示：按采分点写全定义的关键要素，再展开参考答案逐条对照，缺哪条补哪条。'
+      : '提示：先列关键词（原则 / 顺序 / 联动岗位），再展开参考答案逐条对照，缺哪条补哪条。');
+  /* 卡片标签优先用题库自定义题型名（员工素养=名词解释、英语=翻译练习、应急=应用题），没有再回退 */
+  var essayTag = typeName('essay') || (q.ans ? (isTr ? '翻译' : '简答') : '应用');
   return '<article class="q" id="q-' + q.id + '">'
-    + '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">' + (q.ans ? (isTr ? '翻译' : '简答') : '应用') + '</span>'
+    + '<div class="q-hd"><span class="q-idx">' + pad(idx) + '</span><span class="q-tag">' + essayTag + '</span>'
     + '<span class="q-state" id="st-' + q.id + '">未掌握</span></div>'
     + '<p class="stem">' + zhPhrase(q.stem) + '</p>'
     + (ask ? '<div class="ask">' + ask + '</div>' : '')
     + '<textarea class="ta" data-act="ta" data-q="' + q.id + '" rows="4" placeholder="' + ph + '"></textarea>'
     + '<p class="ta-hint">' + hint + '</p>'
-    + '<details class="ans"><summary>' + ICON.book + (isTr ? '展开参考译文与关键表达' : (q.ans ? '展开参考答案与解析' : '展开参考答案与采分点')) + ICON.chev + '</summary>'
+    + '<details class="ans"><summary>' + ICON.book + (isTr ? '展开参考译文与关键表达' : (isTerm ? '展开参考答案与采分点' : (q.ans ? '展开参考答案与解析' : '展开参考答案与采分点'))) + ICON.chev + '</summary>'
     + '<div class="ans-body">' + ansBlock + (pts ? '<ul class="pts">' + pts + '</ul>' : '')
     + '<p class="src">' + srcLabel() + ' · ' + esc(q.from) + '</p></div></details>'
     + '<div class="blank-act"><button type="button" class="mini" data-act="master" data-q="' + q.id + '">标记已掌握</button></div>'
@@ -2691,7 +2855,7 @@ document.addEventListener('click', function(e){
   if(act === 'qeDelOpt'){ qeDelOpt(t); return; }
   if(act === 'restoreBank'){ arm(t, '再点一次', restoreBank); return; }
   if(act === 'impAns'){ return; }
-  if(act === 'theme'){ applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true); return; }
+  if(act === 'theme'){ switchTheme(e); return; }
   if(act === 'bank'){ switchBank(t.dataset.b); return; }
   if(act === 'tab'){ setTab(t.dataset.k, true); return; }
   if(act === 'pick'){ pick(qid, Number(t.dataset.i)); return; }
@@ -2840,6 +3004,119 @@ function applyTheme(t, persist){
   }
   var m = document.querySelector('meta[name="theme-color"]');
   if(m) m.setAttribute('content', dark ? '#1A1A17' : '#F1EEE5');
+}
+
+/* ---------- 切换主题：850ms 圆形扩散 / 收缩 ---------- */
+var THEME_MS = 850;
+var THEME_EASE = 'cubic-bezier(.45,.05,.55,.95)';
+var themeVT = null;     /* View Transition 句柄：连点时要能收掉上一段 */
+var themeWipe = null;   /* 降级墨层 */
+
+/* 关掉「减弱动态效果」就老实瞬切，别拿动画折腾人 */
+function themeMotion(){
+  return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+/* 圆心：点哪儿就从哪儿长；键盘触发没有坐标，退回按钮中心 */
+function themePoint(ev){
+  var btn = document.getElementById('themeToggle');
+  var r = btn ? btn.getBoundingClientRect() : null;
+  var x = (ev && ev.clientX) ? ev.clientX : (r ? r.left + r.width / 2 : window.innerWidth - 34);
+  var y = (ev && ev.clientY) ? ev.clientY : (r ? r.top + r.height / 2 : 52);
+  /* 半径取到最远那个角，保证圆铺满整屏 */
+  var rad = Math.sqrt(Math.pow(Math.max(x, window.innerWidth - x), 2)
+                    + Math.pow(Math.max(y, window.innerHeight - y), 2));
+  return { x: Math.round(x), y: Math.round(y), r: Math.ceil(rad) };
+}
+function circleAt(p, n){
+  return 'circle(' + n + 'px at ' + p.x + 'px ' + p.y + 'px)';
+}
+function dropThemeFx(){
+  if(themeVT){ try{ themeVT.skipTransition(); }catch(e){} themeVT = null; }
+  if(themeWipe){ themeWipe.remove(); themeWipe = null; }
+  document.documentElement.classList.remove('vt-back');
+}
+
+function switchTheme(ev){
+  var to = currentTheme() === 'dark' ? 'light' : 'dark';
+  if(!themeMotion()){ dropThemeFx(); applyTheme(to, true); return; }
+  var p = themePoint(ev);
+  var dark = to === 'dark';
+  dropThemeFx();                                  /* 连点：先把上一段抹掉，不叠影 */
+  if(typeof document.startViewTransition === 'function'){ themeBySnapshot(to, dark, p); return; }
+  themeByWipe(to, dark, p);
+}
+
+/* 主路径：整页快照 + 圆形裁切。圆里是真实的暗色/浅色页面，边缘干净 */
+function themeBySnapshot(to, dark, p){
+  var root = document.documentElement;
+  var vt;
+  try{
+    vt = document.startViewTransition(function(){
+      root.classList.toggle('vt-back', !dark);
+      applyTheme(to, true);
+    });
+  }catch(e){ themeByWipe(to, dark, p); return; }
+  themeVT = vt;
+  vt.ready.then(function(){
+    root.animate(
+      { clipPath: [circleAt(p, dark ? 0 : p.r), circleAt(p, dark ? p.r : 0)] },
+      { duration: THEME_MS, easing: THEME_EASE, fill: 'both',
+        pseudoElement: dark ? '::view-transition-new(root)' : '::view-transition-old(root)' }
+    );
+  }).catch(function(){});
+  vt.finished.catch(function(){}).then(function(){
+    root.classList.remove('vt-back');
+    if(themeVT === vt) themeVT = null;
+  });
+}
+
+/* 降级路径：一层夜墨，用 clip-path 圆把它摊开 / 收拢 */
+function themeByWipe(to, dark, p){
+  var w = document.createElement('div');
+  w.className = 'theme-wipe';
+  var fired = false;
+
+  if(dark){
+    /* 暗：页面先停着，墨圆从按钮点长到满屏，铺满后才换主题 —— 换的那一下被墨挡着，看不见 */
+    w.style.clipPath = circleAt(p, 0);
+    document.body.appendChild(w);
+    themeWipe = w;
+    void w.offsetWidth;                              /* 逼一次样式计算，0→满 才会真的过渡 */
+    w.style.transition = 'clip-path ' + THEME_MS + 'ms ' + THEME_EASE;
+    w.style.clipPath = circleAt(p, p.r);
+    var done = function(){
+      if(fired || themeWipe !== w) return;
+      fired = true;
+      applyTheme(to, true);
+      /* 墨已铺满，这一步看不见；再来 120ms 淡出，让内容从墨里浮出来而不是硬切 */
+      w.style.transition = 'opacity 120ms linear';
+      w.style.opacity = '0';
+      setTimeout(function(){ if(themeWipe === w){ w.remove(); themeWipe = null; } }, 150);
+    };
+    w.addEventListener('transitionend', function(e){
+      if(e.propertyName === 'clip-path') done();
+    });
+    setTimeout(done, THEME_MS + 80);
+  } else {
+    /* 浅：先换成本子，同一帧压一层满屏墨（只绘一帧，闪不出来），
+       墨再往按钮点收，白从四周一圈圈露出来 */
+    applyTheme(to, true);
+    w.style.clipPath = circleAt(p, p.r);
+    document.body.appendChild(w);
+    themeWipe = w;
+    void w.offsetWidth;
+    w.style.transition = 'clip-path ' + THEME_MS + 'ms ' + THEME_EASE;
+    w.style.clipPath = circleAt(p, 0);
+    var done2 = function(){
+      if(fired || themeWipe !== w) return;
+      fired = true;
+      w.remove(); themeWipe = null;
+    };
+    w.addEventListener('transitionend', function(e){
+      if(e.propertyName === 'clip-path') done2();
+    });
+    setTimeout(done2, THEME_MS + 100);
+  }
 }
 
 /* ============================================================
